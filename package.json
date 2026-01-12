@@ -1,0 +1,20 @@
+{
+  "name": "cineconnect",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:front": "pnpm --filter frontend dev",
+    "dev:back": "pnpm --filter backend dev",
+    "dev": "pnpm run dev:front & pnpm run dev:back",
+    "build:front": "pnpm --filter frontend build",
+    "build:back": "pnpm --filter backend build",
+    "test:front": "pnpm --filter frontend test",
+    "test:back": "pnpm --filter backend test",
+    "db:generate": "pnpm --filter backend drizzle-kit generate",
+    "db:migrate": "pnpm --filter backend drizzle-kit migrate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0"
+}
