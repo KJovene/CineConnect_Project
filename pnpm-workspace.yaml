@@ -1,4 +1,9 @@
 packages:
-  - "backend"
-  - "frontend"
-  - "shared"
+  - backend
+  - frontend
+  - shared
+
+onlyBuiltDependencies:
+  - '@scarf/scarf'
+  - bcrypt
+  - esbuild
