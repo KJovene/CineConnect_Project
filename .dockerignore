@@ -1,0 +1,67 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production builds
+**/dist
+**/build
+
+# Local env files
+.env
+.env.local
+.env.production.local
+.env.test.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Temporary folders
+tmp/
+temp/
+
+# Cache
+.cache
+.parcel-cache
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Stores
+.pnpm-store
+
+# Database
+*.sqlite
+*.db
+
+# Test files
+**/test
+**/*.test.*
+**/*.spec.*
