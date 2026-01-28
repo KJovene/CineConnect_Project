@@ -4,19 +4,12 @@ import * as dotenv from 'dotenv';
 // Charger les variables d'environnement depuis .env 
 dotenv.config();
 
-// Utiliser les variables
+// Configuration Drizzle pour PostgreSQL
 export default {
   schema: './src/db/schema.ts',
   out: './drizzle/migrations',
-  dialect: 'mysql',
+  dialect: 'postgresql',
   dbCredentials: {
-    host: process.env.DB_HOST!,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER!,
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME!,
+    url: process.env.DATABASE_URL!,
   },
 } satisfies Config;
-
-
-//...(process.env.DB_PASSWORD && { password: process.env.DB_PASSWORD }),
