@@ -23,9 +23,12 @@ import {
   ReviewCard,
   MobileMenuToggle,
 } from "@/components/Home/";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthButton } from "@/components/Auth/AuthButton";
 
 const Home: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, isLoading, handleLogout } = useAuth();
 
   // Sidebar menu configuration
   const sidebarMenuSections: SidebarMenuSection[] = [
@@ -132,9 +135,11 @@ const Home: React.FC = () => {
 
             <div className="h-6 w-px bg-white/10 mx-1"></div>
 
-            <button className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
-              Connexion
-            </button>
+            <AuthButton
+              isAuthenticated={isAuthenticated}
+              isLoading={isLoading}
+              onLogout={handleLogout}
+            />
           </div>
         </header>
 

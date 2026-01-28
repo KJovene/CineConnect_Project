@@ -18,4 +18,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: "0.0.0.0", // Permet les connexions externes pour Docker
+    port: 5173,
+    watch: {
+      usePolling: true, // Nécessaire pour le hot reload dans Docker
+    },
+  },
 });
