@@ -1,68 +1,68 @@
-import { mysqlTable, varchar, int, text, timestamp, primaryKey } from 'drizzle-orm/mysql-core';
+import { pgTable, serial, varchar, integer, text, timestamp, primaryKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Table users
-export const users = mysqlTable('users', {
-  user_id: int('user_id').autoincrement().primaryKey(),
+export const users = pgTable('users', {
+  user_id: serial('user_id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(),
   display_name: varchar('display_name', { length: 100 }),
   created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().onUpdateNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdateFn(() => new Date()),
 });
 
 // Table films
-export const films = mysqlTable('films', {
-  film_id: int('film_id').autoincrement().primaryKey(),
+export const films = pgTable('films', {
+  film_id: serial('film_id').primaryKey(),
   omdb_id: varchar('omdb_id', { length: 50 }),
   title: varchar('title', { length: 255 }).notNull(),
-  year: int('year'),
+  year: integer('year'),
   director: varchar('director', { length: 255 }),
   poster_url: text('poster_url'),
   created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().onUpdateNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdateFn(() => new Date()),
 });
 
 // Table categories
-export const categories = mysqlTable('categories', {
-  category_id: int('category_id').autoincrement().primaryKey(),
+export const categories = pgTable('categories', {
+  category_id: serial('category_id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
 });
 
 // Table de liaison films_categories
-export const filmsCategories = mysqlTable('films_categories', {
-  film_id: int('film_id').notNull().references(() => films.film_id, { onDelete: 'cascade' }),
-  category_id: int('category_id').notNull().references(() => categories.category_id, { onDelete: 'cascade' }),
+export const filmsCategories = pgTable('films_categories', {
+  film_id: integer('film_id').notNull().references(() => films.film_id, { onDelete: 'cascade' }),
+  category_id: integer('category_id').notNull().references(() => categories.category_id, { onDelete: 'cascade' }),
 }, (table) => [
   primaryKey({ columns: [table.film_id, table.category_id] }),
 ]);
 
 // Table reviews
-export const reviews = mysqlTable('reviews', {
-  review_id: int('review_id').autoincrement().primaryKey(),
-  user_id: int('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
-  film_id: int('film_id').notNull().references(() => films.film_id, { onDelete: 'cascade' }),
-  rating: int('rating').notNull(),
+export const reviews = pgTable('reviews', {
+  review_id: serial('review_id').primaryKey(),
+  user_id: integer('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+  film_id: integer('film_id').notNull().references(() => films.film_id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull(),
   comment: text('comment'),
   created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().onUpdateNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdateFn(() => new Date()),
 });
 
 // Table friends
-export const friends = mysqlTable('friends', {
-  friend_id: int('friend_id').autoincrement().primaryKey(),
-  user_id: int('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
-  friend_user_id: int('friend_user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+export const friends = pgTable('friends', {
+  friend_id: serial('friend_id').primaryKey(),
+  user_id: integer('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+  friend_user_id: integer('friend_user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
   status: varchar('status', { length: 20 }).default('pending'),
   created_at: timestamp('created_at').defaultNow(),
 });
 
 // Table messages
-export const messages = mysqlTable('messages', {
-  message_id: int('message_id').autoincrement().primaryKey(),
-  sender_id: int('sender_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
-  receiver_id: int('receiver_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+export const messages = pgTable('messages', {
+  message_id: serial('message_id').primaryKey(),
+  sender_id: integer('sender_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+  receiver_id: integer('receiver_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
   content: text('content').notNull(),
   sent_at: timestamp('sent_at').defaultNow(),
 });
