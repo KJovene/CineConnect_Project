@@ -1,15 +1,8 @@
 import { useSignup } from "@/hooks/useSignup";
-import {
-  AuthLayout,
-  AuthFormField,
-  AuthErrorAlert,
-  AuthSubmitButton,
-  AuthFooter,
-} from "@/components/Auth";
+import { AuthPageLayout } from "@/components/templates";
+import { FormField, AuthNavLink } from "@/components/molecules";
+import { ErrorAlert, Button } from "@/components/atoms";
 
-/**
- * Page Inscription. Conteneur : logique via useSignup, UI via composants Auth.
- */
 export default function SignupPage() {
   const {
     name,
@@ -24,10 +17,10 @@ export default function SignupPage() {
   } = useSignup();
 
   return (
-    <AuthLayout
+    <AuthPageLayout
       title="Inscription"
       footer={
-        <AuthFooter
+        <AuthNavLink
           prompt="Déjà un compte ?"
           to="/login"
           label="Se connecter"
@@ -35,8 +28,8 @@ export default function SignupPage() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <AuthErrorAlert message={error} />}
-        <AuthFormField
+        {error && <ErrorAlert message={error} />}
+        <FormField
           id="name"
           label="Nom d'affichage"
           type="text"
@@ -45,7 +38,7 @@ export default function SignupPage() {
           placeholder="Alexandre D."
           autoComplete="name"
         />
-        <AuthFormField
+        <FormField
           id="email"
           label="Email"
           type="email"
@@ -55,7 +48,7 @@ export default function SignupPage() {
           placeholder="vous@exemple.com"
           autoComplete="email"
         />
-        <AuthFormField
+        <FormField
           id="password"
           label="Mot de passe"
           type="password"
@@ -66,8 +59,10 @@ export default function SignupPage() {
           placeholder="•••••••• (min. 8 caractères)"
           autoComplete="new-password"
         />
-        <AuthSubmitButton loading={loading}>S'inscrire</AuthSubmitButton>
+        <Button type="submit" loading={loading} fullWidth>
+          S'inscrire
+        </Button>
       </form>
-    </AuthLayout>
+    </AuthPageLayout>
   );
 }

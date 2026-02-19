@@ -1,0 +1,2 @@
+-- Initialisation de la base de données CineConnect
+-- Les migrations Drizzle créent les tables, ce fichier est requis par Docker

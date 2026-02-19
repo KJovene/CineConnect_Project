@@ -1,15 +1,8 @@
 import { useLogin } from "@/hooks/useLogin";
-import {
-  AuthLayout,
-  AuthFormField,
-  AuthErrorAlert,
-  AuthSubmitButton,
-  AuthFooter,
-} from "@/components/Auth";
+import { AuthPageLayout } from "@/components/templates";
+import { FormField, AuthNavLink } from "@/components/molecules";
+import { ErrorAlert, Button } from "@/components/atoms";
 
-/**
- * Page Connexion. Conteneur : logique via useLogin, UI via composants Auth.
- */
 export default function LoginPage() {
   const {
     email,
@@ -22,10 +15,10 @@ export default function LoginPage() {
   } = useLogin();
 
   return (
-    <AuthLayout
+    <AuthPageLayout
       title="Connexion"
       footer={
-        <AuthFooter
+        <AuthNavLink
           prompt="Pas encore de compte ?"
           to="/signup"
           label="S'inscrire"
@@ -33,8 +26,8 @@ export default function LoginPage() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <AuthErrorAlert message={error} />}
-        <AuthFormField
+        {error && <ErrorAlert message={error} />}
+        <FormField
           id="email"
           label="Email"
           type="email"
@@ -44,7 +37,7 @@ export default function LoginPage() {
           placeholder="vous@exemple.com"
           autoComplete="email"
         />
-        <AuthFormField
+        <FormField
           id="password"
           label="Mot de passe"
           type="password"
@@ -54,8 +47,10 @@ export default function LoginPage() {
           placeholder="••••••••"
           autoComplete="current-password"
         />
-        <AuthSubmitButton loading={loading}>Se connecter</AuthSubmitButton>
+        <Button type="submit" loading={loading} fullWidth>
+          Se connecter
+        </Button>
       </form>
-    </AuthLayout>
+    </AuthPageLayout>
   );
 }
