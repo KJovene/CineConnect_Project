@@ -7,3 +7,5 @@ export * from "./SidebarBrand";
 export * from "./UserCard";
 export * from "./MobileMenuToggle";
 export * from "./SearchBar";
+export * from "./SearchUserRow";
+export * from "./ConversationList";

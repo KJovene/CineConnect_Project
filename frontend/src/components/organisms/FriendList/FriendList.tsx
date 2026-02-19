@@ -1,0 +1,131 @@
+import { HiUserPlus, HiCheck, HiXMark, HiChatBubbleLeftRight, HiUserMinus } from 'react-icons/hi2';
+import { Avatar } from '@/components/atoms';
+import type { FriendRelation, PendingRequest, FriendUser } from '@/features/friends/hooks';
+
+export interface FriendListProps {
+  friends: FriendRelation[];
+  pendingRequests: PendingRequest[];
+  isLoading?: boolean;
+  onAccept: (userId: number) => void;
+  onReject: (userId: number) => void;
+  onRemove: (userId: number) => void;
+  onMessage?: (friend: FriendUser) => void;
+}
+
+export function FriendList({
+  friends,
+  pendingRequests,
+  isLoading,
+  onAccept,
+  onReject,
+  onRemove,
+  onMessage,
+}: FriendListProps) {
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-16 rounded-xl bg-white/5 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Demandes en attente */}
+      {pendingRequests.length > 0 && (
+        <section>
+          <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">
+            Demandes reçues ({pendingRequests.length})
+          </h3>
+          <div className="space-y-2">
+            {pendingRequests.map((req) => (
+              <div
+                key={req.friend_id}
+                className="flex items-center justify-between bg-[#0A0A0A] border border-white/5 rounded-xl p-3"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar image={req.requester?.image ?? null} name={req.requester?.name ?? null} />
+                  <div>
+                    <div className="text-sm font-medium text-white">
+                      {req.requester?.name ?? 'Utilisateur inconnu'}
+                    </div>
+                    <div className="text-[11px] text-neutral-500">{req.requester?.email}</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onAccept(req.user_id)}
+                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
+                    title="Accepter"
+                  >
+                    <HiCheck size={16} />
+                  </button>
+                  <button
+                    onClick={() => onReject(req.user_id)}
+                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                    title="Refuser"
+                  >
+                    <HiXMark size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Amis acceptés */}
+      <section>
+        <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">
+          Amis ({friends.length})
+        </h3>
+
+        {friends.length === 0 ? (
+          <div className="text-center py-10 text-neutral-600">
+            <HiUserPlus size={32} className="mx-auto mb-2 opacity-40" />
+            <p className="text-sm">Aucun ami pour l'instant</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {friends.map((rel) => (
+              <div
+                key={rel.friend_id}
+                className="flex items-center justify-between bg-[#0A0A0A] border border-white/5 rounded-xl p-3 hover:border-white/10 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar image={rel.friend?.image ?? null} name={rel.friend?.name ?? null} />
+                  <div>
+                    <div className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors">
+                      {rel.friend?.name ?? 'Utilisateur'}
+                    </div>
+                    <div className="text-[11px] text-neutral-500">{rel.friend?.email}</div>
+                  </div>
+                </div>
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {onMessage && rel.friend && (
+                    <button
+                      onClick={() => onMessage(rel.friend!)}
+                      className="p-2 rounded-lg hover:bg-indigo-500/10 text-neutral-400 hover:text-indigo-400 transition-colors"
+                      title="Envoyer un message"
+                    >
+                      <HiChatBubbleLeftRight size={16} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onRemove(rel.friend?.id ?? 0)}
+                    className="p-2 rounded-lg hover:bg-rose-500/10 text-neutral-500 hover:text-rose-400 transition-colors"
+                    title="Retirer de mes amis"
+                  >
+                    <HiUserMinus size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
