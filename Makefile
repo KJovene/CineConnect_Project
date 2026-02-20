@@ -163,6 +163,14 @@ db-reset: ## Réinitialiser la base de données (ATTENTION: perte de données!)
 	@$(MAKE) db-migrate
 	@echo "$(GREEN)✓ Base de données réinitialisée$(NC)"
 
+db-seed: ## Injecter les fixtures (utilisateurs de test) dans la base de données
+	@echo "$(GREEN)🌱 Injection des fixtures...$(NC)"
+	@$(DOCKER_COMPOSE) exec backend pnpm db:seed
+	@echo "$(GREEN)✓ Fixtures injectées$(NC)"
+
+db-fresh: db-reset db-seed ## Réinitialiser la base de données ET injecter les fixtures
+	@echo "$(GREEN)✓ Base de données fraîche avec fixtures$(NC)"
+
 db-backup: ## Créer une sauvegarde de la base de données
 	@echo "$(GREEN)Sauvegarde de la base de données...$(NC)"
 	@mkdir -p backups
