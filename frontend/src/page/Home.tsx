@@ -1,65 +1,5 @@
 import React from "react";
-import {
-  HiOutlineFilm,
-  HiOutlinePlayCircle,
-  HiOutlineUsers,
-  HiOutlineChatBubbleLeftRight,
-} from "react-icons/hi2";
-import { AppLayout } from "@/components/templates";
 import { HeroSection, MediaGrid, ReviewList } from "@/components/organisms";
-import type { SidebarNavSection } from "@/components/organisms";
-import { useAuth } from "@/hooks/useAuth";
-
-const SIDEBAR_SECTIONS: SidebarNavSection[] = [
-  {
-    title: "Exploration",
-    items: [
-      {
-        id: "discover",
-        icon: <HiOutlineFilm size={20} />,
-        label: "Découvrir",
-        href: "/",
-        isActive: true,
-      },
-      {
-        id: "films",
-        icon: <HiOutlineFilm size={20} />,
-        label: "Films",
-        href: "/films",
-      },
-      {
-        id: "series",
-        icon: <HiOutlinePlayCircle size={20} />,
-        label: "Séries",
-        href: "/series",
-      },
-      {
-        id: "notes",
-        icon: <HiOutlinePlayCircle size={20} />,
-        label: "Mes Notes",
-        href: "/mes-notes",
-      },
-    ],
-  },
-  {
-    title: "Social",
-    items: [
-      {
-        id: "community",
-        icon: <HiOutlineUsers size={20} />,
-        label: "Profil",
-        href: "/profil",
-        showNotification: true,
-      },
-      {
-        id: "discussions",
-        icon: <HiOutlineChatBubbleLeftRight size={20} />,
-        label: "Discussions",
-        href: "/discussion",
-      },
-    ],
-  },
-];
 
 const TRENDING_MOVIES = [
   {
@@ -124,20 +64,8 @@ const RECENT_REVIEWS = [
 ];
 
 const Home: React.FC = () => {
-  const { isAuthenticated, isLoading, handleLogout } = useAuth();
-
   return (
-    <AppLayout
-      sidebarSections={SIDEBAR_SECTIONS}
-      user={{
-        name: "Alexandre D.",
-        badge: "Membre Fondateur",
-        avatar: "https://i.pravatar.cc/150?img=33",
-      }}
-      isAuthenticated={isAuthenticated}
-      isLoading={isLoading}
-      onLogout={handleLogout}
-    >
+    <>
       <HeroSection />
 
       <div className="px-8 py-8">
@@ -153,7 +81,7 @@ const Home: React.FC = () => {
           onWriteReview={() => {}}
         />
       </div>
-    </AppLayout>
+    </>
   );
 };
 
