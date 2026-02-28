@@ -5,15 +5,19 @@ export interface SearchBarProps {
   placeholder?: string;
   value?: string;
   onChange?: (value: string) => void;
+  fullWidth?: boolean;
 }
 
 export function SearchBar({
   placeholder = "Rechercher un film, une série, un membre...",
   value,
   onChange,
+  fullWidth = false,
 }: SearchBarProps) {
   return (
-    <div className="relative w-full max-w-md hidden md:block group">
+    <div className={`relative w-full group ${
+      fullWidth ? "max-w-full" : "max-w-md hidden md:block"
+    }`}>
       <HiMagnifyingGlass
         className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 group-hover:text-neutral-400 transition-colors"
         size={18}

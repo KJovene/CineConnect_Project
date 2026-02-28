@@ -1,5 +1,7 @@
-import { HiBell } from "react-icons/hi2";
-import { SearchBar, MobileMenuToggle, AuthNavButton } from "@/components/molecules";
+import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
+import { MobileMenuToggle, AuthNavButton, CategoryDropdown } from "@/components/molecules";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 export interface AppHeaderProps {
   onMobileMenuToggle: () => void;
@@ -14,6 +16,8 @@ export function AppHeader({
   isLoading,
   onLogout,
 }: AppHeaderProps) {
+  const [selectedCategory, setSelectedCategory] = useState("Catégories");
+
   return (
     <header
       className="absolute top-0 left-0 right-0 z-20 h-20 flex items-center justify-between px-8"
@@ -24,7 +28,18 @@ export function AppHeader({
         border: "1px solid rgba(255, 255, 255, 0.08)",
       }}
     >
-      <SearchBar />
+      <div className="flex items-center gap-3">
+        <CategoryDropdown
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+        />
+        <Link
+          to="/search"
+          className="p-2.5 rounded-lg bg-white/5 border border-white/10 text-neutral-400 hover:text-white hover:border-indigo-500/50 transition-all"
+        >
+          <HiMagnifyingGlass size={20} />
+        </Link>
+      </div>
 
       <div className="flex items-center gap-5 ml-auto">
         <MobileMenuToggle onClick={onMobileMenuToggle} />
