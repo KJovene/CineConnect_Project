@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedFilmIdRouteImport } from './routes/_authenticated/film$id'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
@@ -32,6 +33,12 @@ const LoginRoute = LoginRouteImport.update({
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+
+const AuthenticatedFilmIdRoute = AuthenticatedFilmIdRouteImport.update({
+  id: '/film/$id',
+  path: '/film/$id',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiscussionRouteImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/film/$id': {
+      id: '/_authenticated/film/$id'
+      path: '/film/$id'
+      fullPath: '/film/$id'
+      preLoaderRoute: typeof AuthenticatedFilmIdRouteImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/profil': {
       id: '/_authenticated/profil'
       path: '/profil'
@@ -114,6 +128,7 @@ declare module '@tanstack/react-router' {
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren({
   AuthenticatedDiscussionRoute,
+  AuthenticatedFilmIdRoute,
   AuthenticatedProfilRoute,
   AuthenticatedSearchRoute,
   AuthenticatedIndexRoute,
@@ -124,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film/$id': typeof AuthenticatedFilmIdRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
 }
@@ -133,6 +149,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film/$id': typeof AuthenticatedFilmIdRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
 }
@@ -143,6 +160,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/discussion': typeof AuthenticatedDiscussionRoute
+  '/_authenticated/film/$id': typeof AuthenticatedFilmIdRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -150,15 +168,16 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/discussion' | '/profil' | '/search'
+  fullPaths: '/' | '/login' | '/signup' | '/discussion' | '/film/$id' | '/profil' | '/search'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/discussion' | '/profil' | '/search'
+  to: '/' | '/login' | '/signup' | '/discussion' | '/film/$id' | '/profil' | '/search'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/signup'
     | '/_authenticated/discussion'
+    | '/_authenticated/film/$id'
     | '/_authenticated/profil'
     | '/_authenticated/search'
     | '/_authenticated/'
