@@ -7,3 +7,7 @@ dist/
 *.log
 .DS_Store
 CLAUDE.md
+
+# fichiers de test temporaires pour l'api omdb
+frontend/src/features/media/api/test-api.ts
+frontend/src/features/media/schemas/test-moviesSchema.ts

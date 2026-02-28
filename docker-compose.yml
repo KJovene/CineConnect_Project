@@ -59,6 +59,8 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     container_name: cineconnect-frontend
+    env_file:
+      - ./frontend/.env
     environment:
       NODE_ENV: development
       VITE_API_URL: http://localhost:3000
