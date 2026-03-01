@@ -52,11 +52,17 @@ export const verification = pgTable('verification', {
 // Table films
 export const films = pgTable('films', {
   film_id: serial('film_id').primaryKey(),
-  omdb_id: varchar('omdb_id', { length: 50 }),
+  omdb_id: varchar('omdb_id', { length: 50 }).unique(),
   title: varchar('title', { length: 255 }).notNull(),
   year: integer('year'),
+  type: varchar('type', { length: 20 }),
   director: varchar('director', { length: 255 }),
   poster_url: text('poster_url'),
+  genre: varchar('genre', { length: 255 }),
+  plot: text('plot'),
+  runtime: varchar('runtime', { length: 20 }),
+  imdb_rating: varchar('imdb_rating', { length: 10 }),
+  awards: text('awards'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow().$onUpdateFn(() => new Date()),
 });

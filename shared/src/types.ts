@@ -29,21 +29,44 @@ export interface AuthResponse {
   user: User;
 }
 
-// Movie Types
-export interface Movie {
-  id: string;
-  imdbId: string;
-  title: string;
-  poster?: string;
-  year?: number;
-  type: "movie" | "series";
-  createdAt: Date;
-  updatedAt: Date;
+// Film Types
+export interface Film {
+  film_id:     number;
+  omdb_id:     string;            
+  title:       string;
+  year:        number | null;
+  type:        "movie" | "series" | "episode" | null;
+  director:    string | null;
+  poster_url:  string | null;
+  genre:       string | null;     
+  plot:        string | null;
+  runtime:     string | null;
+  imdb_rating: string | null;
+  awards:      string | null;
+  created_at:  string;
+  updated_at:  string;
 }
 
-export interface MovieResponse extends Movie {
-  ratings?: number;
+// Résultat de recherche — retournée par GET /api/films/search
+export interface FilmSearchResult {
+  omdb_id:    string;
+  title:      string;
+  year:       number | null;
+  type:       "movie" | "series" | "episode" | null;
+  poster_url: string | null;
 }
+
+export interface SearchResponse {
+  results:      FilmSearchResult[];
+  totalResults: number;
+  page:         number;
+}
+
+// Détail complet — retourné par GET /api/films/:omdbId
+export type FilmDetailResponse = Film;
+
+// Films à la une — retourné par GET /api/films/top-rated
+export type TopRatedResponse = Film[];
 
 // Review Types
 export interface Review {
@@ -58,7 +81,7 @@ export interface Review {
 
 export interface ReviewResponse extends Review {
   user?: User;
-  movie?: Movie;
+  movie?: Film;
 }
 
 // List Types
@@ -73,7 +96,7 @@ export interface List {
 }
 
 export interface ListResponse extends List {
-  movies?: Movie[];
+  movies?: Film[];
   movieCount?: number;
 }
 
@@ -87,7 +110,7 @@ export interface WatchlistItem {
 }
 
 export interface WatchlistResponse extends WatchlistItem {
-  movie?: Movie;
+  movie?: Film;
 }
 
 // API Response Types

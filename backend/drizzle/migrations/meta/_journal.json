@@ -15,6 +15,13 @@
       "when": 1738080000000,
       "tag": "0001_better_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772383327576,
+      "tag": "0002_gifted_talos",
+      "breakpoints": true
     }
   ]
 }
