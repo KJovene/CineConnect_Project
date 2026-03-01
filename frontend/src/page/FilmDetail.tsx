@@ -11,6 +11,7 @@ import {
   HiChatBubbleLeftRight,
 } from "react-icons/hi2";
 import { useMovieDetails } from "@/hooks/useMovieDetails";
+import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
 
 const FilmDetailPage: React.FC = () => {
     //récupérer l'id depuis l'url
@@ -64,9 +65,10 @@ const FilmDetailPage: React.FC = () => {
         {/* Image horizontale */}
         <div className="relative w-full h-[60vh] lg:h-[65vh]">
           <img
-            src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/1920x1080?text=No+Image"}
+            src={getPosterUrl(movie.Poster)}
             className="w-full h-full object-cover object-center"
             alt={movie.Title}
+            onError={handlePosterError}
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>

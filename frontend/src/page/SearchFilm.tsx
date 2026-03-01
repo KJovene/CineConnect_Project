@@ -12,6 +12,7 @@ import {
   HiBeaker,
   HiMagnifyingGlass,
 } from "react-icons/hi2";
+import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
 
 const SearchPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,12 +116,9 @@ const SearchPage: React.FC = () => {
                             className="group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer bg-neutral-900 border border-white/5 hover:border-white/20 transition-all"
                         >
                         <img    
-                          src={
-                            movie.Poster !== "N/A"
-                              ? movie.Poster
-                              : "https://via.placeholder.com/300x450?text=No+Image"
-                          }
+                          src={getPosterUrl(movie.Poster)}
                           alt={movie.Title}
+                          onError={handlePosterError}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
