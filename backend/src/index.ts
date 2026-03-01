@@ -8,6 +8,7 @@ import { initSocket } from './socket.js';
 import friendsRouter from './routes/friends.js';
 import messagesRouter from './routes/messages.js';
 import usersRouter from './routes/users.js';
+import filmsRouter from './routes/films.js';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.get('/', (_req, res) => {
 app.use('/api/friends', friendsRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/users', usersRouter);
+app.use("/api/films", filmsRouter)
 
 // Serveur HTTP + Socket.io
 const httpServer = http.createServer(app);

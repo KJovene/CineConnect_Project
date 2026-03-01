@@ -34,17 +34,14 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: cineconnect-backend
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/cineconnect
-      FRONTEND_ORIGIN: http://localhost:5173
-      JWT_SECRET: dev-jwt-secret
+    env_file:
+      - ./backend/.env
     ports:
       - "3000:3000"
     volumes:
       - ./backend/src:/app/backend/src
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - ./backend/package.json:/app/backend/package.json
     depends_on:
       postgres:
@@ -69,6 +66,7 @@ services:
     volumes:
       - ./frontend/src:/app/frontend/src
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - ./frontend/package.json:/app/frontend/package.json
       - ./frontend/vite.config.ts:/app/frontend/vite.config.ts
       - ./frontend/tailwind.config.js:/app/frontend/tailwind.config.js
