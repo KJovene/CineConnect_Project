@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchMovies } from "@/hooks/useSearchMovies";
 import { Link } from "@tanstack/react-router";
 import { SearchBar, CategoryDropdown } from "@/components/molecules";
@@ -11,14 +11,31 @@ import {
   HiWifi,
   HiBeaker,
   HiMagnifyingGlass,
+  HiChevronLeft,
+  HiChevronRight,
 } from "react-icons/hi2";
 import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
 
 const SearchPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
-  const { data, isLoading, error } = useSearchMovies(searchQuery);
-  const results = data?.Search || [];
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading, error } = useSearchMovies(searchQuery, currentPage);
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+  
+  // éviter les doublons
+  const results = React.useMemo(() => {
+    if (!data?.results) return [];
+    const seen = new Set<string>();
+    return data.results.filter((movie) => {
+      if (seen.has(movie.omdb_id)) return false;
+      seen.add(movie.omdb_id);
+      return true;
+    });
+  }, [data]);
 
   const genres = [
     { name: "Science-Fiction", icon: <HiBeaker size={18} /> },
@@ -29,6 +46,11 @@ const SearchPage: React.FC = () => {
     { name: "Drame", icon: <HiDocumentText size={18} /> },
     { name: "Thriller", icon: <HiWifi size={18} /> },
   ];
+
+  // Calcule le nombre total de pages 
+  const totalPages = data?.totalResults ? Math.ceil(data.totalResults / 10) : 0;
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center relative">
@@ -110,32 +132,64 @@ const SearchPage: React.FC = () => {
                     {results.map((movie) => (
 
                         <Link
-                            key={movie.imdbID}
+                            key={movie.omdb_id}
                             to="/film/$id"
-                            params={{ id: movie.imdbID }}
+                            params={{ id: movie.omdb_id }}
                             className="group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer bg-neutral-900 border border-white/5 hover:border-white/20 transition-all"
                         >
                         <img    
-                          src={getPosterUrl(movie.Poster)}
-                          alt={movie.Title}
+                          src={getPosterUrl(movie.poster_url)}
+                          alt={movie.title}
                           onError={handlePosterError}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
                         <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                           <h3 className="text-white font-semibold tracking-tight mb-1 truncate text-xs">
-                            {movie.Title}
+                            {movie.title}
                           </h3>
                           <div className="flex items-center justify-between text-[10px] text-neutral-400 group-hover:text-neutral-300 transition-colors">
-                            <span>{movie.Year}</span>
+                            <span>{movie.year}</span>
                             <span className="capitalize">
-                              {movie.Type === "movie" ? "Film" : movie.Type === "series" ? "Série" : movie.Type}
+                              {movie.type === "movie" ? "Film" : movie.type === "series" ? "Série" : movie.type}
                             </span>
                           </div>
                         </div>
                       </Link>
                     ))}
                   </div>
+                  
+                  {/* PAGINATION */}
+                  {totalPages > 1 && (
+                    <div className="mt-12 flex items-center justify-center gap-3">
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={!hasPrevPage}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      >
+                        <HiChevronLeft size={20} />
+                        Précédent
+                      </button>
+                      
+                      <div className="flex items-center gap-2">
+                        {/* Page courante */}
+                        <span className="px-2 py-2 rounded-lg text-white font-medium">
+                          {currentPage}
+                        </span>
+                        <span className="text-neutral-500">sur</span>
+                        <span className="text-neutral-300 font-medium">{totalPages}</span>
+                      </div>
+                      
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={!hasNextPage}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      >
+                        Suivant
+                        <HiChevronRight size={20} />
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

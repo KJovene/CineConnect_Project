@@ -28,8 +28,7 @@ const FilmDetailPage: React.FC = () => {
   }
 
   //parsing des données de détails du film
-  const genres = movie.Genre ? movie.Genre.split(", ") : [];
-  const actors = movie.Actors ? movie.Actors.split(", ") : [];
+  const genres = movie.genre ? movie.genre.split(", ") : [];
 
   return (
     <div className="bg-[#050505] text-neutral-300 antialiased min-h-screen flex flex-col">
@@ -65,9 +64,9 @@ const FilmDetailPage: React.FC = () => {
         {/* Image horizontale */}
         <div className="relative w-full h-[60vh] lg:h-[65vh]">
           <img
-            src={getPosterUrl(movie.Poster)}
+            src={getPosterUrl(movie.poster_url)}
             className="w-full h-full object-cover object-center"
-            alt={movie.Title}
+            alt={movie.title}
             onError={handlePosterError}
           />
 
@@ -82,23 +81,23 @@ const FilmDetailPage: React.FC = () => {
               {/* Titre */}
               <div>
                 <h1 className="text-4xl lg:text-6xl font-bold text-white tracking-tight mb-4 drop-shadow-xl">
-                  {movie.Title}
+                  {movie.title}
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm lg:text-base font-medium text-neutral-300">
-                  <span className="text-white">{movie.Year}</span>
-                  <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
-                  <span className="px-2 py-0.5 border border-neutral-700 rounded text-xs text-neutral-400">
-                    {movie.Rated}
-                  </span>
-                  <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
-                  <span>{movie.Runtime}</span>
+                  <span className="text-white">{movie.year}</span>
+                  {movie.runtime && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
+                      <span>{movie.runtime}</span>
+                    </>
+                  )}
 
                   {/* Note IMDb */}
-                  {movie.imdbRating && movie.imdbRating !== "N/A" && (
+                  {movie.imdb_rating && movie.imdb_rating !== "N/A" && (
                     <div className="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2 bg-neutral-900/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                       <HiStar className="text-amber-400" size={18} />
-                      <span className="text-white font-semibold">{movie.imdbRating}</span>
+                      <span className="text-white font-semibold">{movie.imdb_rating}</span>
                       <span className="text-neutral-500 text-xs">/ 10</span>
                     </div>
                   )}
@@ -126,23 +125,25 @@ const FilmDetailPage: React.FC = () => {
                   Résumé
                 </h3>
                 <p className="text-lg text-neutral-300 leading-relaxed">
-                  {movie.Plot !== "N/A" ? movie.Plot : "Aucun synopsis disponible."}
+                  {movie.plot ? movie.plot : "Aucun synopsis disponible."}
                 </p>
               </div>
 
               {/* Détails techniques */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-neutral-800/50">
-                <div>
-                  <h4 className="text-xs text-neutral-500 mb-1">Réalisateur</h4>
-                  <p className="text-white font-medium">{movie.Director}</p>
-                </div>
-                <div>
-                  <h4 className="text-xs text-neutral-500 mb-1">Scénariste</h4>
-                  <p className="text-neutral-300 text-sm">
-                    {movie.Writer !== "N/A" ? movie.Writer : "Inconnu"}
-                  </p>
-                </div>
-                <div className="col-span-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 py-8 border-y border-neutral-800/50">
+                {movie.director && (
+                  <div>
+                    <h4 className="text-xs text-neutral-500 mb-1">Réalisateur</h4>
+                    <p className="text-white font-medium">{movie.director}</p>
+                  </div>
+                )}
+                {movie.awards && (
+                  <div>
+                    <h4 className="text-xs text-neutral-500 mb-1">Récompenses</h4>
+                    <p className="text-neutral-300 text-sm">{movie.awards}</p>
+                  </div>
+                )}
+                <div className="col-span-2 md:col-span-1">
                   <h4 className="text-xs text-neutral-500 mb-2">Genres</h4>
                   <div className="flex flex-wrap gap-2">
                     {genres.map((genre) => (
@@ -157,24 +158,17 @@ const FilmDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Distribution */}
-              <div>
-                <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">
-                  Distribution
-                </h3>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                  {actors.slice(0, 5).map((actor, index) => (
-                    <div key={index} className="flex-shrink-0 w-24 text-center group">
-                      <div className="w-20 h-20 mx-auto mb-2 rounded-full overflow-hidden border border-neutral-800 group-hover:border-indigo-500/50 transition-colors bg-neutral-900 flex items-center justify-center">
-                        <span className="text-xs text-neutral-600 font-medium">
-                          {actor.charAt(0)}
-                        </span>
-                      </div>
-                      <p className="text-xs font-medium text-white truncate">{actor}</p>
-                    </div>
-                  ))}
+              {/* Type de média */}
+              {movie.type && (
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">
+                    Type
+                  </h3>
+                  <p className="text-neutral-300 capitalize">
+                    {movie.type === "movie" ? "Film" : movie.type === "series" ? "Série" : movie.type}
+                  </p>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="hidden lg:block lg:w-12"></div>
@@ -186,12 +180,6 @@ const FilmDetailPage: React.FC = () => {
               <h2 className="text-xl font-semibold text-white tracking-tight">
                 Avis de la communauté
               </h2>
-              <div className="flex items-center gap-2 text-sm text-neutral-500">
-                <span className="text-white font-medium">
-                  {movie.imdbVotes !== "N/A" ? movie.imdbVotes : "0"}
-                </span>{" "}
-                avis
-              </div>
             </div>
 
             <div className="text-center py-12 bg-neutral-900/30 border border-neutral-800/50 rounded-2xl">
