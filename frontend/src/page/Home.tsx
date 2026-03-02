@@ -1,40 +1,9 @@
 import React from "react";
 import { HeroSection, MediaGrid, ReviewList } from "@/components/organisms";
-
-const TRENDING_MOVIES = [
-  {
-    image:
-      "https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/917d6f93-fb36-439a-8c48-884b67b35381_1600w.jpg",
-    title: "Interstellar Echoes",
-    director: "Christopher Nolan",
-    year: "2024",
-    rating: "9.2",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&q=80&w=600",
-    title: "Neo Tokyo",
-    director: "Katsuhiro Otomo",
-    year: "2023",
-    rating: "94%",
-    isPercentage: true,
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&q=80&w=600",
-    title: "The Silent Sea",
-    director: "Sci-Fi / Drame",
-    year: "2024",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=600",
-    title: "Dark Matter",
-    director: "Blake Crouch",
-    year: "2023",
-    rating: "8.5",
-  },
-];
+import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
+import { getPosterUrl } from "@/features/media/utils/poster";
+import type { Film } from "@cineconnect/shared";
+import type { MovieCardProps } from "@/components/molecules";
 
 const RECENT_REVIEWS = [
   {
@@ -64,16 +33,33 @@ const RECENT_REVIEWS = [
 ];
 
 const Home: React.FC = () => {
+  const { data: topFilms, isLoading, error } = useTopRatedMovies(5);
+
+  const convertToMovieCard = (film: Film): MovieCardProps => ({
+    image: getPosterUrl(film.poster_url),
+    title: film.title,
+    director: film.director || film.genre || "Film",
+    year: film.year?.toString() || "N/A",
+    rating: film.imdb_rating || undefined,
+    isPercentage: false,
+    omdb_id: film.omdb_id,
+  });
+
+  const featuredFilm = topFilms?.[0];
+  const trendingFilms = topFilms?.slice(1, 5).map(convertToMovieCard) || [];
+
   return (
     <>
-      <HeroSection />
+      <HeroSection film={featuredFilm} isLoading={isLoading} />
 
       <div className="px-8 py-8">
-        <MediaGrid
-          title="Tendances Actuelles"
-          badge="Cette semaine"
-          movies={TRENDING_MOVIES}
-        />
+        {trendingFilms.length > 0 && (
+          <MediaGrid
+            title="Tendances Actuelles"
+            badge="Cette semaine"
+            movies={trendingFilms}
+          />
+        )}
         <ReviewList
           title="Derniers Avis de la communauté"
           reviews={RECENT_REVIEWS}

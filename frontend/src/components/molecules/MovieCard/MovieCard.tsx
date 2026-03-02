@@ -1,4 +1,5 @@
 import { HiStar } from "react-icons/hi2";
+import { Link } from "@tanstack/react-router";
 
 export interface MovieCardProps {
   image: string;
@@ -7,6 +8,7 @@ export interface MovieCardProps {
   year: string;
   rating?: string;
   isPercentage?: boolean;
+  omdb_id?: string;
 }
 
 export function MovieCard({
@@ -16,9 +18,10 @@ export function MovieCard({
   year,
   rating,
   isPercentage,
+  omdb_id,
 }: MovieCardProps) {
-  return (
-    <div className="group relative aspect-2/3 rounded-xl overflow-hidden cursor-pointer bg-[#0A0A0A] border border-white/5 hover:border-white/20 transition-all hover:shadow-2xl hover:shadow-indigo-500/10">
+  const content = (
+    <>
       <img
         src={image}
         alt={title}
@@ -45,6 +48,22 @@ export function MovieCard({
           <span>{year}</span>
         </div>
       </div>
+    </>
+  );
+
+  const className = "group relative aspect-2/3 rounded-xl overflow-hidden cursor-pointer bg-[#0A0A0A] border border-white/5 hover:border-white/20 transition-all hover:shadow-2xl hover:shadow-indigo-500/10";
+
+  if (omdb_id) {
+    return (
+      <Link to="/film/$id" params={{ id: omdb_id }} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={className}>
+      {content}
     </div>
   );
 }
