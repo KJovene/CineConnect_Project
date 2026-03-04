@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedFilmIdRouteImport } from './routes/_authenticated/film$id'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedFilmidRouteImport } from './routes/_authenticated/film$id'
 import { Route as AuthenticatedDiscussionRouteImport } from './routes/_authenticated/discussion'
 
 const SignupRoute = SignupRouteImport.update({
@@ -23,69 +23,121 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthenticatedFilmIdRoute = AuthenticatedFilmIdRouteImport.update({
-  id: '/film/$id',
-  path: '/film/$id',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
-const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
-const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
-  id: '/profil',
-  path: '/profil',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-
+const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFilmidRoute = AuthenticatedFilmidRouteImport.update({
+  id: '/film$id',
+  path: '/film$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDiscussionRoute = AuthenticatedDiscussionRouteImport.update({
   id: '/discussion',
   path: '/discussion',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
+export interface FileRoutesByFullPath {
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film$id': typeof AuthenticatedFilmidRoute
+  '/profil': typeof AuthenticatedProfilRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/': typeof AuthenticatedIndexRoute
+}
+export interface FileRoutesByTo {
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film$id': typeof AuthenticatedFilmidRoute
+  '/profil': typeof AuthenticatedProfilRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/': typeof AuthenticatedIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_authenticated/discussion': typeof AuthenticatedDiscussionRoute
+  '/_authenticated/film$id': typeof AuthenticatedFilmidRoute
+  '/_authenticated/profil': typeof AuthenticatedProfilRoute
+  '/_authenticated/search': typeof AuthenticatedSearchRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/login'
+    | '/signup'
+    | '/discussion'
+    | '/film$id'
+    | '/profil'
+    | '/search'
+    | '/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/login'
+    | '/signup'
+    | '/discussion'
+    | '/film$id'
+    | '/profil'
+    | '/search'
+    | '/'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/login'
+    | '/signup'
+    | '/_authenticated/discussion'
+    | '/_authenticated/film$id'
+    | '/_authenticated/profil'
+    | '/_authenticated/search'
+    | '/_authenticated/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+}
+
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -95,106 +147,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/discussion': {
-      id: '/_authenticated/discussion'
-      path: '/discussion'
-      fullPath: '/discussion'
-      preLoaderRoute: typeof AuthenticatedDiscussionRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
-    '/_authenticated/film/$id': {
-      id: '/_authenticated/film/$id'
-      path: '/film/$id'
-      fullPath: '/film/$id'
-      preLoaderRoute: typeof AuthenticatedFilmIdRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
-    '/_authenticated/profil': {
-      id: '/_authenticated/profil'
-      path: '/profil'
-      fullPath: '/profil'
-      preLoaderRoute: typeof AuthenticatedProfilRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/search': {
       id: '/_authenticated/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof AuthenticatedSearchRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profil': {
+      id: '/_authenticated/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof AuthenticatedProfilRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/film$id': {
+      id: '/_authenticated/film$id'
+      path: '/film$id'
+      fullPath: '/film$id'
+      preLoaderRoute: typeof AuthenticatedFilmidRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/discussion': {
+      id: '/_authenticated/discussion'
+      path: '/discussion'
+      fullPath: '/discussion'
+      preLoaderRoute: typeof AuthenticatedDiscussionRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren({
-  AuthenticatedDiscussionRoute,
-  AuthenticatedFilmIdRoute,
-  AuthenticatedProfilRoute,
-  AuthenticatedSearchRoute,
-  AuthenticatedIndexRoute,
-})
-
-export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/discussion': typeof AuthenticatedDiscussionRoute
-  '/film/$id': typeof AuthenticatedFilmIdRoute
-  '/profil': typeof AuthenticatedProfilRoute
-  '/search': typeof AuthenticatedSearchRoute
+interface AuthenticatedRouteChildren {
+  AuthenticatedDiscussionRoute: typeof AuthenticatedDiscussionRoute
+  AuthenticatedFilmidRoute: typeof AuthenticatedFilmidRoute
+  AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
+  AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
-export interface FileRoutesByTo {
-  '/': typeof AuthenticatedIndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/discussion': typeof AuthenticatedDiscussionRoute
-  '/film/$id': typeof AuthenticatedFilmIdRoute
-  '/profil': typeof AuthenticatedProfilRoute
-  '/search': typeof AuthenticatedSearchRoute
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDiscussionRoute: AuthenticatedDiscussionRoute,
+  AuthenticatedFilmidRoute: AuthenticatedFilmidRoute,
+  AuthenticatedProfilRoute: AuthenticatedProfilRoute,
+  AuthenticatedSearchRoute: AuthenticatedSearchRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
-export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/_authenticated/discussion': typeof AuthenticatedDiscussionRoute
-  '/_authenticated/film/$id': typeof AuthenticatedFilmIdRoute
-  '/_authenticated/profil': typeof AuthenticatedProfilRoute
-  '/_authenticated/search': typeof AuthenticatedSearchRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/discussion' | '/film/$id' | '/profil' | '/search'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/discussion' | '/film/$id' | '/profil' | '/search'
-  id:
-    | '__root__'
-    | '/_authenticated'
-    | '/login'
-    | '/signup'
-    | '/_authenticated/discussion'
-    | '/_authenticated/film/$id'
-    | '/_authenticated/profil'
-    | '/_authenticated/search'
-    | '/_authenticated/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-}
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
 }
-
-export const routeTree =
-  rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
