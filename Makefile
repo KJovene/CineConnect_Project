@@ -143,12 +143,12 @@ shell-redis: ## Accéder au shell Redis
 # ========================================
 db-migrate: ## Exécuter les migrations de la base de données
 	@echo "$(GREEN)Exécution des migrations...$(NC)"
-	pnpm db:migrate
+	$(DOCKER_COMPOSE) exec backend pnpm db:migrate
 	@echo "$(GREEN)✓ Migrations terminées$(NC)"
 
 db-generate: ## Générer les migrations Drizzle
 	@echo "$(GREEN)Génération des migrations...$(NC)"
-	pnpm db:generate
+	$(DOCKER_COMPOSE) exec backend pnpm db:generate
 	@echo "$(GREEN)✓ Migrations générées$(NC)"
 
 db-reset: ## Réinitialiser la base de données (ATTENTION: perte de données!)
