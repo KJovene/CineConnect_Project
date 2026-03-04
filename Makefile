@@ -168,8 +168,17 @@ db-seed: ## Injecter les fixtures (utilisateurs de test) dans la base de donnée
 	@$(DOCKER_COMPOSE) exec backend pnpm db:seed
 	@echo "$(GREEN)✓ Fixtures injectées$(NC)"
 
+db-seed-films: ## Peupler la base de données avec ~100 films depuis l'API OMDB
+	@echo "$(GREEN)🎬 Récupération des films depuis OMDB...$(NC)"
+	@echo "$(YELLOW)⚠️  Nécessite OMDB_API_KEY dans le .env du backend$(NC)"
+	@$(DOCKER_COMPOSE) exec backend pnpm db:seed-films
+	@echo "$(GREEN)✓ Films insérés en base de données$(NC)"
+
 db-fresh: db-reset db-seed ## Réinitialiser la base de données ET injecter les fixtures
 	@echo "$(GREEN)✓ Base de données fraîche avec fixtures$(NC)"
+
+db-fresh-full: db-reset db-seed db-seed-films ## Reset complet + fixtures utilisateurs + ~100 films OMDB
+	@echo "$(GREEN)✓ Base de données fraîche avec utilisateurs et films$(NC)"
 
 db-backup: ## Créer une sauvegarde de la base de données
 	@echo "$(GREEN)Sauvegarde de la base de données...$(NC)"
