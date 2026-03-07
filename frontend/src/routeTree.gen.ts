@@ -15,8 +15,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
-import { Route as AuthenticatedFilmidRouteImport } from './routes/_authenticated/film$id'
 import { Route as AuthenticatedDiscussionRouteImport } from './routes/_authenticated/discussion'
+import { Route as AuthenticatedFilmIdRouteImport } from './routes/_authenticated/film.$id'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -47,14 +47,14 @@ const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   path: '/profil',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedFilmidRoute = AuthenticatedFilmidRouteImport.update({
-  id: '/film$id',
-  path: '/film$id',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedDiscussionRoute = AuthenticatedDiscussionRouteImport.update({
   id: '/discussion',
   path: '/discussion',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFilmIdRoute = AuthenticatedFilmIdRouteImport.update({
+  id: '/film/$id',
+  path: '/film/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -62,19 +62,19 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
-  '/film$id': typeof AuthenticatedFilmidRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
+  '/film/$id': typeof AuthenticatedFilmIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
-  '/film$id': typeof AuthenticatedFilmidRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
+  '/film/$id': typeof AuthenticatedFilmIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -82,10 +82,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/discussion': typeof AuthenticatedDiscussionRoute
-  '/_authenticated/film$id': typeof AuthenticatedFilmidRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/film/$id': typeof AuthenticatedFilmIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -93,29 +93,29 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/discussion'
-    | '/film$id'
     | '/profil'
     | '/search'
     | '/'
+    | '/film/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/signup'
     | '/discussion'
-    | '/film$id'
     | '/profil'
     | '/search'
     | '/'
+    | '/film/$id'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/signup'
     | '/_authenticated/discussion'
-    | '/_authenticated/film$id'
     | '/_authenticated/profil'
     | '/_authenticated/search'
     | '/_authenticated/'
+    | '/_authenticated/film/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -168,13 +168,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/film$id': {
-      id: '/_authenticated/film$id'
-      path: '/film$id'
-      fullPath: '/film$id'
-      preLoaderRoute: typeof AuthenticatedFilmidRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/discussion': {
       id: '/_authenticated/discussion'
       path: '/discussion'
@@ -182,23 +175,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiscussionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/film/$id': {
+      id: '/_authenticated/film/$id'
+      path: '/film/$id'
+      fullPath: '/film/$id'
+      preLoaderRoute: typeof AuthenticatedFilmIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDiscussionRoute: typeof AuthenticatedDiscussionRoute
-  AuthenticatedFilmidRoute: typeof AuthenticatedFilmidRoute
   AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedFilmIdRoute: typeof AuthenticatedFilmIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDiscussionRoute: AuthenticatedDiscussionRoute,
-  AuthenticatedFilmidRoute: AuthenticatedFilmidRoute,
   AuthenticatedProfilRoute: AuthenticatedProfilRoute,
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedFilmIdRoute: AuthenticatedFilmIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
