@@ -78,7 +78,7 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
       <div
         ref={scrollRef}
         onScroll={updateScrollState}
-        className="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory"
+        className="flex gap-3 md:gap-4 overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar snap-x snap-mandatory"
       >
         {films.map((film) => (
           <div
