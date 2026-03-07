@@ -30,7 +30,7 @@ const SIDEBAR_SECTIONS: SidebarNavSection[] = [
         id: "films",
         icon: <HiOutlineFilm size={20} />,
         label: "Films",
-        href: "/films",
+        href: "/film",
       },
       {
         id: "series",

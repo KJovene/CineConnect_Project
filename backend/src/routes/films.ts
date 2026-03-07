@@ -3,6 +3,7 @@ import {
   searchFilms,
   getFilmDetail,
   getTopRatedFilms,
+  getFilmsByGenre,
 } from "../services/filmsService.js";
 
 const router = Router();
@@ -12,10 +13,15 @@ const router = Router();
 
 router.get("/search", async (req: Request, res: Response) => {
   const query = req.query.q as string;
-  const page  = parseInt(req.query.page as string) || 1;
+  const page = parseInt(req.query.page as string) || 1;
 
   if (!query || query.trim().length < 3) {
-    res.status(400).json({ error: "Bad Request", message: "Le paramètre 'q' doit faire au moins 3 caractères" });
+    res
+      .status(400)
+      .json({
+        error: "Bad Request",
+        message: "Le paramètre 'q' doit faire au moins 3 caractères",
+      });
     return;
   }
 
@@ -24,7 +30,32 @@ router.get("/search", async (req: Request, res: Response) => {
     res.json(data);
   } catch (err) {
     console.error("[films/search]", err);
-    res.status(500).json({ error: "Internal Server Error", message: "Erreur lors de la recherche" });
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: "Erreur lors de la recherche",
+      });
+  }
+});
+
+// ─── GET /api/films/by-genre?limit=24 ─────────────────────────────────────────
+// Films groupés par genre → pour la page Films (carousel par catégorie).
+
+router.get("/by-genre", async (req: Request, res: Response) => {
+  const limit = parseInt(req.query.limit as string) || 24;
+
+  try {
+    const data = await getFilmsByGenre(limit);
+    res.json(data);
+  } catch (err) {
+    console.error("[films/by-genre]", err);
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: "Erreur lors de la récupération des films par genre",
+      });
   }
 });
 
@@ -39,7 +70,12 @@ router.get("/top-rated", async (req: Request, res: Response) => {
     res.json(data);
   } catch (err) {
     console.error("[films/top-rated]", err);
-    res.status(500).json({ error: "Internal Server Error", message: "Erreur lors de la récupération des films" });
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: "Erreur lors de la récupération des films",
+      });
   }
 });
 
@@ -48,18 +84,27 @@ router.get("/top-rated", async (req: Request, res: Response) => {
 // ⚠️  Cette route doit être APRÈS /search et /top-rated pour ne pas les intercepter.
 
 router.get("/:omdbId", async (req: Request, res: Response) => {
-  const omdbId = Array.isArray(req.params.omdbId) ? req.params.omdbId[0] : req.params.omdbId;
+  const omdbId = Array.isArray(req.params.omdbId)
+    ? req.params.omdbId[0]
+    : req.params.omdbId;
 
   try {
     const film = await getFilmDetail(omdbId);
     if (!film) {
-      res.status(404).json({ error: "Not Found", message: `Film "${omdbId}" introuvable` });
+      res
+        .status(404)
+        .json({ error: "Not Found", message: `Film "${omdbId}" introuvable` });
       return;
     }
     res.json(film);
   } catch (err) {
     console.error("[films/:omdbId]", err);
-    res.status(500).json({ error: "Internal Server Error", message: "Erreur lors de la récupération du film" });
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: "Erreur lors de la récupération du film",
+      });
   }
 });
 

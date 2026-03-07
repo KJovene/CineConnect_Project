@@ -31,35 +31,35 @@ export interface AuthResponse {
 
 // Film Types
 export interface Film {
-  film_id:     number;
-  omdb_id:     string;            
-  title:       string;
-  year:        number | null;
-  type:        "movie" | "series" | "episode" | null;
-  director:    string | null;
-  poster_url:  string | null;
-  genre:       string | null;     
-  plot:        string | null;
-  runtime:     string | null;
+  film_id: number;
+  omdb_id: string;
+  title: string;
+  year: number | null;
+  type: "movie" | "series" | "episode" | null;
+  director: string | null;
+  poster_url: string | null;
+  genre: string | null;
+  plot: string | null;
+  runtime: string | null;
   imdb_rating: string | null;
-  awards:      string | null;
-  created_at:  string;
-  updated_at:  string;
+  awards: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // Résultat de recherche — retournée par GET /api/films/search
 export interface FilmSearchResult {
-  omdb_id:    string;
-  title:      string;
-  year:       number | null;
-  type:       "movie" | "series" | "episode" | null;
+  omdb_id: string;
+  title: string;
+  year: number | null;
+  type: "movie" | "series" | "episode" | null;
   poster_url: string | null;
 }
 
 export interface SearchResponse {
-  results:      FilmSearchResult[];
+  results: FilmSearchResult[];
   totalResults: number;
-  page:         number;
+  page: number;
 }
 
 // Détail complet — retourné par GET /api/films/:omdbId
@@ -67,6 +67,14 @@ export type FilmDetailResponse = Film;
 
 // Films à la une — retourné par GET /api/films/top-rated
 export type TopRatedResponse = Film[];
+
+// Catégorie avec ses films — retourné par GET /api/films/by-genre
+export interface GenreSection {
+  genre: string;
+  films: Film[];
+}
+
+export type FilmsByGenreResponse = GenreSection[];
 
 // Review Types
 export interface Review {
