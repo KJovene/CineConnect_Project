@@ -1,47 +1,52 @@
 import { db } from "../db/index.js";
 import { films } from "../db/schema.js";
-import { eq, desc, isNotNull, sql, inArray } from "drizzle-orm";
-import type { Film, FilmSearchResult, SearchResponse } from "@cineconnect/shared";
+import { eq, desc, isNotNull, sql, inArray, like } from "drizzle-orm";
+import type {
+  Film,
+  FilmSearchResult,
+  SearchResponse,
+  GenreSection,
+} from "@cineconnect/shared";
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const OMDB_BASE_URL = "https://www.omdbapi.com";
 
-// Types OMDB bruts 
+// Types OMDB bruts
 interface OmdbSearchItem {
-  imdbID:  string;
-  Title:   string;
-  Year:    string;
-  Type:    string;
-  Poster:  string;
+  imdbID: string;
+  Title: string;
+  Year: string;
+  Type: string;
+  Poster: string;
 }
 
 interface OmdbSearchResponse {
-  Search:       OmdbSearchItem[];
+  Search: OmdbSearchItem[];
   totalResults: string;
-  Response:     string;
-  Error?:       string;
+  Response: string;
+  Error?: string;
 }
 
 interface OmdbDetail {
-  imdbID:    string;
-  Title:     string;
-  Year:      string;
-  Type:      string;
-  Poster:    string;
-  Genre:     string;
-  Director:  string;
-  Plot:      string;
-  Runtime:   string;
-  Language:  string;
-  Country:   string;
-  imdbRating:string;
+  imdbID: string;
+  Title: string;
+  Year: string;
+  Type: string;
+  Poster: string;
+  Genre: string;
+  Director: string;
+  Plot: string;
+  Runtime: string;
+  Language: string;
+  Country: string;
+  imdbRating: string;
   imdbVotes: string;
-  Awards:    string;
-  Rated:     string;
-  Response:  string;
+  Awards: string;
+  Rated: string;
+  Response: string;
 }
 
-// Helpers 
+// Helpers
 function cleanPoster(poster: string | undefined): string | null {
   if (!poster || poster === "N/A" || poster.trim() === "") return null;
   return poster;
@@ -54,13 +59,18 @@ function parseYear(year: string | undefined): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
-function parseType(type: string | undefined): "movie" | "series" | "episode" | null {
+function parseType(
+  type: string | undefined,
+): "movie" | "series" | "episode" | null {
   if (type === "movie" || type === "series" || type === "episode") return type;
   return null;
 }
 
-//  Appels OMDB 
-async function fetchOmdbSearch(query: string, page = 1): Promise<OmdbSearchResponse> {
+//  Appels OMDB
+async function fetchOmdbSearch(
+  query: string,
+  page = 1,
+): Promise<OmdbSearchResponse> {
   if (!OMDB_API_KEY) throw new Error("OMDB_API_KEY manquante dans .env");
 
   const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&page=${page}`;
@@ -78,20 +88,20 @@ async function fetchOmdbDetail(imdbId: string): Promise<OmdbDetail> {
   return await res.json();
 }
 
-//  Sauvegarde en BDD 
+//  Sauvegarde en BDD
 async function upsertFilmFromOmdbDetail(omdbDetail: OmdbDetail): Promise<Film> {
   const values = {
-    omdb_id:     omdbDetail.imdbID,
-    title:       omdbDetail.Title,
-    year:        parseYear(omdbDetail.Year),
-    type:        parseType(omdbDetail.Type),
-    director:    omdbDetail.Director !== "N/A" ? omdbDetail.Director : null,
-    poster_url:  cleanPoster(omdbDetail.Poster),
-    genre:       omdbDetail.Genre !== "N/A" ? omdbDetail.Genre : null,
-    plot:        omdbDetail.Plot !== "N/A" ? omdbDetail.Plot : null,
-    runtime:     omdbDetail.Runtime !== "N/A" ? omdbDetail.Runtime : null,
+    omdb_id: omdbDetail.imdbID,
+    title: omdbDetail.Title,
+    year: parseYear(omdbDetail.Year),
+    type: parseType(omdbDetail.Type),
+    director: omdbDetail.Director !== "N/A" ? omdbDetail.Director : null,
+    poster_url: cleanPoster(omdbDetail.Poster),
+    genre: omdbDetail.Genre !== "N/A" ? omdbDetail.Genre : null,
+    plot: omdbDetail.Plot !== "N/A" ? omdbDetail.Plot : null,
+    runtime: omdbDetail.Runtime !== "N/A" ? omdbDetail.Runtime : null,
     imdb_rating: omdbDetail.imdbRating !== "N/A" ? omdbDetail.imdbRating : null,
-    awards:      omdbDetail.Awards !== "N/A" ? omdbDetail.Awards : null,
+    awards: omdbDetail.Awards !== "N/A" ? omdbDetail.Awards : null,
   };
 
   const [film] = await db
@@ -106,9 +116,11 @@ async function upsertFilmFromOmdbDetail(omdbDetail: OmdbDetail): Promise<Film> {
   return film as unknown as Film;
 }
 
-//  Service public 
-export async function searchFilms(query: string, page = 1): Promise<SearchResponse> {
-  
+//  Service public
+export async function searchFilms(
+  query: string,
+  page = 1,
+): Promise<SearchResponse> {
   const omdbSearch = await fetchOmdbSearch(query, page);
 
   if (omdbSearch.Response === "False" || !omdbSearch.Search) {
@@ -133,7 +145,7 @@ export async function searchFilms(query: string, page = 1): Promise<SearchRespon
       const detail = await fetchOmdbDetail(imdbId);
       if (detail.Response === "False") return null;
       return upsertFilmFromOmdbDetail(detail);
-    })
+    }),
   ).then((results) => results.filter(Boolean) as Film[]);
 
   const allFilms = [...existingFilms, ...newFilms] as unknown as Film[];
@@ -144,10 +156,10 @@ export async function searchFilms(query: string, page = 1): Promise<SearchRespon
       const film = filmMap.get(id);
       if (!film) return null;
       return {
-        omdb_id:    film.omdb_id,
-        title:      film.title,
-        year:       film.year,
-        type:       film.type,
+        omdb_id: film.omdb_id,
+        title: film.title,
+        year: film.year,
+        type: film.type,
         poster_url: film.poster_url,
       } satisfies FilmSearchResult;
     })
@@ -156,9 +168,7 @@ export async function searchFilms(query: string, page = 1): Promise<SearchRespon
   return { results, totalResults, page };
 }
 
-
 export async function getFilmDetail(omdbId: string): Promise<Film | null> {
-  
   const [existing] = await db
     .select()
     .from(films)
@@ -178,8 +188,55 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
     .select()
     .from(films)
     .where(isNotNull(films.imdb_rating))
-    .orderBy(desc(films.imdb_rating))  
+    .orderBy(desc(films.imdb_rating))
     .limit(limit);
 
   return result as unknown as Film[];
+}
+
+/**
+ * Liste des genres à afficher sur la page Films.
+ * Chaque genre est recherché via un LIKE sur le champ `genre` (valeurs OMDB, ex: "Action, Crime, Drama").
+ */
+const GENRE_LIST = [
+  "Action",
+  "Drama",
+  "Comedy",
+  "Sci-Fi",
+  "Thriller",
+  "Animation",
+  "Crime",
+  "Adventure",
+  "Horror",
+  "Fantasy",
+  "Mystery",
+  "Romance",
+] as const;
+
+/**
+ * Récupère les films groupés par genre.
+ * @param limitPerGenre Nombre max de films par genre (défaut 24 pour permettre le carousel)
+ */
+export async function getFilmsByGenre(
+  limitPerGenre = 24,
+): Promise<GenreSection[]> {
+  const sections: GenreSection[] = [];
+
+  for (const genre of GENRE_LIST) {
+    const result = await db
+      .select()
+      .from(films)
+      .where(like(films.genre, `%${genre}%`))
+      .orderBy(desc(films.imdb_rating))
+      .limit(limitPerGenre);
+
+    if (result.length > 0) {
+      sections.push({
+        genre,
+        films: result as unknown as Film[],
+      });
+    }
+  }
+
+  return sections;
 }

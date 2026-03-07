@@ -6,3 +6,4 @@ export * from "./MediaGrid";
 export * from "./ReviewList";
 export * from "./FriendList";
 export * from "./ChatWindow";
+export * from "./CategoryCarousel";

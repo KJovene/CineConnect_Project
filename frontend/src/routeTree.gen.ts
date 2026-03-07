@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
+import { Route as AuthenticatedFilmRouteImport } from './routes/_authenticated/film'
 import { Route as AuthenticatedDiscussionRouteImport } from './routes/_authenticated/discussion'
 import { Route as AuthenticatedFilmIdRouteImport } from './routes/_authenticated/film.$id'
 
@@ -47,21 +48,27 @@ const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   path: '/profil',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFilmRoute = AuthenticatedFilmRouteImport.update({
+  id: '/film',
+  path: '/film',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDiscussionRoute = AuthenticatedDiscussionRouteImport.update({
   id: '/discussion',
   path: '/discussion',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFilmIdRoute = AuthenticatedFilmIdRouteImport.update({
-  id: '/film/$id',
-  path: '/film/$id',
-  getParentRoute: () => AuthenticatedRoute,
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedFilmRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film': typeof AuthenticatedFilmRouteWithChildren
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/discussion': typeof AuthenticatedDiscussionRoute
+  '/film': typeof AuthenticatedFilmRouteWithChildren
   '/profil': typeof AuthenticatedProfilRoute
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/discussion': typeof AuthenticatedDiscussionRoute
+  '/_authenticated/film': typeof AuthenticatedFilmRouteWithChildren
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/discussion'
+    | '/film'
     | '/profil'
     | '/search'
     | '/'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/discussion'
+    | '/film'
     | '/profil'
     | '/search'
     | '/'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/discussion'
+    | '/_authenticated/film'
     | '/_authenticated/profil'
     | '/_authenticated/search'
     | '/_authenticated/'
@@ -168,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/film': {
+      id: '/_authenticated/film'
+      path: '/film'
+      fullPath: '/film'
+      preLoaderRoute: typeof AuthenticatedFilmRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/discussion': {
       id: '/_authenticated/discussion'
       path: '/discussion'
@@ -177,28 +196,39 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/film/$id': {
       id: '/_authenticated/film/$id'
-      path: '/film/$id'
+      path: '/$id'
       fullPath: '/film/$id'
       preLoaderRoute: typeof AuthenticatedFilmIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedFilmRoute
     }
   }
 }
 
+interface AuthenticatedFilmRouteChildren {
+  AuthenticatedFilmIdRoute: typeof AuthenticatedFilmIdRoute
+}
+
+const AuthenticatedFilmRouteChildren: AuthenticatedFilmRouteChildren = {
+  AuthenticatedFilmIdRoute: AuthenticatedFilmIdRoute,
+}
+
+const AuthenticatedFilmRouteWithChildren =
+  AuthenticatedFilmRoute._addFileChildren(AuthenticatedFilmRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDiscussionRoute: typeof AuthenticatedDiscussionRoute
+  AuthenticatedFilmRoute: typeof AuthenticatedFilmRouteWithChildren
   AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedFilmIdRoute: typeof AuthenticatedFilmIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDiscussionRoute: AuthenticatedDiscussionRoute,
+  AuthenticatedFilmRoute: AuthenticatedFilmRouteWithChildren,
   AuthenticatedProfilRoute: AuthenticatedProfilRoute,
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedFilmIdRoute: AuthenticatedFilmIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
