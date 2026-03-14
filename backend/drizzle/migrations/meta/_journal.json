@@ -22,6 +22,13 @@
       "when": 1772383327576,
       "tag": "0002_gifted_talos",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773500000000,
+      "tag": "0003_comment_replies",
+      "breakpoints": true
     }
   ]
 }

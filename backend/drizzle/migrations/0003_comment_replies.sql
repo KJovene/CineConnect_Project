@@ -1,0 +1,2 @@
+ALTER TABLE "reviews" ADD COLUMN "parent_review_id" integer;--> statement-breakpoint
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_parent_review_id_reviews_review_id_fk" FOREIGN KEY ("parent_review_id") REFERENCES "public"."reviews"("review_id") ON DELETE cascade ON UPDATE no action;

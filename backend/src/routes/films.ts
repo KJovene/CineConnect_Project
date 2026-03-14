@@ -5,6 +5,7 @@ import {
   getTopRatedFilms,
   getFilmsByGenre,
 } from "../services/filmsService.js";
+import reviewsRouter from "./reviews.js";
 
 const router = Router();
 
@@ -16,12 +17,10 @@ router.get("/search", async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;
 
   if (!query || query.trim().length < 3) {
-    res
-      .status(400)
-      .json({
-        error: "Bad Request",
-        message: "Le paramètre 'q' doit faire au moins 3 caractères",
-      });
+    res.status(400).json({
+      error: "Bad Request",
+      message: "Le paramètre 'q' doit faire au moins 3 caractères",
+    });
     return;
   }
 
@@ -30,12 +29,10 @@ router.get("/search", async (req: Request, res: Response) => {
     res.json(data);
   } catch (err) {
     console.error("[films/search]", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: "Erreur lors de la recherche",
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Erreur lors de la recherche",
+    });
   }
 });
 
@@ -50,12 +47,10 @@ router.get("/by-genre", async (req: Request, res: Response) => {
     res.json(data);
   } catch (err) {
     console.error("[films/by-genre]", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: "Erreur lors de la récupération des films par genre",
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Erreur lors de la récupération des films par genre",
+    });
   }
 });
 
@@ -70,14 +65,14 @@ router.get("/top-rated", async (req: Request, res: Response) => {
     res.json(data);
   } catch (err) {
     console.error("[films/top-rated]", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: "Erreur lors de la récupération des films",
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Erreur lors de la récupération des films",
+    });
   }
 });
+
+router.use("/:omdbId/reviews", reviewsRouter);
 
 // ─── GET /api/films/:omdbId ───────────────────────────────────────────────────
 // Détail d'un film par son imdbID (ex: "tt1375666").
@@ -99,12 +94,10 @@ router.get("/:omdbId", async (req: Request, res: Response) => {
     res.json(film);
   } catch (err) {
     console.error("[films/:omdbId]", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: "Erreur lors de la récupération du film",
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Erreur lors de la récupération du film",
+    });
   }
 });
 
