@@ -40,8 +40,7 @@ const Home: React.FC = () => {
     title: film.title,
     director: film.director || film.genre || "Film",
     year: film.year?.toString() || "N/A",
-    rating: film.imdb_rating || undefined,
-    isPercentage: false,
+    rating: film.average_rating ?? null,
     omdb_id: film.omdb_id,
   });
 

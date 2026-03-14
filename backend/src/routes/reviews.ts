@@ -11,8 +11,10 @@ import {
   FilmNotFoundError,
   ForbiddenReviewActionError,
   getFilmComments,
+  getFilmRatingSummary,
   ReplyDepthExceededError,
   ReviewNotFoundError,
+  upsertFilmRating,
   updateReviewComment,
 } from "../services/reviewsService.js";
 
@@ -46,6 +48,79 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+router.get(
+  "/rating-summary",
+  attachSession,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    if (!omdbId) {
+      res.status(400).json({ error: "omdbId manquant" });
+      return;
+    }
+
+    const sessionUserId = req.session?.user?.id;
+    const userId =
+      typeof sessionUserId === "string"
+        ? Number.parseInt(sessionUserId, 10)
+        : undefined;
+
+    try {
+      const summary = await getFilmRatingSummary({
+        omdbId,
+        userId: Number.isNaN(userId) ? undefined : userId,
+      });
+      res.json(summary);
+    } catch (error) {
+      if (error instanceof FilmNotFoundError) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
+
+router.post(
+  "/rating",
+  attachSession,
+  requireAuth,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    if (!omdbId) {
+      res.status(400).json({ error: "omdbId manquant" });
+      return;
+    }
+
+    const userId = Number.parseInt(req.session!.user.id, 10);
+    const { rating } = req.body as { rating?: number };
+
+    if (typeof rating !== "number") {
+      res.status(400).json({ error: "Le champ rating est requis" });
+      return;
+    }
+
+    try {
+      await upsertFilmRating({ omdbId, userId, rating });
+      const summary = await getFilmRatingSummary({ omdbId, userId });
+      res.json(summary);
+    } catch (error) {
+      if (error instanceof FilmNotFoundError) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
 
 router.post(
   "/",

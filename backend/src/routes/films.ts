@@ -5,6 +5,11 @@ import {
   getTopRatedFilms,
   getFilmsByGenre,
 } from "../services/filmsService.js";
+import {
+  attachSession,
+  type RequestWithSession,
+} from "../middlewares/authMiddleware.js";
+import { getFilmRatingSummary } from "../services/reviewsService.js";
 import reviewsRouter from "./reviews.js";
 
 const router = Router();
@@ -78,27 +83,51 @@ router.use("/:omdbId/reviews", reviewsRouter);
 // Détail d'un film par son imdbID (ex: "tt1375666").
 // ⚠️  Cette route doit être APRÈS /search et /top-rated pour ne pas les intercepter.
 
-router.get("/:omdbId", async (req: Request, res: Response) => {
-  const omdbId = Array.isArray(req.params.omdbId)
-    ? req.params.omdbId[0]
-    : req.params.omdbId;
+router.get(
+  "/:omdbId",
+  attachSession,
+  async (req: RequestWithSession, res: Response) => {
+    const omdbId = Array.isArray(req.params.omdbId)
+      ? req.params.omdbId[0]
+      : req.params.omdbId;
 
-  try {
-    const film = await getFilmDetail(omdbId);
-    if (!film) {
-      res
-        .status(404)
-        .json({ error: "Not Found", message: `Film "${omdbId}" introuvable` });
-      return;
+    const sessionUserId = req.session?.user?.id;
+    const userId =
+      typeof sessionUserId === "string"
+        ? Number.parseInt(sessionUserId, 10)
+        : undefined;
+
+    try {
+      const film = await getFilmDetail(omdbId);
+      if (!film) {
+        res
+          .status(404)
+          .json({
+            error: "Not Found",
+            message: `Film "${omdbId}" introuvable`,
+          });
+        return;
+      }
+
+      const ratingSummary = await getFilmRatingSummary({
+        omdbId,
+        userId: Number.isNaN(userId) ? undefined : userId,
+      });
+
+      res.json({
+        ...film,
+        average_rating: ratingSummary.averageRating,
+        ratings_count: ratingSummary.totalRatings,
+        user_rating: ratingSummary.userRating,
+      });
+    } catch (err) {
+      console.error("[films/:omdbId]", err);
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: "Erreur lors de la récupération du film",
+      });
     }
-    res.json(film);
-  } catch (err) {
-    console.error("[films/:omdbId]", err);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: "Erreur lors de la récupération du film",
-    });
-  }
-});
+  },
+);
 
 export default router;

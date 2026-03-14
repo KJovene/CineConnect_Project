@@ -42,6 +42,8 @@ export interface Film {
   plot: string | null;
   runtime: string | null;
   imdb_rating: string | null;
+  average_rating?: number | null;
+  ratings_count?: number;
   awards: string | null;
   created_at: string;
   updated_at: string;
@@ -63,7 +65,11 @@ export interface SearchResponse {
 }
 
 // Détail complet — retourné par GET /api/films/:omdbId
-export type FilmDetailResponse = Film;
+export interface FilmDetailResponse extends Film {
+  average_rating: number | null;
+  ratings_count: number;
+  user_rating: number | null;
+}
 
 export interface ReviewAuthor {
   id: number;

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { films, reviews, user } from "../db/schema.js";
 
@@ -60,6 +60,25 @@ export class ReviewNotFoundError extends Error {}
 export class ForbiddenReviewActionError extends Error {}
 export class ReplyDepthExceededError extends Error {}
 
+export interface FilmRatingSummaryDto {
+  averageRating: number | null;
+  totalRatings: number;
+  userRating: number | null;
+}
+
+function normalizeRating(value: number): number {
+  const rating = Number.parseInt(String(value), 10);
+  if (Number.isNaN(rating) || rating < 1 || rating > 5) {
+    throw new Error("La note doit être un entier entre 1 et 5");
+  }
+  return rating;
+}
+
+function normalizeOptionalRating(value: number | undefined): number | null {
+  if (typeof value !== "number") return null;
+  return normalizeRating(value);
+}
+
 async function getFilmIdByOmdbId(omdbId: string): Promise<number | null> {
   const [film] = await db
     .select({ film_id: films.film_id })
@@ -104,6 +123,54 @@ async function getReviewById(reviewId: number) {
   return existing ?? null;
 }
 
+async function getParentReviewByUserAndFilm(params: {
+  userId: number;
+  filmId: number;
+}) {
+  const [existing] = await db
+    .select({
+      review_id: reviews.review_id,
+      user_id: reviews.user_id,
+      film_id: reviews.film_id,
+      parent_review_id: reviews.parent_review_id,
+      rating: reviews.rating,
+      comment: reviews.comment,
+    })
+    .from(reviews)
+    .where(
+      and(
+        eq(reviews.user_id, params.userId),
+        eq(reviews.film_id, params.filmId),
+        isNull(reviews.parent_review_id),
+      ),
+    )
+    .limit(1);
+
+  return existing ?? null;
+}
+
+async function getReviewWithAuthorById(reviewId: number) {
+  const [row] = await db
+    .select({
+      review_id: reviews.review_id,
+      user_id: reviews.user_id,
+      film_id: reviews.film_id,
+      parent_review_id: reviews.parent_review_id,
+      rating: reviews.rating,
+      comment: reviews.comment,
+      created_at: reviews.created_at,
+      updated_at: reviews.updated_at,
+      user_name: user.name,
+      user_image: user.image,
+    })
+    .from(reviews)
+    .innerJoin(user, eq(reviews.user_id, user.id))
+    .where(eq(reviews.review_id, reviewId))
+    .limit(1);
+
+  return row as DbReviewRow | undefined;
+}
+
 async function ensureFilmExists(omdbId: string): Promise<number> {
   const filmId = await getFilmIdByOmdbId(omdbId);
   if (!filmId) throw new FilmNotFoundError(`Film ${omdbId} introuvable`);
@@ -133,7 +200,10 @@ export async function getFilmComments(
     .where(eq(reviews.film_id, filmId))
     .orderBy(desc(reviews.created_at));
 
-  const parents = rows.filter((row) => row.parent_review_id === null);
+  const parents = rows.filter(
+    (row) =>
+      row.parent_review_id === null && Boolean((row.comment ?? "").trim()),
+  );
   const parentIds = parents.map((row) => row.review_id);
 
   const repliesRows =
@@ -190,39 +260,121 @@ export async function createFilmComment(params: {
   const comment = params.comment.trim();
   if (!comment) throw new Error("Le commentaire ne peut pas être vide");
 
-  const rating = typeof params.rating === "number" ? params.rating : 0;
+  const optionalRating = normalizeOptionalRating(params.rating);
+  const existingParent = await getParentReviewByUserAndFilm({
+    userId: params.userId,
+    filmId,
+  });
 
-  const [inserted] = await db
-    .insert(reviews)
-    .values({
-      user_id: params.userId,
-      film_id: filmId,
-      parent_review_id: null,
-      rating,
-      comment,
-    })
-    .returning({ review_id: reviews.review_id });
+  let reviewId: number;
 
-  const [created] = await db
+  if (existingParent) {
+    await db
+      .update(reviews)
+      .set({
+        comment,
+        rating:
+          optionalRating !== null ? optionalRating : existingParent.rating,
+        updated_at: new Date(),
+      })
+      .where(eq(reviews.review_id, existingParent.review_id));
+
+    reviewId = existingParent.review_id;
+  } else {
+    const [inserted] = await db
+      .insert(reviews)
+      .values({
+        user_id: params.userId,
+        film_id: filmId,
+        parent_review_id: null,
+        rating: optionalRating ?? 0,
+        comment,
+      })
+      .returning({ review_id: reviews.review_id });
+
+    reviewId = inserted.review_id;
+  }
+
+  const created = await getReviewWithAuthorById(reviewId);
+  if (!created) {
+    throw new ReviewNotFoundError("Commentaire introuvable");
+  }
+
+  const mapped = mapReviewRow(created);
+  return { ...mapped, parentReviewId: null, replies: [] };
+}
+
+export async function upsertFilmRating(params: {
+  omdbId: string;
+  userId: number;
+  rating: number;
+}): Promise<void> {
+  const filmId = await ensureFilmExists(params.omdbId);
+  const rating = normalizeRating(params.rating);
+
+  const existingParent = await getParentReviewByUserAndFilm({
+    userId: params.userId,
+    filmId,
+  });
+
+  if (existingParent) {
+    await db
+      .update(reviews)
+      .set({
+        rating,
+        updated_at: new Date(),
+      })
+      .where(eq(reviews.review_id, existingParent.review_id));
+    return;
+  }
+
+  await db.insert(reviews).values({
+    user_id: params.userId,
+    film_id: filmId,
+    parent_review_id: null,
+    rating,
+    comment: null,
+  });
+}
+
+export async function getFilmRatingSummary(params: {
+  omdbId: string;
+  userId?: number;
+}): Promise<FilmRatingSummaryDto> {
+  const filmId = await ensureFilmExists(params.omdbId);
+
+  const [aggregate] = await db
     .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      updated_at: reviews.updated_at,
-      user_name: user.name,
-      user_image: user.image,
+      averageRating: sql<number | null>`avg(${reviews.rating})::numeric(10,2)`,
+      totalRatings: sql<number>`count(*)`,
     })
     .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .where(eq(reviews.review_id, inserted.review_id))
-    .limit(1);
+    .where(
+      and(
+        eq(reviews.film_id, filmId),
+        isNull(reviews.parent_review_id),
+        sql`${reviews.rating} > 0`,
+      ),
+    );
 
-  const mapped = mapReviewRow(created as DbReviewRow);
-  return { ...mapped, parentReviewId: null, replies: [] };
+  let userRating: number | null = null;
+  if (typeof params.userId === "number") {
+    const userReview = await getParentReviewByUserAndFilm({
+      userId: params.userId,
+      filmId,
+    });
+    userRating = userReview && userReview.rating > 0 ? userReview.rating : null;
+  }
+
+  return {
+    averageRating:
+      aggregate?.averageRating === null ||
+      aggregate?.averageRating === undefined
+        ? null
+        : Number(aggregate.averageRating),
+    totalRatings: Number(aggregate?.totalRatings ?? 0),
+    userRating,
+  };
 }
 
 export async function createReviewReply(params: {

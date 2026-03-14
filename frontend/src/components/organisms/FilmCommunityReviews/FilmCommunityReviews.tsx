@@ -3,6 +3,7 @@ import {
   HiChatBubbleLeftRight,
   HiEllipsisHorizontal,
   HiPencilSquare,
+  HiStar,
   HiTrash,
 } from "react-icons/hi2";
 import {
@@ -11,7 +12,9 @@ import {
   useCreateFilmComment,
   useCreateFilmReply,
   useDeleteFilmComment,
+  useFilmRatingSummary,
   useFilmReviews,
+  useUpsertFilmRating,
   useUpdateFilmComment,
 } from "@/features/reviews/hooks";
 import { useSession } from "@/lib/auth-client";
@@ -37,10 +40,12 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   const { data: session } = useSession();
   const { data: reviews = [], isLoading: reviewsLoading } =
     useFilmReviews(omdbId);
+  const { data: ratingSummary } = useFilmRatingSummary(omdbId);
   const createComment = useCreateFilmComment(omdbId);
   const createReply = useCreateFilmReply(omdbId);
   const updateComment = useUpdateFilmComment(omdbId);
   const deleteComment = useDeleteFilmComment(omdbId);
+  const upsertRating = useUpsertFilmRating(omdbId);
 
   const currentUserId = useMemo(() => {
     const rawId = session?.user?.id;
@@ -50,18 +55,32 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   }, [session?.user?.id]);
 
   const [newComment, setNewComment] = useState("");
+  const [localRatingOverride, setLocalRatingOverride] = useState<number | null>(
+    null,
+  );
   const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
   const [openedMenuId, setOpenedMenuId] = useState<number | null>(null);
 
+  const selectedRating = localRatingOverride ?? ratingSummary?.userRating ?? 0;
+
   const handleCreateComment = async () => {
     const comment = newComment.trim();
     if (!comment) return;
 
-    await createComment.mutateAsync({ comment });
+    await createComment.mutateAsync({
+      comment,
+      rating: selectedRating > 0 ? selectedRating : undefined,
+    });
     setNewComment("");
+  };
+
+  const handleRateFilm = async (rating: number) => {
+    if (!session?.user?.id) return;
+    setLocalRatingOverride(rating);
+    await upsertRating.mutateAsync({ rating });
   };
 
   const handleCreateReply = async (parentReviewId: number) => {
@@ -248,6 +267,46 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
 
       <div className="space-y-6">
         <div className="rounded-2xl border border-neutral-800/70 bg-neutral-950/60 p-4 md:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-neutral-300">Votre note</p>
+              <p className="text-xs text-neutral-500">
+                Une seule note par film, vous pouvez la modifier quand vous
+                voulez.
+              </p>
+            </div>
+
+            {session?.user?.id ? (
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => void handleRateFilm(value)}
+                    disabled={upsertRating.isPending}
+                    className="rounded-md p-1 transition hover:bg-white/10 disabled:opacity-50"
+                    aria-label={`Noter ${value} sur 5`}
+                  >
+                    <HiStar
+                      size={24}
+                      className={
+                        value <= selectedRating
+                          ? "text-amber-400"
+                          : "text-neutral-600"
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-neutral-500">
+                Connectez-vous pour noter ce film.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-neutral-800/70 bg-neutral-950/60 p-4 md:p-5">
           <label className="block text-sm text-neutral-300 mb-2">
             Partage ton avis
           </label>
@@ -262,7 +321,11 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
             <button
               type="button"
               onClick={() => void handleCreateComment()}
-              disabled={createComment.isPending || !newComment.trim()}
+              disabled={
+                createComment.isPending ||
+                !newComment.trim() ||
+                selectedRating === 0
+              }
               className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
             >
               Publier
@@ -271,6 +334,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
         </div>
 
         {(createComment.error ||
+          upsertRating.error ||
           createReply.error ||
           updateComment.error ||
           deleteComment.error) && (
