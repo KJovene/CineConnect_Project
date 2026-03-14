@@ -65,6 +65,50 @@ export interface SearchResponse {
 // Détail complet — retourné par GET /api/films/:omdbId
 export type FilmDetailResponse = Film;
 
+export interface ReviewAuthor {
+  id: number;
+  name: string;
+  image: string | null;
+}
+
+export interface ReviewReply {
+  reviewId: number;
+  filmId: number;
+  parentReviewId: number;
+  rating: number;
+  comment: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  author: ReviewAuthor;
+}
+
+export interface FilmReviewComment {
+  reviewId: number;
+  filmId: number;
+  parentReviewId: null;
+  rating: number;
+  comment: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  author: ReviewAuthor;
+  replies: ReviewReply[];
+}
+
+export type FilmReviewsResponse = FilmReviewComment[];
+
+export interface CreateFilmCommentRequest {
+  comment: string;
+  rating?: number;
+}
+
+export interface UpdateFilmCommentRequest {
+  comment: string;
+}
+
+export interface CreateFilmReplyRequest {
+  comment: string;
+}
+
 // Films à la une — retourné par GET /api/films/top-rated
 export type TopRatedResponse = Film[];
 
