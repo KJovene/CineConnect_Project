@@ -32,6 +32,12 @@ export interface FilmReviewComment {
 
 type FilmReviewsResponse = FilmReviewComment[];
 
+export interface FilmRatingSummary {
+  averageRating: number | null;
+  totalRatings: number;
+  userRating: number | null;
+}
+
 interface CreateFilmCommentRequest {
   comment: string;
   rating?: number;
@@ -49,12 +55,50 @@ function reviewsQueryKey(omdbId: string) {
   return ["films", omdbId, "reviews"] as const;
 }
 
+function ratingSummaryQueryKey(omdbId: string) {
+  return ["films", omdbId, "rating-summary"] as const;
+}
+
+function movieDetailQueryKey(omdbId: string) {
+  return ["movies", "detail", omdbId] as const;
+}
+
 export function useFilmReviews(omdbId: string) {
   return useQuery({
     queryKey: reviewsQueryKey(omdbId),
     queryFn: () =>
       apiClient.get<FilmReviewsResponse>(`/films/${omdbId}/reviews`),
     enabled: !!omdbId,
+  });
+}
+
+export function useFilmRatingSummary(omdbId: string) {
+  return useQuery({
+    queryKey: ratingSummaryQueryKey(omdbId),
+    queryFn: () =>
+      apiClient.get<FilmRatingSummary>(
+        `/films/${omdbId}/reviews/rating-summary`,
+      ),
+    enabled: !!omdbId,
+  });
+}
+
+export function useUpsertFilmRating(omdbId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: { rating: number }) =>
+      apiClient.post<FilmRatingSummary>(
+        `/films/${omdbId}/reviews/rating`,
+        payload,
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ratingSummaryQueryKey(omdbId),
+      });
+      queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
+      queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
+    },
   });
 }
 
@@ -66,6 +110,10 @@ export function useCreateFilmComment(omdbId: string) {
       apiClient.post(`/films/${omdbId}/reviews`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
+      queryClient.invalidateQueries({
+        queryKey: ratingSummaryQueryKey(omdbId),
+      });
+      queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
 }
@@ -83,6 +131,10 @@ export function useUpdateFilmComment(omdbId: string) {
     }) => apiClient.patch(`/films/${omdbId}/reviews/${reviewId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
+      queryClient.invalidateQueries({
+        queryKey: ratingSummaryQueryKey(omdbId),
+      });
+      queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
 }
@@ -95,6 +147,10 @@ export function useDeleteFilmComment(omdbId: string) {
       apiClient.delete(`/films/${omdbId}/reviews/${reviewId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
+      queryClient.invalidateQueries({
+        queryKey: ratingSummaryQueryKey(omdbId),
+      });
+      queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
 }

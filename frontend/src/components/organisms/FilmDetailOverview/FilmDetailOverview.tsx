@@ -1,17 +1,18 @@
-import { HiBookmark, HiPencil, HiPlay, HiStar } from "react-icons/hi2";
+import { RatingStars } from "@/components/atoms";
 import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
 
 export interface FilmDetailMovie {
   title: string;
   year: number | null;
   runtime: string | null;
-  imdb_rating: string | null;
   plot: string | null;
   director: string | null;
   awards: string | null;
   genre: string | null;
   type: "movie" | "series" | "episode" | null;
   poster_url: string | null;
+  average_rating: number | null;
+  ratings_count: number;
 }
 
 interface FilmDetailOverviewProps {
@@ -20,6 +21,14 @@ interface FilmDetailOverviewProps {
 
 export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
   const genres: string[] = movie.genre ? movie.genre.split(", ") : [];
+  const roundedAverageRating =
+    typeof movie.average_rating === "number"
+      ? Math.round(movie.average_rating * 10) / 10
+      : null;
+  const starsRating =
+    roundedAverageRating === null
+      ? 0
+      : Math.max(1, Math.min(5, Math.round(roundedAverageRating)));
 
   return (
     <>
@@ -52,13 +61,17 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
                   </>
                 )}
 
-                {movie.imdb_rating && movie.imdb_rating !== "N/A" && (
+                {roundedAverageRating !== null && (
                   <div className="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2 bg-neutral-900/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                    <HiStar className="text-amber-400" size={18} />
+                    <RatingStars rating={starsRating} size={14} />
                     <span className="text-white font-semibold">
-                      {movie.imdb_rating}
+                      {roundedAverageRating.toFixed(1)}
                     </span>
-                    <span className="text-neutral-500 text-xs">/ 10</span>
+                    <span className="text-neutral-500 text-xs">/ 5</span>
+                    <span className="text-neutral-500 text-xs">
+                      ({movie.ratings_count} note
+                      {movie.ratings_count > 1 ? "s" : ""})
+                    </span>
                   </div>
                 )}
               </div>

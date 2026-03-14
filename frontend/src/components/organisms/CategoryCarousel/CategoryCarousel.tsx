@@ -82,7 +82,7 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
       >
         {films.map((film) => (
           <div
-            key={film.film_id}
+            key={film.omdb_id}
             className="shrink-0 snap-start w-[45%] sm:w-[30%] md:w-[23%] lg:w-[calc((100%-7*1rem)/8)]"
           >
             <MovieCard
@@ -91,7 +91,7 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
               title={film.title}
               director={film.director ?? "Inconnu"}
               year={film.year?.toString() ?? ""}
-              rating={film.imdb_rating ?? undefined}
+              rating={film.average_rating ?? null}
             />
           </div>
         ))}

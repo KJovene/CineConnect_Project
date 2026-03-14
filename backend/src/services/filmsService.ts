@@ -1,6 +1,15 @@
 import { db } from "../db/index.js";
-import { films } from "../db/schema.js";
-import { eq, desc, isNotNull, sql, inArray, like } from "drizzle-orm";
+import { films, reviews } from "../db/schema.js";
+import {
+  and,
+  eq,
+  desc,
+  isNotNull,
+  isNull,
+  sql,
+  inArray,
+  like,
+} from "drizzle-orm";
 import type {
   Film,
   FilmSearchResult,
@@ -116,6 +125,50 @@ async function upsertFilmFromOmdbDetail(omdbDetail: OmdbDetail): Promise<Film> {
   return film as unknown as Film;
 }
 
+async function withCommunityRatings(items: Film[]): Promise<Film[]> {
+  if (items.length === 0) return items;
+
+  const filmIds = items.map((film) => film.film_id);
+
+  const aggregates = await db
+    .select({
+      film_id: reviews.film_id,
+      average_rating: sql<number | null>`avg(${reviews.rating})::numeric(10,2)`,
+      ratings_count: sql<number>`count(*)`,
+    })
+    .from(reviews)
+    .where(
+      and(
+        inArray(reviews.film_id, filmIds),
+        isNull(reviews.parent_review_id),
+        sql`${reviews.rating} > 0`,
+      ),
+    )
+    .groupBy(reviews.film_id);
+
+  const aggregateMap = new Map(aggregates.map((item) => [item.film_id, item]));
+
+  return items.map((film) => {
+    const aggregate = aggregateMap.get(film.film_id);
+    if (!aggregate) {
+      return {
+        ...film,
+        average_rating: null,
+        ratings_count: 0,
+      };
+    }
+
+    return {
+      ...film,
+      average_rating:
+        aggregate.average_rating === null
+          ? null
+          : Number(aggregate.average_rating),
+      ratings_count: Number(aggregate.ratings_count),
+    };
+  });
+}
+
 //  Service public
 export async function searchFilms(
   query: string,
@@ -191,7 +244,7 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
     .orderBy(desc(films.imdb_rating))
     .limit(limit);
 
-  return result as unknown as Film[];
+  return withCommunityRatings(result as unknown as Film[]);
 }
 
 /**
@@ -231,9 +284,12 @@ export async function getFilmsByGenre(
       .limit(limitPerGenre);
 
     if (result.length > 0) {
+      const filmsWithRatings = await withCommunityRatings(
+        result as unknown as Film[],
+      );
       sections.push({
         genre,
-        films: result as unknown as Film[],
+        films: filmsWithRatings,
       });
     }
   }
