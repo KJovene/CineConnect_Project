@@ -1,0 +1,224 @@
+import { Router } from "express";
+import {
+  attachSession,
+  requireAuth,
+  type RequestWithSession,
+} from "../middlewares/authMiddleware.js";
+import {
+  createFilmComment,
+  createReviewReply,
+  deleteReviewComment,
+  FilmNotFoundError,
+  ForbiddenReviewActionError,
+  getFilmComments,
+  ReplyDepthExceededError,
+  ReviewNotFoundError,
+  updateReviewComment,
+} from "../services/reviewsService.js";
+
+const router = Router({ mergeParams: true });
+
+function getOmdbId(req: RequestWithSession): string {
+  const value = req.params.omdbId;
+  return (Array.isArray(value) ? value[0] : (value ?? "")).trim();
+}
+
+function getNumberParam(value: string | string[] | undefined): number {
+  const normalized = Array.isArray(value) ? value[0] : value;
+  return Number.parseInt(String(normalized ?? ""), 10);
+}
+
+router.get("/", async (req, res) => {
+  const omdbId = getOmdbId(req);
+  if (!omdbId) {
+    res.status(400).json({ error: "omdbId manquant" });
+    return;
+  }
+
+  try {
+    const comments = await getFilmComments(omdbId);
+    res.json(comments);
+  } catch (error) {
+    if (error instanceof FilmNotFoundError) {
+      res.status(404).json({ error: error.message });
+      return;
+    }
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+router.post(
+  "/",
+  attachSession,
+  requireAuth,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    if (!omdbId) {
+      res.status(400).json({ error: "omdbId manquant" });
+      return;
+    }
+
+    const userId = parseInt(req.session!.user.id, 10);
+    const { comment, rating } = req.body as {
+      comment?: string;
+      rating?: number;
+    };
+
+    if (typeof comment !== "string") {
+      res.status(400).json({ error: "Le champ comment est requis" });
+      return;
+    }
+
+    try {
+      const created = await createFilmComment({
+        omdbId,
+        userId,
+        comment,
+        rating,
+      });
+      res.status(201).json(created);
+    } catch (error) {
+      if (error instanceof FilmNotFoundError) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
+
+router.post(
+  "/:reviewId/replies",
+  attachSession,
+  requireAuth,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    const reviewId = getNumberParam(req.params.reviewId);
+
+    if (!omdbId || Number.isNaN(reviewId)) {
+      res.status(400).json({ error: "Paramètres invalides" });
+      return;
+    }
+
+    const userId = parseInt(req.session!.user.id, 10);
+    const { comment } = req.body as { comment?: string };
+
+    if (typeof comment !== "string") {
+      res.status(400).json({ error: "Le champ comment est requis" });
+      return;
+    }
+
+    try {
+      const created = await createReviewReply({
+        omdbId,
+        userId,
+        parentReviewId: reviewId,
+        comment,
+      });
+      res.status(201).json(created);
+    } catch (error) {
+      if (
+        error instanceof FilmNotFoundError ||
+        error instanceof ReviewNotFoundError
+      ) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof ReplyDepthExceededError) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
+
+router.patch(
+  "/:reviewId",
+  attachSession,
+  requireAuth,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    const reviewId = getNumberParam(req.params.reviewId);
+
+    if (!omdbId || Number.isNaN(reviewId)) {
+      res.status(400).json({ error: "Paramètres invalides" });
+      return;
+    }
+
+    const userId = parseInt(req.session!.user.id, 10);
+    const { comment } = req.body as { comment?: string };
+
+    if (typeof comment !== "string") {
+      res.status(400).json({ error: "Le champ comment est requis" });
+      return;
+    }
+
+    try {
+      await updateReviewComment({ omdbId, userId, reviewId, comment });
+      res.status(204).send();
+    } catch (error) {
+      if (
+        error instanceof FilmNotFoundError ||
+        error instanceof ReviewNotFoundError
+      ) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof ForbiddenReviewActionError) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
+
+router.delete(
+  "/:reviewId",
+  attachSession,
+  requireAuth,
+  async (req: RequestWithSession, res) => {
+    const omdbId = getOmdbId(req);
+    const reviewId = getNumberParam(req.params.reviewId);
+
+    if (!omdbId || Number.isNaN(reviewId)) {
+      res.status(400).json({ error: "Paramètres invalides" });
+      return;
+    }
+
+    const userId = parseInt(req.session!.user.id, 10);
+
+    try {
+      await deleteReviewComment({ omdbId, userId, reviewId });
+      res.status(204).send();
+    } catch (error) {
+      if (
+        error instanceof FilmNotFoundError ||
+        error instanceof ReviewNotFoundError
+      ) {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error instanceof ForbiddenReviewActionError) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  },
+);
+
+export default router;

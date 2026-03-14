@@ -7,3 +7,6 @@ export * from "./ReviewList";
 export * from "./FriendList";
 export * from "./ChatWindow";
 export * from "./CategoryCarousel";
+export * from "./FilmDetailHeader";
+export * from "./FilmDetailOverview";
+export * from "./FilmCommunityReviews";
