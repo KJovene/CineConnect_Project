@@ -1,5 +1,5 @@
 import React from "react";
-import posterPlaceholder from "@/assets/poster-indispo.png";
+import posterPlaceholder from "@/assets/pixel.jpg";
 
 export const getPosterUrl = (poster: string | undefined): string => {
   if (!poster || poster === "N/A" || poster.trim() === "") {
