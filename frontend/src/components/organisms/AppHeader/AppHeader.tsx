@@ -1,5 +1,5 @@
 import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
-import { MobileMenuToggle, AuthNavButton, CategoryDropdown } from "@/components/molecules";
+import { MobileMenuToggle, AuthNavButton } from "@/components/molecules";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -29,10 +29,6 @@ export function AppHeader({
       }}
     >
       <div className="flex items-center gap-3">
-        <CategoryDropdown
-          value={selectedCategory}
-          onChange={setSelectedCategory}
-        />
         <Link
           to="/search"
           className="p-2.5 rounded-lg bg-white/5 border border-white/10 text-neutral-400 hover:text-white hover:border-indigo-500/50 transition-all"
