@@ -33,12 +33,6 @@ const SIDEBAR_SECTIONS: SidebarNavSection[] = [
         href: "/film",
       },
       {
-        id: "series",
-        icon: <HiOutlinePlayCircle size={20} />,
-        label: "Séries",
-        href: "/series",
-      },
-      {
         id: "notes",
         icon: <HiOutlinePlayCircle size={20} />,
         label: "Mes Notes",

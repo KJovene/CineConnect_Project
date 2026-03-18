@@ -35,7 +35,7 @@ export interface Film {
   omdb_id: string;
   title: string;
   year: number | null;
-  type: "movie" | "series" | "episode" | null;
+  type: "movie" | null;
   director: string | null;
   poster_url: string | null;
   genre: string | null;
@@ -54,7 +54,7 @@ export interface FilmSearchResult {
   omdb_id: string;
   title: string;
   year: number | null;
-  type: "movie" | "series" | "episode" | null;
+  type: "movie" | null;
   poster_url: string | null;
 }
 

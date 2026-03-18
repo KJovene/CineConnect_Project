@@ -9,7 +9,7 @@ export interface FilmDetailMovie {
   director: string | null;
   awards: string | null;
   genre: string | null;
-  type: "movie" | "series" | "episode" | null;
+  type: "movie" | null;
   poster_url: string | null;
   average_rating: number | null;
   ratings_count: number;
@@ -119,13 +119,7 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
                 <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">
                   Type
                 </h3>
-                <p className="text-neutral-300 capitalize">
-                  {movie.type === "movie"
-                    ? "Film"
-                    : movie.type === "series"
-                      ? "Serie"
-                      : movie.type}
-                </p>
+                <p className="text-neutral-300 capitalize">Film</p>
               </div>
             )}
           </div>

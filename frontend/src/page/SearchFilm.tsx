@@ -70,7 +70,7 @@ const SearchPage: React.FC = () => {
               </div>
               <div className="flex-1 w-full">
                 <SearchBar 
-                  placeholder="Rechercher un film, une série, un réalisateur..."
+                  placeholder="Rechercher un film, un réalisateur..."
                   value={searchQuery}
                   onChange={setSearchQuery}
                   fullWidth={true}
@@ -82,7 +82,7 @@ const SearchPage: React.FC = () => {
           {/* BARRE DE RECHERCHE */}
           <div className="mb-12">
             <SearchBar 
-              placeholder="Rechercher un film, une série, un réalisateur..."
+              placeholder="Rechercher un film, un réalisateur..."
               value={searchQuery}
               onChange={setSearchQuery}
               fullWidth={true}
@@ -150,9 +150,7 @@ const SearchPage: React.FC = () => {
                           </h3>
                           <div className="flex items-center justify-between text-[10px] text-neutral-400 group-hover:text-neutral-300 transition-colors">
                             <span>{movie.year}</span>
-                            <span className="capitalize">
-                              {movie.type === "movie" ? "Film" : movie.type === "series" ? "Série" : movie.type}
-                            </span>
+                            <span className="capitalize">Film</span>
                           </div>
                         </div>
                       </Link>

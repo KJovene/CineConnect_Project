@@ -70,8 +70,8 @@ function parseYear(year: string | undefined): number | null {
 
 function parseType(
   type: string | undefined,
-): "movie" | "series" | "episode" | null {
-  if (type === "movie" || type === "series" || type === "episode") return type;
+): "movie" | null {
+  if (type === "movie") return type;
   return null;
 }
 
@@ -82,7 +82,7 @@ async function fetchOmdbSearch(
 ): Promise<OmdbSearchResponse> {
   if (!OMDB_API_KEY) throw new Error("OMDB_API_KEY manquante dans .env");
 
-  const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&page=${page}`;
+  const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&type=movie&page=${page}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`OMDB search HTTP ${res.status}`);
   return await res.json();
@@ -197,6 +197,7 @@ export async function searchFilms(
     missingIds.map(async (imdbId) => {
       const detail = await fetchOmdbDetail(imdbId);
       if (detail.Response === "False") return null;
+      if (parseType(detail.Type) !== "movie") return null;
       return upsertFilmFromOmdbDetail(detail);
     }),
   ).then((results) => results.filter(Boolean) as Film[]);
@@ -228,10 +229,13 @@ export async function getFilmDetail(omdbId: string): Promise<Film | null> {
     .where(eq(films.omdb_id, omdbId))
     .limit(1);
 
-  if (existing) return existing as unknown as Film;
+  if (existing) {
+    return existing.type === "movie" ? (existing as unknown as Film) : null;
+  }
 
   const detail = await fetchOmdbDetail(omdbId);
   if (detail.Response === "False") return null;
+  if (parseType(detail.Type) !== "movie") return null;
 
   return upsertFilmFromOmdbDetail(detail);
 }
@@ -240,7 +244,7 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
   const result = await db
     .select()
     .from(films)
-    .where(isNotNull(films.imdb_rating))
+    .where(and(isNotNull(films.imdb_rating), eq(films.type, "movie")))
     .orderBy(desc(films.imdb_rating))
     .limit(limit);
 
@@ -279,7 +283,7 @@ export async function getFilmsByGenre(
     const result = await db
       .select()
       .from(films)
-      .where(like(films.genre, `%${genre}%`))
+      .where(and(eq(films.type, "movie"), like(films.genre, `%${genre}%`)))
       .orderBy(desc(films.imdb_rating))
       .limit(limitPerGenre);
 
