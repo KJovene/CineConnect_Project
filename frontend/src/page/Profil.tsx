@@ -2,7 +2,11 @@ import React, { useRef, useState } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { useNavigate } from "@tanstack/react-router";
 import { Avatar } from "@/components/atoms";
-import { FriendList } from "@/components/organisms";
+import {
+  FriendList,
+  ProfileLatestComments,
+  ProfileLatestRatings,
+} from "@/components/organisms";
 import { SearchUserRow } from "@/components/molecules";
 import { getSession, updateCurrentUser, useSession } from "@/lib/auth-client";
 import {
@@ -16,6 +20,10 @@ import {
   type FriendUser,
   type UserSearchResult,
 } from "@/features/friends/hooks";
+import {
+  useMyLatestComments,
+  useMyLatestRatings,
+} from "@/features/reviews/hooks";
 
 const Profil: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +34,10 @@ const Profil: React.FC = () => {
   const { data: friends = [], isLoading: friendsLoading } = useFriends();
   const { data: pendingRequests = [] } = usePendingRequests();
   const { data: searchResults = [] } = useSearchUsers(search);
+  const { data: latestRatings = [], isLoading: latestRatingsLoading } =
+    useMyLatestRatings();
+  const { data: latestComments = [], isLoading: latestCommentsLoading } =
+    useMyLatestComments();
 
   const [requestError, setRequestError] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
@@ -55,6 +67,11 @@ const Profil: React.FC = () => {
       month: "long",
       year: "numeric",
     });
+  };
+
+  const handleOpenFilm = (omdbId: string) => {
+    if (!omdbId) return;
+    navigate({ to: "/film/$id", params: { id: omdbId } });
   };
 
   const handleChoosePhoto = () => {
@@ -183,6 +200,19 @@ const Profil: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="mb-8 grid grid-cols-1 gap-4">
+        <ProfileLatestRatings
+          ratings={latestRatings}
+          isLoading={latestRatingsLoading}
+          onOpenFilm={handleOpenFilm}
+        />
+        <ProfileLatestComments
+          comments={latestComments}
+          isLoading={latestCommentsLoading}
+          onOpenFilm={handleOpenFilm}
+        />
       </section>
 
       {/* Recherche d'amis */}
