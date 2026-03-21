@@ -1,20 +1,30 @@
-import { HiUserPlus } from 'react-icons/hi2';
-import type { UserSearchResult } from '@/features/friends/hooks';
+import { HiUserPlus } from "react-icons/hi2";
+import type { UserSearchResult } from "@/features/friends/hooks";
 
 const RELATION_LABEL: Record<string, string> = {
-  accepted: 'Déjà ami',
-  pending: 'Demande envoyée',
-  rejected: 'Refusé',
+  accepted: "Déjà ami",
+  pending: "Demande envoyée",
+  rejected: "Refusé",
 };
 
 export interface SearchUserRowProps {
   user: UserSearchResult;
   onAdd: (id: number) => void;
   isPending?: boolean;
+  requestSent?: boolean;
 }
 
-export function SearchUserRow({ user, onAdd, isPending }: SearchUserRowProps) {
-  const hasRelation = user.relationStatus !== null;
+export function SearchUserRow({
+  user,
+  onAdd,
+  isPending,
+  requestSent = false,
+}: SearchUserRowProps) {
+  const hasRelation = user.relationStatus !== null || requestSent;
+  const relationLabel =
+    requestSent && user.relationStatus === null
+      ? "Demande envoyée"
+      : RELATION_LABEL[user.relationStatus ?? "pending"];
 
   return (
     <div className="flex items-center justify-between bg-[#0A0A0A] border border-white/5 rounded-xl p-3">
@@ -23,14 +33,18 @@ export function SearchUserRow({ user, onAdd, isPending }: SearchUserRowProps) {
           {(user.name ?? user.email)[0].toUpperCase()}
         </div>
         <div className="min-w-0">
-          <div className="text-sm font-medium text-white truncate">{user.name ?? 'Utilisateur'}</div>
-          <div className="text-[11px] text-neutral-500 truncate">{user.email}</div>
+          <div className="text-sm font-medium text-white truncate">
+            {user.name ?? "Utilisateur"}
+          </div>
+          <div className="text-[11px] text-neutral-500 truncate">
+            {user.email}
+          </div>
         </div>
       </div>
 
       {hasRelation ? (
         <span className="text-xs text-neutral-500 px-3 py-1.5 shrink-0">
-          {RELATION_LABEL[user.relationStatus!]}
+          {relationLabel}
         </span>
       ) : (
         <button

@@ -40,6 +40,7 @@ const Profil: React.FC = () => {
     useMyLatestComments();
 
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [sentRequestIds, setSentRequestIds] = useState<Set<number>>(new Set());
   const [profileError, setProfileError] = useState<string | null>(null);
   const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
 
@@ -259,11 +260,20 @@ const Profil: React.FC = () => {
                   user={u}
                   onAdd={(id) => {
                     setRequestError(null);
+                    setSentRequestIds((previous) => new Set(previous).add(id));
                     sendRequest.mutate(id, {
-                      onError: (err) => setRequestError(err.message),
+                      onError: (err) => {
+                        setSentRequestIds((previous) => {
+                          const next = new Set(previous);
+                          next.delete(id);
+                          return next;
+                        });
+                        setRequestError(err.message);
+                      },
                     });
                   }}
                   isPending={sendRequest.isPending}
+                  requestSent={sentRequestIds.has(u.id)}
                 />
               ))
             )}
