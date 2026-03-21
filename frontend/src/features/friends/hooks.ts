@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/apiClient';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/apiClient";
 
 export interface FriendUser {
   id: number;
@@ -9,7 +9,7 @@ export interface FriendUser {
 }
 
 export interface UserSearchResult extends FriendUser {
-  relationStatus: 'pending' | 'accepted' | 'rejected' | null;
+  relationStatus: "pending" | "accepted" | "rejected" | null;
 }
 
 export interface FriendRelation {
@@ -32,22 +32,25 @@ export interface PendingRequest {
 
 export function useFriends() {
   return useQuery({
-    queryKey: ['friends'],
-    queryFn: () => apiClient.get<FriendRelation[]>('/friends'),
+    queryKey: ["friends"],
+    queryFn: () => apiClient.get<FriendRelation[]>("/friends"),
   });
 }
 
 export function usePendingRequests() {
   return useQuery({
-    queryKey: ['friends', 'pending'],
-    queryFn: () => apiClient.get<PendingRequest[]>('/friends/pending'),
+    queryKey: ["friends", "pending"],
+    queryFn: () => apiClient.get<PendingRequest[]>("/friends/pending"),
   });
 }
 
 export function useSearchUsers(search: string) {
   return useQuery({
-    queryKey: ['users', 'search', search],
-    queryFn: () => apiClient.get<UserSearchResult[]>(`/users?search=${encodeURIComponent(search)}`),
+    queryKey: ["users", "search", search],
+    queryFn: () =>
+      apiClient.get<UserSearchResult[]>(
+        `/users?search=${encodeURIComponent(search)}`,
+      ),
     enabled: search.length >= 2,
   });
 }
@@ -56,8 +59,11 @@ export function useSendFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (friendUserId: number) =>
-      apiClient.post('/friends/request', { friendUserId }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+      apiClient.post("/friends/request", { friendUserId }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["friends"] });
+      qc.invalidateQueries({ queryKey: ["users", "search"] });
+    },
   });
 }
 
@@ -65,10 +71,10 @@ export function useAcceptFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (friendUserId: number) =>
-      apiClient.post('/friends/accept', { friendUserId }),
+      apiClient.post("/friends/accept", { friendUserId }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['friends'] });
-      qc.invalidateQueries({ queryKey: ['friends', 'pending'] });
+      qc.invalidateQueries({ queryKey: ["friends"] });
+      qc.invalidateQueries({ queryKey: ["friends", "pending"] });
     },
   });
 }
@@ -77,8 +83,8 @@ export function useRejectFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (friendUserId: number) =>
-      apiClient.post('/friends/reject', { friendUserId }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends', 'pending'] }),
+      apiClient.post("/friends/reject", { friendUserId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["friends", "pending"] }),
   });
 }
 
@@ -87,6 +93,6 @@ export function useRemoveFriend() {
   return useMutation({
     mutationFn: (friendUserId: number) =>
       apiClient.delete(`/friends/${friendUserId}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["friends"] }),
   });
 }

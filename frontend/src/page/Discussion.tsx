@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
+import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
 import { useSession } from "@/lib/auth-client";
@@ -12,6 +13,7 @@ import {
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 
 const Discussion: React.FC = () => {
+  const search = useSearch({ from: "/_authenticated/discussion" });
   const { data: session } = useSession();
   const currentUserId = session?.user ? parseInt(session.user.id) : null;
 
@@ -28,6 +30,20 @@ const Discussion: React.FC = () => {
     connectSocket();
     return () => disconnectSocket();
   }, []);
+
+  useEffect(() => {
+    const rawFriendId = search.friendId;
+    if (!rawFriendId) return;
+
+    const parsedFriendId = Number.parseInt(rawFriendId, 10);
+    if (Number.isNaN(parsedFriendId)) return;
+
+    const relation = friends.find((item) => item.friend?.id === parsedFriendId);
+    const targetFriend = relation?.friend;
+    if (!targetFriend) return;
+
+    setSelectedFriend(targetFriend);
+  }, [friends, search.friendId]);
 
   // Écoute les messages entrants et met à jour le cache TanStack Query
   useIncomingMessages(currentUserId);

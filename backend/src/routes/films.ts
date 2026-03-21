@@ -9,7 +9,10 @@ import {
   attachSession,
   type RequestWithSession,
 } from "../middlewares/authMiddleware.js";
-import { getFilmRatingSummary } from "../services/reviewsService.js";
+import {
+  getFilmRatingSummary,
+  getLatestCommunityReviews,
+} from "../services/reviewsService.js";
 import reviewsRouter from "./reviews.js";
 
 const router = Router();
@@ -77,6 +80,21 @@ router.get("/top-rated", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/community-reviews", async (req: Request, res: Response) => {
+  const limit = Number.parseInt(req.query.limit as string, 10) || 4;
+
+  try {
+    const data = await getLatestCommunityReviews(limit);
+    res.json(data);
+  } catch (err) {
+    console.error("[films/community-reviews]", err);
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Erreur lors de la récupération des avis de la communauté",
+    });
+  }
+});
+
 router.use("/:omdbId/reviews", reviewsRouter);
 
 // ─── GET /api/films/:omdbId ───────────────────────────────────────────────────
@@ -100,12 +118,10 @@ router.get(
     try {
       const film = await getFilmDetail(omdbId);
       if (!film) {
-        res
-          .status(404)
-          .json({
-            error: "Not Found",
-            message: `Film "${omdbId}" introuvable`,
-          });
+        res.status(404).json({
+          error: "Not Found",
+          message: `Film "${omdbId}" introuvable`,
+        });
         return;
       }
 

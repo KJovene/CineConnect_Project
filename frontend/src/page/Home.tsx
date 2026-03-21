@@ -1,39 +1,15 @@
 import React from "react";
 import { HeroSection, MediaGrid, ReviewList } from "@/components/organisms";
 import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
+import { useLatestCommunityReviews } from "@/hooks/useLatestCommunityReviews";
 import { getPosterUrl } from "@/features/media/utils/poster";
 import type { Film } from "@cineconnect/shared";
 import type { MovieCardProps } from "@/components/molecules";
 
-const RECENT_REVIEWS = [
-  {
-    avatar: "https://i.pravatar.cc/150?img=12",
-    name: "Sophie M.",
-    badge: "Membre Verified",
-    rating: 5,
-    movie: "Interstellar Echoes",
-    review:
-      "Une photographie époustouflante. Probablement le meilleur film de l'année. La bande son est tout simplement magistrale.",
-    time: "Il y a 2h",
-    likes: 24,
-    comments: 4,
-  },
-  {
-    avatar: "https://i.pravatar.cc/150?img=8",
-    name: "Marc L.",
-    badge: "Critique Amateur",
-    rating: 4,
-    movie: "Neo Tokyo",
-    review:
-      "L'intrigue est un peu lente au début, mais le final rattrape tout. Incroyable performance d'acteur sur la scène finale.",
-    time: "Il y a 5h",
-    likes: 12,
-    comments: 1,
-  },
-];
-
 const Home: React.FC = () => {
   const { data: topFilms, isLoading } = useTopRatedMovies(5);
+  const { data: communityReviews = [], isLoading: isLoadingCommunityReviews } =
+    useLatestCommunityReviews(4);
 
   const convertToMovieCard = (film: Film): MovieCardProps => ({
     image: getPosterUrl(film.poster_url),
@@ -46,6 +22,15 @@ const Home: React.FC = () => {
 
   const featuredFilm = topFilms?.[0];
   const trendingFilms = topFilms?.slice(1, 5).map(convertToMovieCard) || [];
+  const recentReviews = communityReviews.slice(0, 4).map((review) => ({
+    avatar: review.author.image,
+    name: review.author.name,
+    rating: review.rating,
+    movie: review.film.title,
+    review: review.comment,
+    commentedAt: review.createdAt,
+    omdbId: review.film.omdbId,
+  }));
 
   return (
     <>
@@ -61,9 +46,8 @@ const Home: React.FC = () => {
         )}
         <ReviewList
           title="Derniers Avis de la communauté"
-          reviews={RECENT_REVIEWS}
-          onViewAll={() => {}}
-          onWriteReview={() => {}}
+          reviews={recentReviews}
+          isLoading={isLoadingCommunityReviews}
         />
       </div>
     </>

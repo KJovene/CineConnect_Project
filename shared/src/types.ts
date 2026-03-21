@@ -115,6 +115,20 @@ export interface CreateFilmReplyRequest {
   comment: string;
 }
 
+export interface CommunityReview {
+  reviewId: number;
+  rating: number;
+  comment: string;
+  createdAt: string | null;
+  author: ReviewAuthor;
+  film: {
+    omdbId: string;
+    title: string;
+  };
+}
+
+export type CommunityReviewsResponse = CommunityReview[];
+
 // Films à la une — retourné par GET /api/films/top-rated
 export type TopRatedResponse = Film[];
 
