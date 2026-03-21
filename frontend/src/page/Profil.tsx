@@ -175,7 +175,7 @@ const Profil: React.FC = () => {
             <p className="text-xs text-rose-400">{profileError}</p>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="text-xs uppercase tracking-wide text-neutral-500">
                 Pseudo
@@ -192,10 +192,18 @@ const Profil: React.FC = () => {
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="text-xs uppercase tracking-wide text-neutral-500">
-                Demandes
+                Notes
               </p>
               <p className="text-sm text-neutral-100 mt-1">
-                {pendingRequests.length}
+                {latestRatings.length}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Commentaires
+              </p>
+              <p className="text-sm text-neutral-100 mt-1">
+                {latestComments.length}
               </p>
             </div>
           </div>
