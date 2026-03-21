@@ -41,6 +41,18 @@ router.get("/conversations", async (req: RequestWithSession, res) => {
   }
 });
 
+// GET /api/messages/incoming?limit=20 — messages reçus pour les notifications
+router.get("/incoming", async (req: RequestWithSession, res) => {
+  try {
+    const myId = parseInt(req.session!.user.id);
+    const limit = parseInt((req.query.limit as string) ?? "20");
+    const data = await messagesService.getIncomingMessages(myId, limit);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
 // POST /api/messages — envoyer un message (fallback sans socket)
 router.post("/", async (req: RequestWithSession, res) => {
   try {

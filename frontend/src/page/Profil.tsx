@@ -282,7 +282,7 @@ const Profil: React.FC = () => {
       </section>
 
       {/* Liste des amis */}
-      <section>
+      <section id="friends-section" className="scroll-mt-28">
         <h2 className="text-lg font-semibold text-white mb-4">Mes amis</h2>
         <FriendList
           friends={friends}

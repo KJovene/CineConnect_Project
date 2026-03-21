@@ -7,6 +7,7 @@ import {
 import { db } from "../db/index.js";
 import { user, friends, reviews, films } from "../db/schema.js";
 import { ilike, or, and, eq, inArray, desc, isNull, sql } from "drizzle-orm";
+import { getUserCommentReplyNotifications } from "../services/reviewsService.js";
 
 const router = Router();
 
@@ -94,6 +95,23 @@ router.get("/me/latest-comments", async (req: RequestWithSession, res) => {
         createdAt: row.createdAt ? row.createdAt.toISOString() : null,
       })),
     );
+  } catch (err) {
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+// GET /api/users/me/comment-replies — réponses reçues sur les commentaires de l'utilisateur
+router.get("/me/comment-replies", async (req: RequestWithSession, res) => {
+  try {
+    const myId = parseInt(String(req.session!.user.id));
+    const limit = parseInt((req.query.limit as string) ?? "20");
+
+    const rows = await getUserCommentReplyNotifications({
+      userId: myId,
+      limit,
+    });
+
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: "Erreur serveur" });
   }

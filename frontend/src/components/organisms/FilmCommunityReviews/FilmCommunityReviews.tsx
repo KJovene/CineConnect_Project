@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   HiChatBubbleLeftRight,
   HiEllipsisHorizontal,
@@ -66,6 +66,19 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   const [openedMenuId, setOpenedMenuId] = useState<number | null>(null);
 
   const selectedRating = localRatingOverride ?? ratingSummary?.userRating ?? 0;
+
+  useEffect(() => {
+    if (reviewsLoading || reviews.length === 0) return;
+    if (!window.location.hash.startsWith("#comment-")) return;
+
+    const targetId = window.location.hash.slice(1);
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    window.setTimeout(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  }, [reviews, reviewsLoading]);
 
   const handleCreateComment = async () => {
     const comment = newComment.trim();
@@ -350,7 +363,11 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
         ) : (
           <div className="space-y-4">
             {reviews.map((review) => (
-              <div key={review.reviewId} className="space-y-3">
+              <div
+                key={review.reviewId}
+                id={`comment-${review.reviewId}`}
+                className="space-y-3 scroll-mt-28"
+              >
                 {renderReviewRow(review, { canReply: true })}
 
                 {replyTargetId === review.reviewId && (

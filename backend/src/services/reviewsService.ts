@@ -78,6 +78,16 @@ export interface CommunityReviewDto {
   };
 }
 
+export interface UserCommentReplyNotificationDto {
+  replyReviewId: number;
+  parentReviewId: number;
+  omdbId: string;
+  filmTitle: string;
+  replier: ReviewAuthorDto;
+  comment: string;
+  createdAt: string | null;
+}
+
 function normalizeRating(value: number): number {
   const rating = Number.parseInt(String(value), 10);
   if (Number.isNaN(rating) || rating < 1 || rating > 5) {
@@ -434,6 +444,67 @@ export async function getLatestCommunityReviews(
       title: row.film_title,
     },
   }));
+}
+
+export async function getUserCommentReplyNotifications(params: {
+  userId: number;
+  limit?: number;
+}): Promise<UserCommentReplyNotificationDto[]> {
+  const normalizedLimit = Math.min(
+    Math.max(Math.trunc(params.limit ?? 20), 1),
+    100,
+  );
+
+  const parentRows = await db
+    .select({ review_id: reviews.review_id })
+    .from(reviews)
+    .where(
+      and(eq(reviews.user_id, params.userId), isNull(reviews.parent_review_id)),
+    );
+
+  const parentIds = parentRows.map((row) => row.review_id);
+  if (parentIds.length === 0) return [];
+
+  const rows = await db
+    .select({
+      reply_review_id: reviews.review_id,
+      parent_review_id: reviews.parent_review_id,
+      film_omdb_id: films.omdb_id,
+      film_title: films.title,
+      comment: reviews.comment,
+      created_at: reviews.created_at,
+      replier_id: user.id,
+      replier_name: user.name,
+      replier_image: user.image,
+    })
+    .from(reviews)
+    .innerJoin(user, eq(reviews.user_id, user.id))
+    .innerJoin(films, eq(reviews.film_id, films.film_id))
+    .where(
+      and(
+        inArray(reviews.parent_review_id, parentIds),
+        sql`${reviews.user_id} <> ${params.userId}`,
+        sql`coalesce(length(trim(${reviews.comment})), 0) > 0`,
+      ),
+    )
+    .orderBy(desc(reviews.created_at))
+    .limit(normalizedLimit);
+
+  return rows
+    .filter((row) => row.parent_review_id !== null)
+    .map((row) => ({
+      replyReviewId: row.reply_review_id,
+      parentReviewId: row.parent_review_id as number,
+      omdbId: row.film_omdb_id ?? "",
+      filmTitle: row.film_title,
+      replier: {
+        id: row.replier_id,
+        name: row.replier_name ?? "Utilisateur",
+        image: row.replier_image,
+      },
+      comment: row.comment ?? "",
+      createdAt: row.created_at ? row.created_at.toISOString() : null,
+    }));
 }
 
 export async function createReviewReply(params: {
