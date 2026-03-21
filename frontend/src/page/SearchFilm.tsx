@@ -56,38 +56,19 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-4xl mx-auto pt-8 px-6 pb-20 z-10">
-        {/* SEARCH INPUT AREA */}
-        <div className="mb-16">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="w-full md:w-auto">
-              <CategoryDropdown
-                value={selectedCategory}
-                onChange={setSelectedCategory}
-              />
-            </div>
-            <div className="flex-1 w-full">
-              <SearchBar
-                placeholder="Rechercher un film, un réalisateur..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                fullWidth={true}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="w-full max-w-4xl mx-auto pt-24 px-6 pb-20 z-10">
 
-        {/* BARRE DE RECHERCHE */}
-        <div className="mb-12">
+        <div className="mb-10">
           <SearchBar
-            placeholder="Rechercher un film, un réalisateur..."
+            placeholder="Rechercher un film "
             value={searchQuery}
             onChange={handleSearchChange}
             fullWidth={true}
           />
         </div>
+
 
         {/* RESULTS SECTION */}
         {searchQuery.length >= 3 && (
@@ -201,42 +182,9 @@ const SearchPage: React.FC = () => {
             )}
           </div>
         )}
-
-        {/* GENRES (si pas de recherche) */}
-        {searchQuery.length < 3 && (
-          <>
-            <div className="mb-16">
-              <div className="flex items-center justify-between mb-6 px-2">
-                <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                  Explorer par genre
-                </h2>
-              </div>
-
-              <div className="flex flex-wrap gap-3 px-2">
-                {genres.map((genre) => (
-                  <button
-                    key={genre.name}
-                    className="group relative px-5 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-900 transition-all text-sm font-medium"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      {genre.icon} {genre.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* RECHERCHES RÉCENTES */}
-            <div className="space-y-3">
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-4 px-2">
-                Recherches récentes
-              </h2>
-            </div>
-          </>
-        )}
-      </div>
+      </div> 
     </div>
   );
-};
+}
 
 export default SearchPage;
