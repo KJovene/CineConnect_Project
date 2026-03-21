@@ -18,7 +18,7 @@ export interface SidebarNavSection {
 export interface SidebarUser {
   name: string;
   badge: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 export interface SidebarProps {

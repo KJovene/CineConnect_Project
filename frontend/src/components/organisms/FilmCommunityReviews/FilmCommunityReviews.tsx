@@ -17,6 +17,7 @@ import {
   useUpsertFilmRating,
   useUpdateFilmComment,
 } from "@/features/reviews/hooks";
+import { Avatar } from "@/components/atoms";
 import { useSession } from "@/lib/auth-client";
 
 type ReviewItem = FilmReviewComment | ReviewReply;
@@ -140,14 +141,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
         }`}
       >
         <div className="flex items-start gap-3">
-          <img
-            src={
-              item.author.image ??
-              `https://i.pravatar.cc/100?u=${item.author.id}`
-            }
-            alt={item.author.name}
-            className="h-9 w-9 rounded-full object-cover ring-1 ring-white/10"
-          />
+          <Avatar image={item.author.image} name={item.author.name} size="lg" />
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">

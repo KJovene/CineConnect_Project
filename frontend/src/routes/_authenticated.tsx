@@ -72,9 +72,7 @@ const AuthenticatedLayout = () => {
       user={{
         name: currentUser?.name ?? "Utilisateur",
         badge: "Membre",
-        avatar:
-          currentUser?.image ??
-          `https://i.pravatar.cc/150?u=${currentUser?.id}`,
+        avatar: currentUser?.image ?? null,
       }}
       isAuthenticated={isAuthenticated}
       isLoading={isLoading}

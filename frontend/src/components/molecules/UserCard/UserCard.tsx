@@ -1,7 +1,9 @@
+import { Avatar } from "@/components/atoms";
+
 export interface UserCardProps {
   userName: string;
   userBadge: string;
-  userAvatar: string;
+  userAvatar: string | null;
   onClick?: () => void;
 }
 
@@ -17,11 +19,7 @@ export function UserCard({
         onClick={onClick}
         className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left border border-transparent hover:border-white/5 group"
       >
-        <img
-          src={userAvatar}
-          alt={userName}
-          className="w-9 h-9 rounded-full ring-2 ring-neutral-800 group-hover:ring-neutral-700 transition-all"
-        />
+        <Avatar image={userAvatar} name={userName} size="lg" />
         <div className="hidden lg:block overflow-hidden">
           <div className="text-sm font-medium text-white truncate">
             {userName}
