@@ -39,13 +39,22 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
   };
 
   return (
-    <aside className="w-20 lg:w-64 flex flex-col border-r border-white/5 h-full shrink-0 bg-[#080808]">
+    <aside
+      className="w-20 lg:w-64 flex flex-col h-full shrink-0"
+      style={{
+        background: "var(--color-bg)",
+        borderRight: "1px solid var(--color-border)",
+      }}
+    >
       <SidebarBrand />
 
       <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto no-scrollbar">
         {sections.map((section, index) => (
           <div key={index}>
-            <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-widest mb-3 px-3 hidden lg:block">
+            <div
+              className="text-[10px] font-semibold uppercase tracking-widest mb-3 px-3 hidden lg:block"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               {section.title}
             </div>
 
@@ -54,18 +63,27 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
                 key={item.id}
                 href={item.href}
                 to={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group border ${
-                  isItemActive(item.href)
-                    ? "bg-white/5 text-white border-white/5 shadow-sm"
-                    : "text-neutral-400 hover:text-white hover:bg-white/5 border-transparent hover:border-white/5"
-                }`}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group"
+                style={{
+                  background: isItemActive(item.href)
+                    ? "var(--color-surface)"
+                    : "transparent",
+                  border: `1px solid ${
+                    isItemActive(item.href)
+                      ? "var(--color-border)"
+                      : "transparent"
+                  }`,
+                  color: isItemActive(item.href)
+                    ? "var(--color-text)"
+                    : "var(--color-text-muted)",
+                }}
               >
                 <div
-                  className={`shrink-0 ${
+                  className={`shrink-0 transition-colors ${
                     isItemActive(item.href)
                       ? "text-indigo-400 group-hover:text-indigo-300"
-                      : "group-hover:text-neutral-300"
-                  } transition-colors`}
+                      : ""
+                  }`}
                 >
                   {item.icon}
                 </div>

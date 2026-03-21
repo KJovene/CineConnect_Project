@@ -31,14 +31,10 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
     (direction: "left" | "right") => {
       const el = scrollRef.current;
       if (!el) return;
-
-      const scrollAmount = el.clientWidth;
       el.scrollBy({
-        left: direction === "right" ? scrollAmount : -scrollAmount,
+        left: direction === "right" ? el.clientWidth : -el.clientWidth,
         behavior: "smooth",
       });
-
-      // Attendre la fin de l'animation pour mettre à jour les boutons
       setTimeout(updateScrollState, 350);
     },
     [updateScrollState],
@@ -48,9 +44,11 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
 
   return (
     <section className="mb-10 md:mb-14">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4 md:mb-6">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight text-white">
+        <h2
+          className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight"
+          style={{ color: "var(--color-text)" }}
+        >
           {genre}
         </h2>
 
@@ -59,7 +57,11 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             aria-label={`Section précédente – ${genre}`}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
           >
             <HiChevronLeft size={18} />
           </button>
@@ -67,14 +69,17 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             aria-label={`Section suivante – ${genre}`}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
           >
             <HiChevronRight size={18} />
           </button>
         </div>
       </div>
 
-      {/* Carousel */}
       <div
         ref={scrollRef}
         onScroll={updateScrollState}

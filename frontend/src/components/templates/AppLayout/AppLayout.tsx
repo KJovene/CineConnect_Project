@@ -22,14 +22,23 @@ export function AppLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="bg-[#050505] text-neutral-300 h-screen flex overflow-hidden antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div
+      className="h-screen flex overflow-hidden antialiased selection:bg-indigo-500/30 selection:text-indigo-200"
+      style={{
+        background: "var(--color-bg)",
+        color: "var(--color-text)",
+      }}
+    >
       <Sidebar
         sections={sidebarSections}
         user={user}
         onUserClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-[#050505]">
+      <main
+        className="flex-1 flex flex-col relative overflow-hidden"
+        style={{ background: "var(--color-bg)" }}
+      >
         <AppHeader
           onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           isAuthenticated={isAuthenticated}

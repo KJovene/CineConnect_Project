@@ -3,6 +3,7 @@ import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
 import { MobileMenuToggle, AuthNavButton } from "@/components/molecules";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useNotificationsFeed } from "@/features/notifications/hooks";
+import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 
 export interface AppHeaderProps {
   onMobileMenuToggle: () => void;
@@ -30,11 +31,8 @@ export function AppHeader({
         setIsNotificationsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   const formattedCount = useMemo(() => {
@@ -83,16 +81,21 @@ export function AppHeader({
     <header
       className="absolute top-0 left-0 right-0 z-20 h-20 flex items-center justify-between px-8"
       style={{
-        background: "rgba(20, 20, 20, 0.6)",
+        background: "var(--color-bg)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
+        border: "1px solid var(--color-border)",
       }}
     >
       <div className="flex items-center gap-3">
         <Link
           to="/search"
-          className="p-2.5 rounded-lg bg-white/5 border border-white/10 text-neutral-400 hover:text-white hover:border-indigo-500/50 transition-all"
+          className="p-2.5 rounded-lg transition-all hover:border-indigo-500/50"
+          style={{
+            background: "var(--color-bg)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text-muted)",
+          }}
         >
           <HiMagnifyingGlass size={20} />
         </Link>
@@ -105,20 +108,36 @@ export function AppHeader({
           <button
             type="button"
             onClick={() => setIsNotificationsOpen((previous) => !previous)}
-            className="relative p-2 text-neutral-400 hover:text-white transition-colors"
+            className="relative p-2 transition-colors"
+            style={{ color: "var(--color-text-muted)" }}
           >
             <HiBell size={22} />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-semibold text-white border border-[#141414] flex items-center justify-center">
+              <span
+                className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-semibold text-white flex items-center justify-center"
+                style={{ border: "1px solid var(--color-bg)" }} 
+              >
                 {formattedCount}
               </span>
             )}
           </button>
 
           {isNotificationsOpen && (
-            <div className="absolute right-0 mt-2 w-[340px] max-h-[70vh] overflow-y-auto rounded-xl border border-white/10 bg-[#0C0C0C]/95 backdrop-blur-md shadow-2xl z-50">
-              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-                <p className="text-sm font-semibold text-white">
+            <div
+              className="absolute right-0 mt-2 w-[340px] max-h-[70vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-2xl z-50"
+              style={{
+                background: "var(--color-bg)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <div
+                className="px-4 py-3 flex items-center justify-between"
+                style={{ borderBottom: "1px solid var(--color-border)" }}
+              >
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--color-text)" }}
+                >
                   Notifications
                 </p>
                 <button
@@ -131,7 +150,10 @@ export function AppHeader({
               </div>
 
               {notifications.length === 0 ? (
-                <p className="px-4 py-6 text-sm text-neutral-500 text-center">
+                <p
+                  className="px-4 py-6 text-sm text-center"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   Aucune notification pour le moment.
                 </p>
               ) : (
@@ -140,14 +162,18 @@ export function AppHeader({
                     <button
                       key={notification.id}
                       type="button"
-                      onClick={() =>
-                        void handleNotificationClick(notification.id)
-                      }
-                      className={`w-full text-left px-4 py-3 border-b border-white/5 transition-colors ${
+                      onClick={() => void handleNotificationClick(notification.id)}
+                      className={`w-full text-left px-4 py-3 transition-colors ${
                         notification.isRead
-                          ? "bg-transparent text-neutral-500 hover:bg-white/5"
-                          : "bg-indigo-500/10 text-neutral-100 hover:bg-indigo-500/15"
+                          ? "bg-transparent hover:bg-white/5"
+                          : "bg-indigo-500/10 hover:bg-indigo-500/15"
                       }`}
+                      style={{
+                        borderBottom: "1px solid var(--color-border)",
+                        color: notification.isRead
+                          ? "var(--color-text-muted)"
+                          : "var(--color-text)",
+                      }}
                     >
                       <p className="text-xs font-semibold">
                         {notification.title}
@@ -163,8 +189,11 @@ export function AppHeader({
           )}
         </div>
 
-        <div className="h-6 w-px bg-white/10 mx-1" />
-
+        <div
+          className="h-6 w-px mx-1"
+          style={{ background: "var(--color-border)" }}
+        />
+        <ThemeToggle />
         <AuthNavButton
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}

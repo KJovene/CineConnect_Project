@@ -1,5 +1,4 @@
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { inputClassName } from "@/components/atoms";
 
 export interface SearchBarProps {
   placeholder?: string;
@@ -15,11 +14,14 @@ export function SearchBar({
   fullWidth = false,
 }: SearchBarProps) {
   return (
-    <div className={`relative w-full group ${
-      fullWidth ? "max-w-full" : "max-w-md hidden md:block"
-    }`}>
+    <div
+      className={`relative w-full group ${
+        fullWidth ? "max-w-full" : "max-w-md hidden md:block"
+      }`}
+    >
       <HiMagnifyingGlass
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 group-hover:text-neutral-400 transition-colors"
+        className="absolute left-3 top-1/2 -translate-y-1/2 transition-colors"
+        style={{ color: "var(--color-text-muted)" }}
         size={18}
       />
       <input
@@ -27,7 +29,12 @@ export function SearchBar({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-        className={`${inputClassName} pl-10 shadow-inner`}
+        className="w-full rounded-lg px-4 py-2.5 pl-10 text-sm shadow-inner outline-none transition-colors"
+        style={{
+          background: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
+          color: "var(--color-text)",
+        }}
       />
     </div>
   );

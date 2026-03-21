@@ -13,16 +13,31 @@ export function MediaGrid({ title, badge, movies }: MediaGridProps) {
     <section className="mb-16">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-semibold tracking-tight text-white">
+          <h2
+            className="text-2xl font-semibold tracking-tight"
+            style={{ color: "var(--color-text)" }}
+          >
             {title}
           </h2>
           {badge && <Badge>{badge}</Badge>}
         </div>
         <div className="flex gap-2">
-          <button className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-neutral-400 hover:text-white">
+          <button
+            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
+          >
             <HiChevronLeft size={18} />
           </button>
-          <button className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-neutral-400 hover:text-white">
+          <button
+            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
+          >
             <HiChevronRight size={18} />
           </button>
         </div>
