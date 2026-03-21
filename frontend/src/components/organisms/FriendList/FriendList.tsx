@@ -25,7 +25,11 @@ export function FriendList({
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 rounded-xl bg-white/5 animate-pulse" />
+          <div
+            key={i}
+            className="h-16 rounded-xl animate-pulse"
+            style={{ background: "var(--color-surface)" }}
+          />
         ))}
       </div>
     );
@@ -33,28 +37,39 @@ export function FriendList({
 
   return (
     <div className="space-y-6">
+
       {/* Demandes en attente */}
       {pendingRequests.length > 0 && (
         <section>
-          <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">
+          <h3
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             Demandes reçues ({pendingRequests.length})
           </h3>
           <div className="space-y-2">
             {pendingRequests.map((req) => (
               <div
                 key={req.friend_id}
-                className="flex items-center justify-between bg-[#0A0A0A] border border-white/5 rounded-xl p-3"
+                className="flex items-center justify-between rounded-xl p-3"
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                }}
               >
                 <div className="flex items-center gap-3">
                   <Avatar image={req.requester?.image ?? null} name={req.requester?.name ?? null} />
                   <div>
-                    <div className="text-sm font-medium text-white">
+                    <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
                       {req.requester?.name ?? 'Utilisateur inconnu'}
                     </div>
-                    <div className="text-[11px] text-neutral-500">{req.requester?.email}</div>
+                    <div className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>
+                      {req.requester?.email}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {/* Boutons accept/reject — couleurs sémantiques, gardées */}
                   <button
                     onClick={() => onAccept(req.user_id)}
                     className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
@@ -78,12 +93,18 @@ export function FriendList({
 
       {/* Amis acceptés */}
       <section>
-        <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">
+        <h3
+          className="text-xs font-semibold uppercase tracking-widest mb-3"
+          style={{ color: "var(--color-text-muted)" }}
+        >
           Amis ({friends.length})
         </h3>
 
         {friends.length === 0 ? (
-          <div className="text-center py-10 text-neutral-600">
+          <div
+            className="text-center py-10"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <HiUserPlus size={32} className="mx-auto mb-2 opacity-40" />
             <p className="text-sm">Aucun ami pour l'instant</p>
           </div>
@@ -92,22 +113,32 @@ export function FriendList({
             {friends.map((rel) => (
               <div
                 key={rel.friend_id}
-                className="flex items-center justify-between bg-[#0A0A0A] border border-white/5 rounded-xl p-3 hover:border-white/10 transition-colors group"
+                className="flex items-center justify-between rounded-xl p-3 transition-colors group"
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                }}
               >
                 <div className="flex items-center gap-3">
                   <Avatar image={rel.friend?.image ?? null} name={rel.friend?.name ?? null} />
                   <div>
-                    <div className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors">
+                    <div
+                      className="text-sm font-medium group-hover:text-indigo-400 transition-colors"
+                      style={{ color: "var(--color-text)" }}
+                    >
                       {rel.friend?.name ?? 'Utilisateur'}
                     </div>
-                    <div className="text-[11px] text-neutral-500">{rel.friend?.email}</div>
+                    <div className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>
+                      {rel.friend?.email}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   {onMessage && rel.friend && (
                     <button
                       onClick={() => onMessage(rel.friend!)}
-                      className="p-2 rounded-lg hover:bg-indigo-500/10 text-neutral-400 hover:text-indigo-400 transition-colors"
+                      className="p-2 rounded-lg hover:bg-indigo-500/10 hover:text-indigo-400 transition-colors"
+                      style={{ color: "var(--color-text-muted)" }}
                       title="Envoyer un message"
                     >
                       <HiChatBubbleLeftRight size={16} />
@@ -115,7 +146,8 @@ export function FriendList({
                   )}
                   <button
                     onClick={() => onRemove(rel.friend?.id ?? 0)}
-                    className="p-2 rounded-lg hover:bg-rose-500/10 text-neutral-500 hover:text-rose-400 transition-colors"
+                    className="p-2 rounded-lg hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+                    style={{ color: "var(--color-text-muted)" }}
                     title="Retirer de mes amis"
                   >
                     <HiUserMinus size={16} />

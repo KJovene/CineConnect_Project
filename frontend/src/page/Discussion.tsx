@@ -41,7 +41,6 @@ const Discussion: React.FC = () => {
     const relation = friends.find((item) => item.friend?.id === parsedFriendId);
     const targetFriend = relation?.friend;
     if (!targetFriend) return;
-
     setSelectedFriend(targetFriend);
   }, [friends, search.friendId]);
 
@@ -56,10 +55,25 @@ const Discussion: React.FC = () => {
 
   return (
     <div className="flex h-full pt-20">
+
       {/* Panel gauche */}
-      <aside className="w-72 shrink-0 border-r border-white/5 flex flex-col bg-[#080808]">
-        <div className="px-4 py-4 border-b border-white/5 shrink-0">
-          <h2 className="text-sm font-semibold text-white">Messages</h2>
+      <aside
+        className="w-72 shrink-0 flex flex-col"
+        style={{
+          background: "var(--color-surface)",
+          borderRight: "1px solid var(--color-border)",
+        }}
+      >
+        <div
+          className="px-4 py-4 shrink-0"
+          style={{ borderBottom: "1px solid var(--color-border)" }}
+        >
+          <h2
+            className="text-sm font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
+            Messages
+          </h2>
         </div>
         <div className="flex-1 overflow-y-auto no-scrollbar">
           <ConversationList
@@ -82,7 +96,10 @@ const Discussion: React.FC = () => {
             onSend={handleSend}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-neutral-600">
+          <div
+            className="flex flex-col items-center justify-center h-full"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <HiChatBubbleLeftRight size={48} className="mb-4 opacity-20" />
             <p className="text-sm">
               Sélectionnez un ami pour commencer à discuter

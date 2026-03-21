@@ -9,10 +9,8 @@ interface ProfileLatestCommentsProps {
 
 function formatDate(dateLike?: string | null): string {
   if (!dateLike) return "-";
-
   const date = new Date(dateLike);
   if (Number.isNaN(date.getTime())) return "-";
-
   return date.toLocaleDateString("fr-FR", {
     day: "2-digit",
     month: "long",
@@ -26,15 +24,26 @@ export function ProfileLatestComments({
   onOpenFilm,
 }: ProfileLatestCommentsProps) {
   return (
-    <div className="rounded-2xl border border-white/5 bg-[#0A0A0A] p-5">
-      <h2 className="text-lg font-semibold text-white mb-4">
+    <div
+      className="rounded-2xl p-5"
+      style={{
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+      }}
+    >
+      <h2
+        className="text-lg font-semibold mb-4"
+        style={{ color: "var(--color-text)" }}
+      >
         Derniers commentaires
       </h2>
 
       {isLoading ? (
-        <p className="text-sm text-neutral-500">Chargement...</p>
+        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+          Chargement...
+        </p>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Aucun commentaire pour le moment.
         </p>
       ) : (
@@ -44,24 +53,38 @@ export function ProfileLatestComments({
               key={item.reviewId}
               type="button"
               onClick={() => onOpenFilm(item.omdbId)}
-              className="w-full text-left rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-colors"
+              className="w-full text-left rounded-xl px-3 py-2 hover:bg-indigo-500/5 hover:border-indigo-500/30 transition-colors"
+              style={{
+                background: "var(--color-bg)",
+                border: "1px solid var(--color-border)",
+              }}
             >
               <div className="flex items-center gap-3">
                 <img
                   src={getPosterUrl(item.posterUrl)}
                   alt={item.filmTitle}
                   onError={handlePosterError}
-                  className="w-10 h-14 rounded-md object-cover border border-white/10 shrink-0"
+                  className="w-10 h-14 rounded-md object-cover shrink-0"
+                  style={{ border: "1px solid var(--color-border)" }}
                 />
                 <div className="min-w-0">
-                  <p className="text-sm text-white font-medium truncate">
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{ color: "var(--color-text)" }}
+                  >
                     {item.filmTitle}
                   </p>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    {item.isReply ? "Reponse" : "Commentaire"} -{" "}
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    {item.isReply ? "Réponse" : "Commentaire"} —{" "}
                     {formatDate(item.createdAt)}
                   </p>
-                  <p className="text-sm text-neutral-300 mt-1 truncate">
+                  <p
+                    className="text-sm mt-1 truncate"
+                    style={{ color: "var(--color-text)" }}
+                  >
                     {item.comment}
                   </p>
                 </div>

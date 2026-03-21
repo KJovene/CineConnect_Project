@@ -30,14 +30,11 @@ const Profil: React.FC = () => {
   const { data: session } = useSession();
 
   const [search, setSearch] = useState("");
-
   const { data: friends = [], isLoading: friendsLoading } = useFriends();
   const { data: pendingRequests = [] } = usePendingRequests();
   const { data: searchResults = [] } = useSearchUsers(search);
-  const { data: latestRatings = [], isLoading: latestRatingsLoading } =
-    useMyLatestRatings();
-  const { data: latestComments = [], isLoading: latestCommentsLoading } =
-    useMyLatestComments();
+  const { data: latestRatings = [], isLoading: latestRatingsLoading } = useMyLatestRatings();
+  const { data: latestComments = [], isLoading: latestCommentsLoading } = useMyLatestComments();
 
   const [requestError, setRequestError] = useState<string | null>(null);
   const [sentRequestIds, setSentRequestIds] = useState<Set<number>>(new Set());
@@ -59,10 +56,8 @@ const Profil: React.FC = () => {
 
   const formatDate = (dateLike?: string | Date) => {
     if (!dateLike) return "-";
-
     const date = new Date(dateLike);
     if (Number.isNaN(date.getTime())) return "-";
-
     return date.toLocaleDateString("fr-FR", {
       day: "2-digit",
       month: "long",
@@ -75,9 +70,7 @@ const Profil: React.FC = () => {
     navigate({ to: "/film/$id", params: { id: omdbId } });
   };
 
-  const handleChoosePhoto = () => {
-    imageInputRef.current?.click();
-  };
+  const handleChoosePhoto = () => imageInputRef.current?.click();
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,13 +79,12 @@ const Profil: React.FC = () => {
     setProfileError(null);
 
     if (!file.type.startsWith("image/")) {
-      setProfileError("Selectionnez uniquement une image.");
+      setProfileError("Sélectionnez uniquement une image.");
       e.target.value = "";
       return;
     }
 
-    const MAX_FILE_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > 2 * 1024 * 1024) {
       setProfileError("Image trop volumineuse (max 2 Mo).");
       e.target.value = "";
       return;
@@ -104,23 +96,17 @@ const Profil: React.FC = () => {
       const base64Image = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-            return;
-          }
+          if (typeof reader.result === "string") { resolve(reader.result); return; }
           reject(new Error("Format image invalide"));
         };
-        reader.onerror = () =>
-          reject(new Error("Lecture du fichier impossible"));
+        reader.onerror = () => reject(new Error("Lecture du fichier impossible"));
         reader.readAsDataURL(file);
       });
 
       await updateCurrentUser({ image: base64Image });
       await getSession();
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Mise a jour impossible";
-      setProfileError(message);
+      setProfileError(error instanceof Error ? error.message : "Mise à jour impossible");
     } finally {
       setIsUpdatingPhoto(false);
       e.target.value = "";
@@ -129,9 +115,16 @@ const Profil: React.FC = () => {
 
   return (
     <div className="px-8 pt-28 pb-8 max-w-3xl mx-auto">
+
       {/* Profil utilisateur */}
       <section className="mb-10">
-        <div className="p-6 bg-[#0A0A0A] border border-white/5 rounded-2xl space-y-6">
+        <div
+          className="p-6 rounded-2xl space-y-6"
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="shrink-0">
               <Avatar
@@ -142,13 +135,16 @@ const Profil: React.FC = () => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-white truncate">
+              <h1
+                className="text-xl font-bold truncate"
+                style={{ color: "var(--color-text)" }}
+              >
                 {currentUser?.name ?? "Utilisateur"}
               </h1>
-              <p className="text-sm text-neutral-500 truncate">
+              <p className="text-sm truncate" style={{ color: "var(--color-text-muted)" }}>
                 {currentUser?.email}
               </p>
-              <p className="text-xs text-neutral-600 mt-1">
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
                 Membre depuis {formatDate(currentUser?.createdAt)}
               </p>
             </div>
@@ -165,9 +161,13 @@ const Profil: React.FC = () => {
                 type="button"
                 onClick={handleChoosePhoto}
                 disabled={isUpdatingPhoto}
-                className="px-4 py-2 text-sm rounded-xl border border-white/10 text-neutral-200 hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed hover:bg-indigo-500/10 hover:border-indigo-500/40"
+                style={{
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                }}
               >
-                {isUpdatingPhoto ? "Mise a jour..." : "Changer la photo"}
+                {isUpdatingPhoto ? "Mise à jour..." : "Changer la photo"}
               </button>
             </div>
           </div>
@@ -176,37 +176,36 @@ const Profil: React.FC = () => {
             <p className="text-xs text-rose-400">{profileError}</p>
           )}
 
+          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">
-                Pseudo
-              </p>
-              <p className="text-sm text-neutral-100 mt-1 truncate">
-                {currentUser?.name ?? "Utilisateur"}
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">
-                Amis
-              </p>
-              <p className="text-sm text-neutral-100 mt-1">{friends.length}</p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">
-                Notes
-              </p>
-              <p className="text-sm text-neutral-100 mt-1">
-                {latestRatings.length}
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">
-                Commentaires
-              </p>
-              <p className="text-sm text-neutral-100 mt-1">
-                {latestComments.length}
-              </p>
-            </div>
+            {[
+              { label: "Pseudo", value: currentUser?.name ?? "Utilisateur" },
+              { label: "Amis", value: friends.length },
+              { label: "Notes", value: latestRatings.length },
+              { label: "Commentaires", value: latestComments.length },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="rounded-xl p-3"
+                style={{
+                  border: "1px solid var(--color-border)",
+                  background: "var(--color-bg)",
+                }}
+              >
+                <p
+                  className="text-xs uppercase tracking-wide"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  {label}
+                </p>
+                <p
+                  className="text-sm mt-1 truncate"
+                  style={{ color: "var(--color-text)" }}
+                >
+                  {value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -226,12 +225,16 @@ const Profil: React.FC = () => {
 
       {/* Recherche d'amis */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">
+        <h2
+          className="text-lg font-semibold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
           Ajouter un ami
         </h2>
         <div className="relative mb-4">
           <HiMagnifyingGlass
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+            className="absolute left-3 top-1/2 -translate-y-1/2"
+            style={{ color: "var(--color-text-muted)" }}
             size={16}
           />
           <input
@@ -239,7 +242,12 @@ const Profil: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom ou email..."
-            className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+            className="w-full rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition-all"
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+            }}
           />
         </div>
 
@@ -250,7 +258,10 @@ const Profil: React.FC = () => {
         {search.length >= 2 && (
           <div className="space-y-2">
             {searchResults.length === 0 ? (
-              <p className="text-sm text-neutral-600 text-center py-4">
+              <p
+                className="text-sm text-center py-4"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 Aucun résultat
               </p>
             ) : (
@@ -260,11 +271,11 @@ const Profil: React.FC = () => {
                   user={u}
                   onAdd={(id) => {
                     setRequestError(null);
-                    setSentRequestIds((previous) => new Set(previous).add(id));
+                    setSentRequestIds((prev) => new Set(prev).add(id));
                     sendRequest.mutate(id, {
                       onError: (err) => {
-                        setSentRequestIds((previous) => {
-                          const next = new Set(previous);
+                        setSentRequestIds((prev) => {
+                          const next = new Set(prev);
                           next.delete(id);
                           return next;
                         });
@@ -283,7 +294,12 @@ const Profil: React.FC = () => {
 
       {/* Liste des amis */}
       <section id="friends-section" className="scroll-mt-28">
-        <h2 className="text-lg font-semibold text-white mb-4">Mes amis</h2>
+        <h2
+          className="text-lg font-semibold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
+          Mes amis
+        </h2>
         <FriendList
           friends={friends}
           pendingRequests={pendingRequests}
