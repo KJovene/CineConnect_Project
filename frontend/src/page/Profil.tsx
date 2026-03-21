@@ -92,14 +92,16 @@ const Profil: React.FC = () => {
           }
           reject(new Error("Format image invalide"));
         };
-        reader.onerror = () => reject(new Error("Lecture du fichier impossible"));
+        reader.onerror = () =>
+          reject(new Error("Lecture du fichier impossible"));
         reader.readAsDataURL(file);
       });
 
       await updateCurrentUser({ image: base64Image });
       await getSession();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Mise a jour impossible";
+      const message =
+        error instanceof Error ? error.message : "Mise a jour impossible";
       setProfileError(message);
     } finally {
       setIsUpdatingPhoto(false);
@@ -125,7 +127,9 @@ const Profil: React.FC = () => {
               <h1 className="text-xl font-bold text-white truncate">
                 {currentUser?.name ?? "Utilisateur"}
               </h1>
-              <p className="text-sm text-neutral-500 truncate">{currentUser?.email}</p>
+              <p className="text-sm text-neutral-500 truncate">
+                {currentUser?.email}
+              </p>
               <p className="text-xs text-neutral-600 mt-1">
                 Membre depuis {formatDate(currentUser?.createdAt)}
               </p>
@@ -156,18 +160,26 @@ const Profil: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">Pseudo</p>
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Pseudo
+              </p>
               <p className="text-sm text-neutral-100 mt-1 truncate">
                 {currentUser?.name ?? "Utilisateur"}
               </p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">Amis</p>
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Amis
+              </p>
               <p className="text-sm text-neutral-100 mt-1">{friends.length}</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">Demandes</p>
-              <p className="text-sm text-neutral-100 mt-1">{pendingRequests.length}</p>
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Demandes
+              </p>
+              <p className="text-sm text-neutral-100 mt-1">
+                {pendingRequests.length}
+              </p>
             </div>
           </div>
         </div>

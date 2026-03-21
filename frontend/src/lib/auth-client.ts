@@ -33,7 +33,9 @@ export async function updateCurrentUser(payload: UpdateCurrentUserInput) {
 
   if (!response.ok) {
     const err = body as { message?: string; error?: string };
-    throw new Error(err.message ?? err.error ?? "Echec de mise a jour du profil");
+    throw new Error(
+      err.message ?? err.error ?? "Echec de mise a jour du profil",
+    );
   }
 
   return body;

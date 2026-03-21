@@ -1,7 +1,6 @@
 import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
 import { MobileMenuToggle, AuthNavButton } from "@/components/molecules";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
 
 export interface AppHeaderProps {
   onMobileMenuToggle: () => void;
@@ -16,8 +15,6 @@ export function AppHeader({
   isLoading,
   onLogout,
 }: AppHeaderProps) {
-  const [selectedCategory, setSelectedCategory] = useState("Catégories");
-
   return (
     <header
       className="absolute top-0 left-0 right-0 z-20 h-20 flex items-center justify-between px-8"

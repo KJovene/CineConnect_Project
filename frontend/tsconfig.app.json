@@ -19,7 +19,9 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@cineconnect/shared": ["../shared/src/index.ts"],
+      "@cineconnect/shared/*": ["../shared/src/*"]
     },
 
     /* Linting */

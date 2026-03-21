@@ -18,8 +18,9 @@ export function useSignup() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const normalizedName = name.trim();
     const { error: err } = await authClient.signUp.email({
-      name: name || undefined,
+      name: normalizedName,
       email,
       password,
       callbackURL: "/",

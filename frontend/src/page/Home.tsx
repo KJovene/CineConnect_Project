@@ -33,7 +33,7 @@ const RECENT_REVIEWS = [
 ];
 
 const Home: React.FC = () => {
-  const { data: topFilms, isLoading, error } = useTopRatedMovies(5);
+  const { data: topFilms, isLoading } = useTopRatedMovies(5);
 
   const convertToMovieCard = (film: Film): MovieCardProps => ({
     image: getPosterUrl(film.poster_url),
