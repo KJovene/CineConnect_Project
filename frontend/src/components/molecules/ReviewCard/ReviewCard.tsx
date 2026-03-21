@@ -1,39 +1,42 @@
-import { HiOutlineEllipsisVertical, HiChatBubbleLeft } from "react-icons/hi2";
-import { RatingStars } from "@/components/atoms";
+import { Avatar, RatingStars } from "@/components/atoms";
 
 export interface ReviewCardProps {
-  avatar: string;
+  avatar: string | null;
   name: string;
-  badge: string;
   rating: number;
   movie: string;
   review: string;
-  time: string;
-  likes: number;
-  comments: number;
+  commentedAt: string | null;
+}
+
+function formatCommentDateTime(value: string | null): string {
+  if (!value) return "Date inconnue";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date inconnue";
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
 }
 
 export function ReviewCard({
   avatar,
   name,
-  badge,
   rating,
   movie,
   review,
-  time,
-  likes,
-  comments,
+  commentedAt,
 }: ReviewCardProps) {
   return (
     <div className="bg-[#0A0A0A] border border-white/5 p-5 rounded-2xl hover:border-white/10 transition-colors group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <img src={avatar} alt={name} className="w-10 h-10 rounded-full" />
+          <Avatar image={avatar} name={name} size="lg" />
           <div>
             <div className="text-sm text-white font-medium group-hover:text-indigo-400 transition-colors">
               {name}
             </div>
-            <div className="text-[10px] text-neutral-500">{badge}</div>
           </div>
         </div>
         <RatingStars rating={rating} />
@@ -43,15 +46,7 @@ export function ReviewCard({
       <p className="text-sm text-neutral-400 leading-relaxed mb-4">{review}</p>
 
       <div className="flex items-center justify-between text-xs text-neutral-500 pt-4 border-t border-white/5">
-        <span>{time}</span>
-        <div className="flex gap-4">
-          <button className="flex items-center gap-1.5 hover:text-white transition">
-            <HiOutlineEllipsisVertical size={14} /> {likes}
-          </button>
-          <button className="flex items-center gap-1.5 hover:text-white transition">
-            <HiChatBubbleLeft size={14} /> {comments}
-          </button>
-        </div>
+        <span>{formatCommentDateTime(commentedAt)}</span>
       </div>
     </div>
   );
