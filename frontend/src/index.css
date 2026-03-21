@@ -1,28 +1,46 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+/* ↓ Ajoute les variables ici */
+:root {
+  --color-bg: #f5f5f5;
+  --color-surface: rgba(230, 230, 230, 0.7);
+  --color-border: rgba(0, 0, 0, 0.08);
+  --hero-gradient-from: rgba(245, 245, 245, 0);
+  --hero-gradient-to: #f5f5f5;
+  --color-text: #111111;
+   --color-text-muted: #888888;
+}
+
+.dark {
+  --color-bg: #050505;
+  --color-surface: rgba(20, 20, 20, 0.6);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --hero-gradient-from: rgba(5, 5, 5, 0);
+  --hero-gradient-to: #050505;
+  --color-text: #f5f5f5;
+  --color-text-muted: #737373;
+}
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #050505;
+  background-color: var(--color-bg); /* ← remplace #050505 */
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .glass-panel {
-  background: rgba(20, 20, 20, 0.6);
+  background: var(--color-surface);      /* ← remplace rgba(20,20,20,0.6) */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border); /* ← remplace rgba(255,255,255,0.08) */
 }
 
 .hero-gradient {
-  background: linear-gradient(180deg, rgba(5, 5, 5, 0) 0%, #050505 100%);
+  background: linear-gradient(
+    180deg,
+    var(--hero-gradient-from) 0%,
+    var(--hero-gradient-to) 100%   /* ← remplace les valeurs hardcodées */
+  );
 }
