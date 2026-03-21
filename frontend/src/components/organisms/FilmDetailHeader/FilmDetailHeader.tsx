@@ -14,17 +14,10 @@ export function FilmDetailHeader() {
       </div>
 
       <div className="flex items-center gap-6">
-        <button className="relative text-neutral-300 hover:text-white transition-colors">
+        <button className="relative text-white/70 hover:text-white transition-colors">
           <HiBell size={22} />
         </button>
-        <div className="h-6 w-px bg-white/10"></div>
-        <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <img
-            src="https://i.pravatar.cc/150?img=33"
-            alt="Avatar"
-            className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10"
-          />
-        </button>
+        <div className="h-6 w-px bg-white/20" />
       </div>
     </header>
   );

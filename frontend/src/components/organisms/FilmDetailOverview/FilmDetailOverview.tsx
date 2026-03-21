@@ -32,6 +32,7 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
 
   return (
     <>
+      {/* Hero image — les overlays noirs restent hardcodés (sur image) */}
       <div className="relative w-full h-[60vh] lg:h-[65vh]">
         <img
           src={getPosterUrl(movie.poster_url ?? undefined)}
@@ -39,73 +40,111 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
           alt={movie.title}
           onError={handlePosterError}
         />
-
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent"></div>
-        <div className="absolute inset-0 bg-linear-to-r from-black/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/40 to-transparent" />
       </div>
 
       <div className="relative z-10 -mt-32 w-full max-w-6xl mx-auto px-6 lg:px-12">
         <div className="flex flex-col lg:flex-row gap-12">
           <div className="flex-1 space-y-8">
+
+            {/* Titre + métadonnées */}
             <div>
               <h1 className="text-4xl lg:text-6xl font-bold text-white tracking-tight mb-4 drop-shadow-xl">
                 {movie.title}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm lg:text-base font-medium text-neutral-300">
-                <span className="text-white">{movie.year}</span>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm lg:text-base font-medium text-white">
+                <span>{movie.year}</span>
                 {movie.runtime && (
                   <>
-                    <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
+                    <span className="w-1 h-1 rounded-full bg-white/50" />
                     <span>{movie.runtime}</span>
                   </>
                 )}
 
                 {roundedAverageRating !== null && (
-                  <div className="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2 bg-neutral-900/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                  <div
+                    className="lg:flex-none lg:ml-auto flex items-center gap-2 backdrop-blur-md px-3 py-1 rounded-full" // ← supprimé flex-1
+                    style={{
+                      background: "rgba(0,0,0,0.5)", // ← fond sombre sur image dans les 2 thèmes
+                      border: "1px solid rgba(255,255,255,0.15)",
+                    }}
+                  >
                     <RatingStars rating={starsRating} size={14} />
                     <span className="text-white font-semibold">
                       {roundedAverageRating.toFixed(1)}
                     </span>
-                    <span className="text-neutral-500 text-xs">/ 5</span>
-                    <span className="text-neutral-500 text-xs">
-                      ({movie.ratings_count} note
-                      {movie.ratings_count > 1 ? "s" : ""})
+                    <span className="text-white/60 text-xs">/ 5</span>
+                    <span className="text-white/60 text-xs">
+                      ({movie.ratings_count} note{movie.ratings_count > 1 ? "s" : ""})
                     </span>
                   </div>
                 )}
               </div>
             </div>
 
+            {/* Synopsis */}
             <div className="max-w-3xl">
-              <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-3">
-                Resume
+              <h3
+                className="text-sm font-semibold uppercase tracking-wider mt-20 mb-3"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Résumé
               </h3>
-              <p className="text-lg text-neutral-300 leading-relaxed">
-                {movie.plot ? movie.plot : "Aucun synopsis disponible."}
+              <p className="text-lg leading-relaxed" style={{ color: "var(--color-text)" }}>
+                {movie.plot ?? "Aucun synopsis disponible."}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 py-8 border-y border-neutral-800/50">
+            {/* Détails */}
+            <div
+              className="grid grid-cols-2 md:grid-cols-3 gap-8 py-8"
+              style={{ borderTop: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)" }}
+            >
               {movie.director && (
                 <div>
-                  <h4 className="text-xs text-neutral-500 mb-1">Realisateur</h4>
-                  <p className="text-white font-medium">{movie.director}</p>
+                  <h4
+                    className="text-xs mb-1"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    Réalisateur
+                  </h4>
+                  <p className="font-medium" style={{ color: "var(--color-text)" }}>
+                    {movie.director}
+                  </p>
                 </div>
               )}
               {movie.awards && (
                 <div>
-                  <h4 className="text-xs text-neutral-500 mb-1">Recompenses</h4>
-                  <p className="text-neutral-300 text-sm">{movie.awards}</p>
+                  <h4
+                    className="text-xs mb-1"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    Récompenses
+                  </h4>
+                  <p className="text-sm" style={{ color: "var(--color-text)" }}>
+                    {movie.awards}
+                  </p>
                 </div>
               )}
               <div className="col-span-2 md:col-span-1">
-                <h4 className="text-xs text-neutral-500 mb-2">Genres</h4>
+                <h4
+                  className="text-xs mb-2"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  Genres
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {genres.map((genre) => (
                     <span
                       key={genre}
-                      className="px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-neutral-400"
+                      className="px-3 py-1 rounded-lg text-xs"
+                      style={{
+                        background: "var(--color-surface)",
+                        border: "1px solid var(--color-border)",
+                        color: "var(--color-text-muted)",
+                      }}
                     >
                       {genre}
                     </span>
@@ -116,15 +155,20 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
 
             {movie.type && (
               <div>
-                <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">
+                <h3
+                  className="text-sm font-semibold uppercase tracking-wider mb-4"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   Type
                 </h3>
-                <p className="text-neutral-300 capitalize">Film</p>
+                <p className="capitalize" style={{ color: "var(--color-text)" }}>
+                  Film
+                </p>
               </div>
             )}
           </div>
 
-          <div className="hidden lg:block lg:w-12"></div>
+          <div className="hidden lg:block lg:w-12" />
         </div>
       </div>
     </>

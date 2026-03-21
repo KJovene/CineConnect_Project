@@ -21,7 +21,13 @@ const FilmDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#050505] text-neutral-300 antialiased min-h-screen flex flex-col">
+    <div
+      className="antialiased min-h-screen flex flex-col"
+      style={{
+        background: "var(--color-bg)",
+        color: "var(--color-text)",
+      }}
+    >
       <FilmDetailHeader />
 
       <main className="flex-1 w-full pb-20">
@@ -36,14 +42,32 @@ const FilmDetailPage: React.FC = () => {
 
 const LoadingSkeleton: React.FC = () => {
   return (
-    <div className="bg-[#050505] min-h-screen">
-      <div className="h-20 bg-neutral-900/50"></div>
-      <div className="w-full h-[65vh] bg-neutral-900/50 animate-pulse"></div>
+    <div className="min-h-screen" style={{ background: "var(--color-bg)" }}>
+      {/* Barre de nav factice */}
+      <div
+        className="h-20"
+        style={{ background: "var(--color-surface)" }}
+      />
+      {/* Hero factice */}
+      <div
+        className="w-full h-[65vh] animate-pulse"
+        style={{ background: "var(--color-surface)" }}
+      />
+      {/* Contenu factice */}
       <div className="max-w-6xl mx-auto px-12 -mt-32">
         <div className="space-y-4">
-          <div className="h-12 bg-neutral-900/50 rounded animate-pulse w-1/2"></div>
-          <div className="h-6 bg-neutral-900/50 rounded animate-pulse w-1/4"></div>
-          <div className="h-32 bg-neutral-900/50 rounded animate-pulse"></div>
+          <div
+            className="h-12 rounded animate-pulse w-1/2"
+            style={{ background: "var(--color-surface)" }}
+          />
+          <div
+            className="h-6 rounded animate-pulse w-1/4"
+            style={{ background: "var(--color-surface)" }}
+          />
+          <div
+            className="h-32 rounded animate-pulse"
+            style={{ background: "var(--color-surface)" }}
+          />
         </div>
       </div>
     </div>
@@ -52,10 +76,18 @@ const LoadingSkeleton: React.FC = () => {
 
 const ErrorState: React.FC<{ error: Error | null }> = ({ error }) => {
   return (
-    <div className="bg-[#050505] min-h-screen flex items-center justify-center">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: "var(--color-bg)" }}
+    >
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-white mb-4">Film introuvable</h1>
-        <p className="text-neutral-400 mb-8">
+        <h1
+          className="text-4xl font-bold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
+          Film introuvable
+        </h1>
+        <p className="mb-8" style={{ color: "var(--color-text-muted)" }}>
           {error?.message || "Ce film n'existe pas ou a été supprimé."}
         </p>
         <Link
