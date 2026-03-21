@@ -1,5 +1,6 @@
 import React from "react";
 import { SidebarBrand, UserCard } from "@/components/molecules";
+import { Link, useRouterState } from "@tanstack/react-router";
 
 export interface SidebarNavItem {
   id: string;
@@ -18,7 +19,7 @@ export interface SidebarNavSection {
 export interface SidebarUser {
   name: string;
   badge: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 export interface SidebarProps {
@@ -28,6 +29,15 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+
+  const isItemActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <aside className="w-20 lg:w-64 flex flex-col border-r border-white/5 h-full shrink-0 bg-[#080808]">
       <SidebarBrand />
@@ -40,18 +50,19 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
             </div>
 
             {section.items.map((item) => (
-              <a
+              <Link
                 key={item.id}
                 href={item.href}
+                to={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group border ${
-                  item.isActive
+                  isItemActive(item.href)
                     ? "bg-white/5 text-white border-white/5 shadow-sm"
                     : "text-neutral-400 hover:text-white hover:bg-white/5 border-transparent hover:border-white/5"
                 }`}
               >
                 <div
                   className={`shrink-0 ${
-                    item.isActive
+                    isItemActive(item.href)
                       ? "text-indigo-400 group-hover:text-indigo-300"
                       : "group-hover:text-neutral-300"
                   } transition-colors`}
@@ -64,7 +75,7 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
                 {item.showNotification && (
                   <span className="hidden lg:flex ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                 )}
-              </a>
+              </Link>
             ))}
 
             {index < sections.length - 1 && <div className="mt-6" />}

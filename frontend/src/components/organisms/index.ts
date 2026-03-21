@@ -10,3 +10,5 @@ export * from "./CategoryCarousel";
 export * from "./FilmDetailHeader";
 export * from "./FilmDetailOverview";
 export * from "./FilmCommunityReviews";
+export * from "./ProfileLatestRatings";
+export * from "./ProfileLatestComments";

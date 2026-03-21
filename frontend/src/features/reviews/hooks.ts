@@ -38,6 +38,27 @@ export interface FilmRatingSummary {
   userRating: number | null;
 }
 
+export interface LatestUserRating {
+  reviewId: number;
+  filmId: number;
+  omdbId: string;
+  filmTitle: string;
+  posterUrl: string | null;
+  rating: number;
+  createdAt: string | null;
+}
+
+export interface LatestUserComment {
+  reviewId: number;
+  filmId: number;
+  omdbId: string;
+  filmTitle: string;
+  posterUrl: string | null;
+  comment: string;
+  isReply: boolean;
+  createdAt: string | null;
+}
+
 interface CreateFilmCommentRequest {
   comment: string;
   rating?: number;
@@ -61,6 +82,30 @@ function ratingSummaryQueryKey(omdbId: string) {
 
 function movieDetailQueryKey(omdbId: string) {
   return ["movies", "detail", omdbId] as const;
+}
+
+function latestRatingsQueryKey() {
+  return ["users", "me", "latest-ratings"] as const;
+}
+
+function latestCommentsQueryKey() {
+  return ["users", "me", "latest-comments"] as const;
+}
+
+export function useMyLatestRatings() {
+  return useQuery({
+    queryKey: latestRatingsQueryKey(),
+    queryFn: () =>
+      apiClient.get<LatestUserRating[]>("/users/me/latest-ratings"),
+  });
+}
+
+export function useMyLatestComments() {
+  return useQuery({
+    queryKey: latestCommentsQueryKey(),
+    queryFn: () =>
+      apiClient.get<LatestUserComment[]>("/users/me/latest-comments"),
+  });
 }
 
 export function useFilmReviews(omdbId: string) {
