@@ -23,4 +23,4 @@ WORKDIR /app/backend
 EXPOSE 3000
 
 # Commande de développement avec hot reload
-CMD ["pnpm", "dev"]
+CMD ["sh", "-c", "pnpm db:migrate && pnpm dev"]

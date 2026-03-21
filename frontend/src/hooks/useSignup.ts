@@ -27,7 +27,7 @@ export function useSignup() {
     });
     setLoading(false);
     if (err) {
-      setError(err.message ?? "Échec de l'inscription");
+      setError("Echec de l'inscription");
       return;
     }
     navigate({ to: "/" });
