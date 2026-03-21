@@ -7,12 +7,7 @@ import {
 import { AppLayout } from "@/components/templates";
 import type { SidebarNavSection } from "@/components/organisms";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  HiOutlineFilm,
-  HiOutlinePlayCircle,
-  HiOutlineUsers,
-  HiOutlineChatBubbleLeftRight,
-} from "react-icons/hi2";
+import { HiOutlineFilm, HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import { getSession, useSession } from "@/lib/auth-client";
 
 const SIDEBAR_SECTIONS: SidebarNavSection[] = [
@@ -32,24 +27,11 @@ const SIDEBAR_SECTIONS: SidebarNavSection[] = [
         label: "Films",
         href: "/film",
       },
-      {
-        id: "notes",
-        icon: <HiOutlinePlayCircle size={20} />,
-        label: "Mes Notes",
-        href: "/mes-notes",
-      },
     ],
   },
   {
     title: "Social",
     items: [
-      {
-        id: "community",
-        icon: <HiOutlineUsers size={20} />,
-        label: "Profil",
-        href: "/profil",
-        showNotification: true,
-      },
       {
         id: "discussions",
         icon: <HiOutlineChatBubbleLeftRight size={20} />,

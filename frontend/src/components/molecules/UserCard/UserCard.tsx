@@ -1,4 +1,5 @@
 import { Avatar } from "@/components/atoms";
+import { Link } from "@tanstack/react-router";
 
 export interface UserCardProps {
   userName: string;
@@ -15,20 +16,19 @@ export function UserCard({
 }: UserCardProps) {
   return (
     <div className="p-4 border-t border-white/5 shrink-0">
-      <button
+      <Link
+        to="/profil"
         onClick={onClick}
-        className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left border border-transparent hover:border-white/5 group"
+        className="cursor-pointer flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left border border-transparent hover:border-white/5 group"
       >
         <Avatar image={userAvatar} name={userName} size="lg" />
         <div className="hidden lg:block overflow-hidden">
-          <div className="text-sm font-medium text-white truncate">
-            {userName}
-          </div>
-          <div className="text-[11px] text-neutral-500 truncate">
+          <p className="text-sm font-medium text-white truncate">{userName}</p>
+          <p className="text-[11px] text-neutral-500 truncate group-hover:text-indigo-300 transition-colors">
             {userBadge}
-          </div>
+          </p>
         </div>
-      </button>
+      </Link>
     </div>
   );
 }
