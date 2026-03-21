@@ -95,7 +95,7 @@ router.post('/reject', async (req: RequestWithSession, res) => {
 router.delete('/:friendUserId', async (req: RequestWithSession, res) => {
   try {
     const userId = parseInt(req.session!.user.id);
-    const friendUserId = parseInt(req.params.friendUserId);
+    const friendUserId = parseInt(String(req.params.friendUserId));
     await friendsService.removeFriend(userId, friendUserId);
     res.status(204).send();
   } catch (err) {

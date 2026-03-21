@@ -10,7 +10,7 @@ router.use(attachSession, requireAuth);
 router.get('/with/:userId', async (req: RequestWithSession, res) => {
   try {
     const myId = parseInt(req.session!.user.id);
-    const otherId = parseInt(req.params.userId);
+    const otherId = parseInt(String(req.params.userId));
     const page = parseInt((req.query.page as string) ?? '1');
     const limit = parseInt((req.query.limit as string) ?? '50');
 

@@ -4,6 +4,7 @@ import { ReviewCard, type ReviewCardProps } from "@/components/molecules";
 export interface ReviewListProps {
   title: string;
   reviews: ReviewCardProps[];
+  isLoading?: boolean;
   onViewAll?: () => void;
   onWriteReview?: () => void;
 }
@@ -11,6 +12,7 @@ export interface ReviewListProps {
 export function ReviewList({
   title,
   reviews,
+  isLoading = false,
   onViewAll,
   onWriteReview,
 }: ReviewListProps) {
@@ -31,9 +33,34 @@ export function ReviewList({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {reviews.map((review, index) => (
-          <ReviewCard key={index} {...review} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={`review-skeleton-${index}`}
+                className="bg-[#0A0A0A] border border-white/5 p-5 rounded-2xl animate-pulse"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white/10" />
+                    <div className="space-y-2">
+                      <div className="h-3 w-24 rounded bg-white/10" />
+                      <div className="h-2 w-16 rounded bg-white/10" />
+                    </div>
+                  </div>
+                  <div className="h-3 w-16 rounded bg-white/10" />
+                </div>
+
+                <div className="h-4 w-2/3 rounded bg-white/10 mb-3" />
+                <div className="space-y-2 mb-4">
+                  <div className="h-3 w-full rounded bg-white/10" />
+                  <div className="h-3 w-5/6 rounded bg-white/10" />
+                  <div className="h-3 w-4/6 rounded bg-white/10" />
+                </div>
+
+                <div className="h-3 w-28 rounded bg-white/10 pt-4 border-t border-white/5" />
+              </div>
+            ))
+          : reviews.map((review, index) => <ReviewCard key={index} {...review} />)}
 
         {onWriteReview && (
           <button

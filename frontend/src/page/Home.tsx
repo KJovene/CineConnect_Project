@@ -8,7 +8,8 @@ import type { MovieCardProps } from "@/components/molecules";
 
 const Home: React.FC = () => {
   const { data: topFilms, isLoading } = useTopRatedMovies(5);
-  const { data: communityReviews = [] } = useLatestCommunityReviews(4);
+  const { data: communityReviews = [], isLoading: isLoadingCommunityReviews } =
+    useLatestCommunityReviews(4);
 
   const convertToMovieCard = (film: Film): MovieCardProps => ({
     image: getPosterUrl(film.poster_url),
@@ -45,6 +46,7 @@ const Home: React.FC = () => {
         <ReviewList
           title="Derniers Avis de la communauté"
           reviews={recentReviews}
+          isLoading={isLoadingCommunityReviews}
         />
       </div>
     </>
