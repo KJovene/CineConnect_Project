@@ -60,7 +60,9 @@ export function ReviewList({
                 <div className="h-3 w-28 rounded bg-white/10 pt-4 border-t border-white/5" />
               </div>
             ))
-          : reviews.map((review, index) => <ReviewCard key={index} {...review} />)}
+          : reviews.map((review, index) => (
+              <ReviewCard key={index} {...review} />
+            ))}
 
         {onWriteReview && (
           <button

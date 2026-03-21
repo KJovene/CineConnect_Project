@@ -1,4 +1,5 @@
 import { Avatar, RatingStars } from "@/components/atoms";
+import { Link } from "@tanstack/react-router";
 
 export interface ReviewCardProps {
   avatar: string | null;
@@ -7,6 +8,7 @@ export interface ReviewCardProps {
   movie: string;
   review: string;
   commentedAt: string | null;
+  omdbId?: string;
 }
 
 function formatCommentDateTime(value: string | null): string {
@@ -27,9 +29,10 @@ export function ReviewCard({
   movie,
   review,
   commentedAt,
+  omdbId,
 }: ReviewCardProps) {
-  return (
-    <div className="bg-[#0A0A0A] border border-white/5 p-5 rounded-2xl hover:border-white/10 transition-colors group">
+  const cardContent = (
+    <>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <Avatar image={avatar} name={name} size="lg" />
@@ -48,6 +51,27 @@ export function ReviewCard({
       <div className="flex items-center justify-between text-xs text-neutral-500 pt-4 border-t border-white/5">
         <span>{formatCommentDateTime(commentedAt)}</span>
       </div>
+    </>
+  );
+
+  const className =
+    "bg-[#0A0A0A] border border-white/5 p-5 rounded-2xl transition-colors group";
+
+  if (omdbId) {
+    return (
+      <Link
+        to="/film/$id"
+        params={{ id: omdbId }}
+        className={`${className} hover:border-white/10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70`}
+      >
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="bg-[#0A0A0A] border border-white/5 p-5 rounded-2xl hover:border-white/10 transition-colors group">
+      {cardContent}
     </div>
   );
 }

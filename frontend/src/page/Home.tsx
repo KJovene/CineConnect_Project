@@ -29,6 +29,7 @@ const Home: React.FC = () => {
     movie: review.film.title,
     review: review.comment,
     commentedAt: review.createdAt,
+    omdbId: review.film.omdbId,
   }));
 
   return (
