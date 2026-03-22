@@ -17,18 +17,27 @@ export function useLogin() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const { error: err } = await authClient.signIn.email({
-      email,
-      password,
-      callbackURL: "/",
-      fetchOptions: { onSuccess: () => navigate({ to: "/" }) },
-    });
-    setLoading(false);
-    if (err) {
-      setError(err.message ?? "Échec de la connexion");
-      return;
+    try {
+      const { error: err } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+        fetchOptions: { onSuccess: () => navigate({ to: "/" }) },
+      });
+
+      if (err) {
+        setError(err.message ?? "Échec de la connexion");
+        return;
+      }
+
+      navigate({ to: "/" });
+    } catch {
+      setError(
+        "Impossible de contacter le serveur. Vérifie que le backend tourne sur localhost:3000.",
+      );
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/" });
   };
 
   return {
