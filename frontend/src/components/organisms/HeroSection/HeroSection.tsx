@@ -31,6 +31,14 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
   }
 
   const posterUrl = getPosterUrl(film.poster_url);
+  const communityRating =
+    typeof film.average_rating === "number" && film.average_rating > 0
+      ? film.average_rating
+      : null;
+  const displayCommunityRating =
+    communityRating !== null
+      ? (Math.round(communityRating * 10) / 10).toFixed(1)
+      : null;
 
   return (
     <div
@@ -59,11 +67,11 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
       <div className="relative z-10 px-8 pb-16 pt-16 w-full max-w-5xl">
         <div className="flex items-center gap-3 mb-5">
           <Badge variant="indigo">À la une</Badge>
-          {film.imdb_rating && (
+          {displayCommunityRating && (
             <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded border border-white/5">
               <HiStar className="text-amber-400" size={12} />
               <span className="text-xs text-neutral-200 font-medium">
-                {film.imdb_rating}/10
+                {displayCommunityRating}
               </span>
             </div>
           )}
@@ -78,7 +86,8 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
         </h1>
 
         <p className="text-neutral-300 text-base md:text-lg leading-relaxed max-w-2xl mb-10 line-clamp-3 font-light">
-          {film.plot || "Découvrez les discussions passionnées de notre communauté sur ce film."}
+          {film.plot ||
+            "Découvrez les discussions passionnées de notre communauté sur ce film."}
         </p>
 
         <Link
