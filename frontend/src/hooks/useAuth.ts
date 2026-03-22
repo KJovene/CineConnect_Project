@@ -13,7 +13,7 @@ export function useAuth() {
       fetchOptions: {
         onSuccess: () => {
           // Redirection vers la page de connexion après logout
-          window.location.href = "/login";
+          window.location.assign("/login");
         },
       },
     });
