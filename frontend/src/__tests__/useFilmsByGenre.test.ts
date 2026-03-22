@@ -1,17 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useFilmsByGenre } from "@/hooks/useFilmsByGenre";
-import { createQueryClientWrapper, createTestQueryClient } from "@/__tests__/test-utils";
+import {
+  createQueryClientWrapper,
+  createTestQueryClient,
+} from "@/__tests__/test-utils";
 
 describe("useFilmsByGenre", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    global.fetch = jest.fn();
+    globalThis.fetch = jest.fn();
   });
 
   it("fetches films by genre with provided limit", async () => {
     const payload = { genres: [{ genre: "Action", films: [] }] };
 
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue(payload),
     });
@@ -25,14 +28,14 @@ describe("useFilmsByGenre", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/api/films/by-genre?limit=12",
     );
     expect(result.current.data).toEqual(payload);
   });
 
   it("throws expected error when response is not ok", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       json: jest.fn(),
     });

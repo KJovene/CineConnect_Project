@@ -13,7 +13,7 @@ async function fetchTopRated(limit: number): Promise<TopRatedResponse> {
 export function useTopRatedMovies(limit = 10) {
   return useQuery({
     queryKey: ["movies", "top-rated", limit],
-    queryFn:  () => fetchTopRated(limit),
+    queryFn: () => fetchTopRated(limit),
     staleTime: 1000 * 60 * 15, // 15 min — données stables
   });
 }

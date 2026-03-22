@@ -33,7 +33,9 @@ describe("useSignup", () => {
     });
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault: jest.fn() } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
     });
 
     expect(authClient.signUp.email).toHaveBeenCalledWith(
@@ -62,7 +64,9 @@ describe("useSignup", () => {
     const { result } = renderHook(() => useSignup());
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault: jest.fn() } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
     });
 
     expect(result.current.error).toBe("Echec de l'inscription");

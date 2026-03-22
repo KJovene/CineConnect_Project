@@ -34,7 +34,9 @@ describe("useLogin", () => {
     const preventDefault = jest.fn();
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault,
+      } as unknown as React.FormEvent);
     });
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
@@ -63,7 +65,9 @@ describe("useLogin", () => {
     const { result } = renderHook(() => useLogin());
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault: jest.fn() } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
     });
 
     expect(result.current.error).toBe("Invalid credentials");
@@ -79,7 +83,9 @@ describe("useLogin", () => {
     const { result } = renderHook(() => useLogin());
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault: jest.fn() } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
     });
 
     expect(result.current.error).toBe("Échec de la connexion");
@@ -88,12 +94,16 @@ describe("useLogin", () => {
   });
 
   it("sets fallback message when signIn throws", async () => {
-    (authClient.signIn.email as jest.Mock).mockRejectedValue(new Error("network"));
+    (authClient.signIn.email as jest.Mock).mockRejectedValue(
+      new Error("network"),
+    );
 
     const { result } = renderHook(() => useLogin());
 
     await act(async () => {
-      await result.current.handleSubmit({ preventDefault: jest.fn() } as unknown as React.FormEvent);
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
     });
 
     expect(result.current.error).toBe(

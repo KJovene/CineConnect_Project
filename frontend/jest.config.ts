@@ -23,9 +23,7 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  collectCoverageFrom: [
-    "src/hooks/*.ts",
-  ],
+  collectCoverageFrom: ["src/hooks/*.ts"],
   coverageThreshold: {
     global: {
       branches: 100,

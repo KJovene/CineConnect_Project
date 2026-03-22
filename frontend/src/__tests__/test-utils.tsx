@@ -13,6 +13,8 @@ export function createTestQueryClient() {
 
 export function createQueryClientWrapper(client: QueryClient) {
   return function Wrapper({ children }: PropsWithChildren) {
-    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    return (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    );
   };
 }

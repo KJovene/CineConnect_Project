@@ -24,7 +24,10 @@ describe("useAuth", () => {
 
   it("returns authenticated state when session exists", () => {
     const session = { user: { id: "user-1" } };
-    (useSession as jest.Mock).mockReturnValue({ data: session, isPending: true });
+    (useSession as jest.Mock).mockReturnValue({
+      data: session,
+      isPending: true,
+    });
 
     const { result } = renderHook(() => useAuth());
 
