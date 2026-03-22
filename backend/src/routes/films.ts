@@ -105,15 +105,8 @@ router.get(
   "/:omdbId",
   attachSession,
   async (req: RequestWithSession, res: Response) => {
-    const omdbId = Array.isArray(req.params.omdbId)
-      ? req.params.omdbId[0]
-      : req.params.omdbId;
-
-    const sessionUserId = req.session?.user?.id;
-    const userId =
-      typeof sessionUserId === "string"
-        ? Number.parseInt(sessionUserId, 10)
-        : undefined;
+    const omdbId = req.params.omdbId;
+    const userId = Number.parseInt(String(req.session?.user?.id ?? ""), 10);
 
     try {
       const film = await getFilmDetail(omdbId);

@@ -68,9 +68,7 @@ function parseYear(year: string | undefined): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
-function parseType(
-  type: string | undefined,
-): "movie" | null {
+function parseType(type: string | undefined): "movie" | null {
   if (type === "movie") return type;
   return null;
 }
@@ -78,7 +76,7 @@ function parseType(
 //  Appels OMDB
 async function fetchOmdbSearch(
   query: string,
-  page = 1,
+  page: number,
 ): Promise<OmdbSearchResponse> {
   if (!OMDB_API_KEY) throw new Error("OMDB_API_KEY manquante dans .env");
 

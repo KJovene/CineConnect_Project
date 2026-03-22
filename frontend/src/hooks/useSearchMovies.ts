@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import type { SearchResponse } from "@cineconnect/shared";
+import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const API_BASE = getApiBaseUrl();
 
-async function searchMovies(query: string, page = 1): Promise<SearchResponse> {
+async function searchMovies(
+  query: string,
+  page: number,
+): Promise<SearchResponse> {
   const res = await fetch(
-    `${API_BASE}/api/films/search?q=${encodeURIComponent(query)}&page=${page}`
+    `${API_BASE}/api/films/search?q=${encodeURIComponent(query)}&page=${page}`,
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -17,8 +21,8 @@ async function searchMovies(query: string, page = 1): Promise<SearchResponse> {
 export function useSearchMovies(query: string, page = 1) {
   return useQuery({
     queryKey: ["movies", "search", query, page],
-    queryFn:  () => searchMovies(query, page),
-    enabled:  !!query && query.length >= 3,
+    queryFn: () => searchMovies(query, page),
+    enabled: !!query && query.length >= 3,
     staleTime: 1000 * 60 * 5, // 5 min — pas besoin de recharger souvent, c'est en BDD
   });
 }

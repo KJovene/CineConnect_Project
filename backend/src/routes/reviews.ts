@@ -21,13 +21,11 @@ import {
 const router = Router({ mergeParams: true });
 
 function getOmdbId(req: RequestWithSession): string {
-  const value = req.params.omdbId;
-  return (Array.isArray(value) ? value[0] : (value ?? "")).trim();
+  return String(req.params.omdbId ?? "").trim();
 }
 
 function getNumberParam(value: string | string[] | undefined): number {
-  const normalized = Array.isArray(value) ? value[0] : value;
-  return Number.parseInt(String(normalized ?? ""), 10);
+  return Number.parseInt(String(value ?? ""), 10);
 }
 
 router.get("/", async (req, res) => {
@@ -60,10 +58,7 @@ router.get(
     }
 
     const sessionUserId = req.session?.user?.id;
-    const userId =
-      typeof sessionUserId === "string"
-        ? Number.parseInt(sessionUserId, 10)
-        : undefined;
+    const userId = Number.parseInt(String(sessionUserId ?? ""), 10);
 
     try {
       const summary = await getFilmRatingSummary({

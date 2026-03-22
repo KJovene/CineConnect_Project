@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["jest", "node", "vite/client"],
+    "esModuleInterop": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src"]
+}
