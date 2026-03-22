@@ -209,15 +209,13 @@ describe("users routes", () => {
   it("GET / retourne [] si seulement soi-meme", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
-        where: jest
-          .fn()
-          .mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue([
-                { id: 1, name: "Me", email: "m", image: null },
-              ]),
-          }),
+        where: jest.fn().mockReturnValue({
+          limit: jest
+            .fn()
+            .mockResolvedValue([
+              { id: 1, name: "Me", email: "m", image: null },
+            ]),
+        }),
       }),
     });
 
@@ -270,9 +268,11 @@ describe("users routes", () => {
       })
       .mockReturnValueOnce({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([
-            { user_id: 2, friend_user_id: 1, status: null },
-          ]),
+          where: jest
+            .fn()
+            .mockResolvedValue([
+              { user_id: 2, friend_user_id: 1, status: null },
+            ]),
         }),
       });
 

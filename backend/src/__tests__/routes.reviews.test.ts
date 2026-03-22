@@ -163,7 +163,9 @@ describe("reviews routes", () => {
   });
 
   it("POST / retourne 400 si omdbId manquant", async () => {
-    const res = await request(app).post("/api/films/%20/reviews").send({ comment: "ok" });
+    const res = await request(app)
+      .post("/api/films/%20/reviews")
+      .send({ comment: "ok" });
     expect([400, 404]).toContain(res.status);
   });
 
@@ -293,9 +295,7 @@ describe("reviews routes", () => {
   });
 
   it("PATCH /:reviewId couvre 400 comment manquant", async () => {
-    const res = await request(app)
-      .patch("/api/films/tt1/reviews/1")
-      .send({});
+    const res = await request(app).patch("/api/films/tt1/reviews/1").send({});
 
     expect(res.status).toBe(400);
   });

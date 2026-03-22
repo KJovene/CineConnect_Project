@@ -128,7 +128,10 @@ describe("films routes", () => {
 
   it("GET /:omdbId passe userId undefined si id session non numerique", async () => {
     sessionUserId = "abc";
-    mockFilmsService.getFilmDetail.mockResolvedValue({ omdb_id: "tt1", title: "A" });
+    mockFilmsService.getFilmDetail.mockResolvedValue({
+      omdb_id: "tt1",
+      title: "A",
+    });
     mockReviewsService.getFilmRatingSummary.mockResolvedValue({
       averageRating: null,
       totalRatings: 0,
@@ -146,7 +149,10 @@ describe("films routes", () => {
 
   it("GET /:omdbId passe userId undefined si session absente", async () => {
     sessionUserId = undefined;
-    mockFilmsService.getFilmDetail.mockResolvedValue({ omdb_id: "tt1", title: "A" });
+    mockFilmsService.getFilmDetail.mockResolvedValue({
+      omdb_id: "tt1",
+      title: "A",
+    });
     mockReviewsService.getFilmRatingSummary.mockResolvedValue({
       averageRating: null,
       totalRatings: 0,

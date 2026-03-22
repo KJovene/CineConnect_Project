@@ -68,9 +68,7 @@ function parseYear(year: string | undefined): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
-function parseType(
-  type: string | undefined,
-): "movie" | null {
+function parseType(type: string | undefined): "movie" | null {
   if (type === "movie") return type;
   return null;
 }
