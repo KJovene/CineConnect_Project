@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { FilmDetailResponse } from "@cineconnect/shared";
+import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const API_BASE = getApiBaseUrl();
 
 async function fetchFilmDetail(omdbId: string): Promise<FilmDetailResponse> {
   const res = await fetch(`${API_BASE}/api/films/${omdbId}`, {

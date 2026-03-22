@@ -3,8 +3,8 @@
   "compilerOptions": {
     "types": ["jest", "node", "vite/client"],
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "verbatimModuleSyntax": false
   },
   "include": ["src"]

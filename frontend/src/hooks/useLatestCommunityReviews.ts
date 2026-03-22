@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import type { CommunityReviewsResponse } from "@cineconnect/shared";
+import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const API_BASE = getApiBaseUrl();
 
 async function fetchLatestCommunityReviews(
-  limit = 4,
+  limit: number,
 ): Promise<CommunityReviewsResponse> {
   const res = await fetch(
     `${API_BASE}/api/films/community-reviews?limit=${limit}`,
