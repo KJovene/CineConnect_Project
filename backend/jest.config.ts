@@ -1,22 +1,22 @@
-import type { Config } from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  preset: "ts-jest",
+  testEnvironment: "node",
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
+    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.test.ts'],
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
+  roots: ["<rootDir>/src"],
+  testMatch: ["**/__tests__/**/*.test.ts"],
+  setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
   collectCoverageFrom: [
-    'src/app.ts',
-    'src/auth.ts',
-    'src/index.ts',
-    'src/socket.ts',
-    'src/middlewares/authMiddleware.ts',
-    'src/services/friendsService.ts',
-    'src/services/messagesService.ts',
+    "src/**/*.ts",
+    "!src/**/*.d.ts",
+    "!src/**/__tests__/**",
+    "!src/db/schema.ts",
+    "!src/db/seed.ts",
+    "!src/db/seedCommunity.ts",
+    "!src/db/seedFilms.ts",
   ],
   coverageThreshold: {
     global: {

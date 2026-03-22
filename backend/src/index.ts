@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv';
-import { createApp, createHttpServer } from './app.js';
+import * as dotenv from "dotenv";
+import { createApp, createHttpServer } from "./app.js";
 
 dotenv.config();
 
@@ -15,6 +15,6 @@ export function startServer() {
   return { app, httpServer };
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   startServer();
 }

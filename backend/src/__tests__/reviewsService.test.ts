@@ -5,7 +5,7 @@ const mockDb = {
   delete: jest.fn(),
 };
 
-jest.mock('../db/index.js', () => ({ db: mockDb }));
+jest.mock("../db/index.js", () => ({ db: mockDb }));
 
 import {
   FilmNotFoundError,
@@ -21,7 +21,7 @@ import {
   createReviewReply,
   updateReviewComment,
   deleteReviewComment,
-} from '../services/reviewsService.js';
+} from "../services/reviewsService.js";
 
 function selectWhereLimitResult(result: unknown) {
   return {
@@ -33,19 +33,23 @@ function selectWhereLimitResult(result: unknown) {
   };
 }
 
-describe('reviewsService', () => {
+describe("reviewsService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('getFilmComments throw FilmNotFoundError si film absent', async () => {
+  it("getFilmComments throw FilmNotFoundError si film absent", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
-    await expect(getFilmComments('tt1')).rejects.toBeInstanceOf(FilmNotFoundError);
+    await expect(getFilmComments("tt1")).rejects.toBeInstanceOf(
+      FilmNotFoundError,
+    );
   });
 
-  it('getFilmComments retourne commentaires parents avec replies', async () => {
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
+  it("getFilmComments retourne commentaires parents avec replies", async () => {
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([{ film_id: 10 }]),
+    );
 
     const parentRows = [
       {
@@ -54,10 +58,10 @@ describe('reviewsService', () => {
         film_id: 10,
         parent_review_id: null,
         rating: 4,
-        comment: 'Top',
-        created_at: new Date('2024-01-01T00:00:00.000Z'),
-        updated_at: new Date('2024-01-01T00:00:00.000Z'),
-        user_name: 'Bob',
+        comment: "Top",
+        created_at: new Date("2024-01-01T00:00:00.000Z"),
+        updated_at: new Date("2024-01-01T00:00:00.000Z"),
+        user_name: "Bob",
         user_image: null,
       },
       {
@@ -66,7 +70,7 @@ describe('reviewsService', () => {
         film_id: 10,
         parent_review_id: null,
         rating: 5,
-        comment: '   ',
+        comment: "   ",
         created_at: new Date(),
         updated_at: new Date(),
         user_name: null,
@@ -95,10 +99,10 @@ describe('reviewsService', () => {
                 film_id: 10,
                 parent_review_id: 1,
                 rating: 0,
-                comment: 'Reply',
-                created_at: new Date('2024-01-02T00:00:00.000Z'),
-                updated_at: new Date('2024-01-02T00:00:00.000Z'),
-                user_name: 'Alice',
+                comment: "Reply",
+                created_at: new Date("2024-01-02T00:00:00.000Z"),
+                updated_at: new Date("2024-01-02T00:00:00.000Z"),
+                user_name: "Alice",
                 user_image: null,
               },
             ]),
@@ -107,38 +111,160 @@ describe('reviewsService', () => {
       }),
     });
 
-    const result = await getFilmComments('tt1');
+    const result = await getFilmComments("tt1");
 
     expect(result).toHaveLength(1);
     expect(result[0].reviewId).toBe(1);
-    expect(result[0].author.name).toBe('Bob');
+    expect(result[0].author.name).toBe("Bob");
     expect(result[0].replies).toHaveLength(1);
     expect(result[0].replies[0].parentReviewId).toBe(1);
   });
 
-  it('createFilmComment refuse commentaire vide', async () => {
+  it("getFilmComments ignore replies sans parent et garde replies vides", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
 
-    await expect(
-      createFilmComment({ omdbId: 'tt1', userId: 1, comment: '   ' })
-    ).rejects.toThrow('Le commentaire ne peut pas être vide');
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue([
+              {
+                review_id: 1,
+                user_id: 2,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 4,
+                comment: "Top",
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: new Date("2024-01-01T00:00:00.000Z"),
+                user_name: "Bob",
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue([
+              {
+                review_id: 99,
+                user_id: 2,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 0,
+                comment: "oops",
+                created_at: new Date(),
+                updated_at: new Date(),
+                user_name: "Alice",
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    const result = await getFilmComments("tt1");
+
+    expect(result[0].replies).toEqual([]);
   });
 
-  it('createFilmComment met a jour un parent existant', async () => {
+  it("getFilmComments retourne vide quand aucun parent commentaire", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      {
-        review_id: 100,
-        user_id: 1,
-        film_id: 10,
-        parent_review_id: null,
-        rating: 3,
-        comment: 'old',
-      },
-    ]));
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue([
+              {
+                review_id: 1,
+                user_id: 2,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 4,
+                comment: "   ",
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: null,
+                user_name: null,
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    const result = await getFilmComments("tt1");
+
+    expect(result).toEqual([]);
+  });
+
+  it("getFilmComments couvre fallback comment null", async () => {
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue([
+              {
+                review_id: 1,
+                user_id: 2,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 4,
+                comment: null,
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: null,
+                user_name: null,
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    const result = await getFilmComments("tt1");
+
+    expect(result).toEqual([]);
+  });
+
+  it("createFilmComment refuse commentaire vide", async () => {
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([{ film_id: 10 }]),
+    );
+
+    await expect(
+      createFilmComment({ omdbId: "tt1", userId: 1, comment: "   " }),
+    ).rejects.toThrow("Le commentaire ne peut pas être vide");
+  });
+
+  it("createFilmComment met a jour un parent existant", async () => {
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([{ film_id: 10 }]),
+    );
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 100,
+          user_id: 1,
+          film_id: 10,
+          parent_review_id: null,
+          rating: 3,
+          comment: "old",
+        },
+      ]),
+    );
 
     mockDb.update.mockReturnValue({
-      set: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) }),
+      set: jest
+        .fn()
+        .mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) }),
     });
 
     mockDb.select.mockReturnValueOnce({
@@ -152,9 +278,9 @@ describe('reviewsService', () => {
                 film_id: 10,
                 parent_review_id: null,
                 rating: 4,
-                comment: 'new',
-                created_at: new Date('2024-01-01T00:00:00.000Z'),
-                updated_at: new Date('2024-01-03T00:00:00.000Z'),
+                comment: "new",
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: new Date("2024-01-03T00:00:00.000Z"),
                 user_name: null,
                 user_image: null,
               },
@@ -165,19 +291,68 @@ describe('reviewsService', () => {
     });
 
     const result = await createFilmComment({
-      omdbId: 'tt1',
+      omdbId: "tt1",
       userId: 1,
-      comment: 'new',
+      comment: "new",
       rating: 4,
     });
 
     expect(result.reviewId).toBe(100);
     expect(result.replies).toEqual([]);
-    expect(result.author.name).toBe('Utilisateur');
+    expect(result.author.name).toBe("Utilisateur");
   });
 
-  it('createFilmComment cree puis throw ReviewNotFoundError si select vide', async () => {
+  it("createFilmComment conserve rating existant si rating absent", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 100,
+          user_id: 1,
+          film_id: 10,
+          parent_review_id: null,
+          rating: 3,
+          comment: "old",
+        },
+      ]),
+    );
+
+    const set = jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) });
+    mockDb.update.mockReturnValue({ set });
+
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([
+              {
+                review_id: 100,
+                user_id: 1,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 3,
+                comment: "new",
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: new Date("2024-01-03T00:00:00.000Z"),
+                user_name: "Bob",
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    await createFilmComment({ omdbId: "tt1", userId: 1, comment: "new" });
+
+    const setArg = set.mock.calls[0][0] as { rating: number };
+    expect(setArg.rating).toBe(3);
+  });
+
+  it("createFilmComment cree puis throw ReviewNotFoundError si select vide", async () => {
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([{ film_id: 10 }]),
+    );
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
     mockDb.insert.mockReturnValue({
@@ -189,78 +364,196 @@ describe('reviewsService', () => {
     mockDb.select.mockReturnValueOnce({
       from: jest.fn().mockReturnValue({
         innerJoin: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+          where: jest
+            .fn()
+            .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
         }),
       }),
     });
 
     await expect(
-      createFilmComment({ omdbId: 'tt1', userId: 1, comment: 'hello' })
+      createFilmComment({ omdbId: "tt1", userId: 1, comment: "hello" }),
     ).rejects.toBeInstanceOf(ReviewNotFoundError);
   });
 
-  it('upsertFilmRating met a jour si parent existe', async () => {
+  it("upsertFilmRating met a jour si parent existe", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 30, user_id: 1, film_id: 9, parent_review_id: null, rating: 2, comment: null },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 30,
+          user_id: 1,
+          film_id: 9,
+          parent_review_id: null,
+          rating: 2,
+          comment: null,
+        },
+      ]),
+    );
 
     const where = jest.fn().mockResolvedValue(undefined);
-    mockDb.update.mockReturnValue({ set: jest.fn().mockReturnValue({ where }) });
+    mockDb.update.mockReturnValue({
+      set: jest.fn().mockReturnValue({ where }),
+    });
 
-    await upsertFilmRating({ omdbId: 'tt9', userId: 1, rating: 5 });
+    await upsertFilmRating({ omdbId: "tt9", userId: 1, rating: 5 });
     expect(mockDb.update).toHaveBeenCalledTimes(1);
     expect(mockDb.insert).not.toHaveBeenCalled();
   });
 
-  it('upsertFilmRating insere si parent absent', async () => {
+  it("upsertFilmRating insere si parent absent", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
-    mockDb.insert.mockReturnValue({ values: jest.fn().mockResolvedValue(undefined) });
+    mockDb.insert.mockReturnValue({
+      values: jest.fn().mockResolvedValue(undefined),
+    });
 
-    await upsertFilmRating({ omdbId: 'tt9', userId: 1, rating: 4 });
+    await upsertFilmRating({ omdbId: "tt9", userId: 1, rating: 4 });
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
   });
 
-  it('upsertFilmRating throw si rating invalide', async () => {
+  it("upsertFilmRating throw si rating invalide", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
 
     await expect(
-      upsertFilmRating({ omdbId: 'tt9', userId: 1, rating: 99 })
-    ).rejects.toThrow('La note doit être un entier entre 1 et 5');
+      upsertFilmRating({ omdbId: "tt9", userId: 1, rating: 99 }),
+    ).rejects.toThrow("La note doit être un entier entre 1 et 5");
   });
 
-  it('getFilmRatingSummary retourne null average et userRating selon parent', async () => {
+  it("getFilmRatingSummary retourne null average et userRating selon parent", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
 
     mockDb.select.mockReturnValueOnce({
       from: jest.fn().mockReturnValue({
-        where: jest.fn().mockResolvedValue([{ averageRating: null, totalRatings: 0 }]),
+        where: jest
+          .fn()
+          .mockResolvedValue([{ averageRating: null, totalRatings: 0 }]),
       }),
     });
 
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 1, user_id: 1, film_id: 9, parent_review_id: null, rating: 0, comment: null },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 1,
+          user_id: 1,
+          film_id: 9,
+          parent_review_id: null,
+          rating: 0,
+          comment: null,
+        },
+      ]),
+    );
 
-    const result = await getFilmRatingSummary({ omdbId: 'tt9', userId: 1 });
+    const result = await getFilmRatingSummary({ omdbId: "tt9", userId: 1 });
 
-    expect(result).toEqual({ averageRating: null, totalRatings: 0, userRating: null });
+    expect(result).toEqual({
+      averageRating: null,
+      totalRatings: 0,
+      userRating: null,
+    });
   });
 
-  it('getLatestCommunityReviews normalise limit et mappe', async () => {
+  it("getFilmRatingSummary mappe average numerique sans userId", async () => {
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
+
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        where: jest
+          .fn()
+          .mockResolvedValue([{ averageRating: "4.25", totalRatings: 7 }]),
+      }),
+    });
+
+    const result = await getFilmRatingSummary({ omdbId: "tt9" });
+
+    expect(result).toEqual({ averageRating: 4.25, totalRatings: 7, userRating: null });
+  });
+
+  it("getFilmRatingSummary retourne userRating > 0", async () => {
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([{ averageRating: "4.25", totalRatings: 7 }]),
+      }),
+    });
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        { review_id: 1, user_id: 1, film_id: 9, parent_review_id: null, rating: 5, comment: null },
+      ]),
+    );
+
+    const result = await getFilmRatingSummary({ omdbId: "tt9", userId: 1 });
+
+    expect(result.userRating).toBe(5);
+  });
+
+  it("getFilmRatingSummary couvre mapReview dates nulles via createFilmComment", async () => {
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 10 }]));
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
+
+    mockDb.insert.mockReturnValue({
+      values: jest.fn().mockReturnValue({
+        returning: jest.fn().mockResolvedValue([{ review_id: 77 }]),
+      }),
+    });
+
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([
+              {
+                review_id: 77,
+                user_id: 1,
+                film_id: 10,
+                parent_review_id: null,
+                rating: 0,
+                comment: null,
+                created_at: null,
+                updated_at: null,
+                user_name: null,
+                user_image: null,
+              },
+            ]),
+          }),
+        }),
+      }),
+    });
+
+    const created = await createFilmComment({ omdbId: "tt1", userId: 1, comment: "ok" });
+
+    expect(created.comment).toBe("");
+    expect(created.createdAt).toBeNull();
+    expect(created.updatedAt).toBeNull();
+  });
+
+  it("getFilmRatingSummary applique totalRatings fallback 0", async () => {
+    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 9 }]));
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([{ averageRating: undefined, totalRatings: undefined }]),
+      }),
+    });
+
+    const result = await getFilmRatingSummary({ omdbId: "tt9" });
+
+    expect(result.averageRating).toBeNull();
+    expect(result.totalRatings).toBe(0);
+  });
+
+  it("getLatestCommunityReviews normalise limit et mappe", async () => {
     const limit = jest.fn().mockResolvedValue([
       {
         review_id: 1,
         rating: 4,
         comment: null,
-        created_at: new Date('2024-01-01T00:00:00.000Z'),
+        created_at: new Date("2024-01-01T00:00:00.000Z"),
         user_id: 2,
         user_name: null,
         user_image: null,
         film_omdb_id: null,
-        film_title: 'Film',
+        film_title: "Film",
       },
     ]);
 
@@ -268,7 +561,11 @@ describe('reviewsService', () => {
       from: jest.fn().mockReturnValue({
         innerJoin: jest.fn().mockReturnValue({
           innerJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+            where: jest
+              .fn()
+              .mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({ limit }),
+              }),
           }),
         }),
       }),
@@ -277,23 +574,65 @@ describe('reviewsService', () => {
     const result = await getLatestCommunityReviews(999);
 
     expect(limit).toHaveBeenCalledWith(12);
-    expect(result[0].comment).toBe('');
-    expect(result[0].author.name).toBe('Utilisateur');
-    expect(result[0].film.omdbId).toBe('');
+    expect(result[0].comment).toBe("");
+    expect(result[0].author.name).toBe("Utilisateur");
+    expect(result[0].film.omdbId).toBe("");
   });
 
-  it('getUserCommentReplyNotifications retourne [] sans parent', async () => {
-    mockDb.select.mockReturnValueOnce({
-      from: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue([]) }),
+  it("getLatestCommunityReviews utilise la limite par defaut et mappe createdAt null", async () => {
+    const limit = jest.fn().mockResolvedValue([
+      {
+        review_id: 1,
+        rating: 4,
+        comment: "ok",
+        created_at: null,
+        user_id: 2,
+        user_name: "Bob",
+        user_image: null,
+        film_omdb_id: "tt1",
+        film_title: "Film",
+      },
+    ]);
+
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest
+              .fn()
+              .mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+          }),
+        }),
+      }),
     });
 
-    const result = await getUserCommentReplyNotifications({ userId: 1, limit: 20 });
+    const result = await getLatestCommunityReviews();
+
+    expect(limit).toHaveBeenCalledWith(4);
+    expect(result[0].createdAt).toBeNull();
+  });
+
+  it("getUserCommentReplyNotifications retourne [] sans parent", async () => {
+    mockDb.select.mockReturnValueOnce({
+      from: jest
+        .fn()
+        .mockReturnValue({ where: jest.fn().mockResolvedValue([]) }),
+    });
+
+    const result = await getUserCommentReplyNotifications({
+      userId: 1,
+      limit: 20,
+    });
     expect(result).toEqual([]);
   });
 
-  it('getUserCommentReplyNotifications filtre parent null et mappe', async () => {
+  it("getUserCommentReplyNotifications filtre parent null et mappe", async () => {
     mockDb.select.mockReturnValueOnce({
-      from: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue([{ review_id: 10 }]) }),
+      from: jest
+        .fn()
+        .mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ review_id: 10 }]),
+        }),
     });
 
     const limit = jest.fn().mockResolvedValue([
@@ -301,9 +640,9 @@ describe('reviewsService', () => {
         reply_review_id: 20,
         parent_review_id: 10,
         film_omdb_id: null,
-        film_title: 'Film',
+        film_title: "Film",
         comment: null,
-        created_at: new Date('2024-01-01T00:00:00.000Z'),
+        created_at: new Date("2024-01-01T00:00:00.000Z"),
         replier_id: 2,
         replier_name: null,
         replier_image: null,
@@ -311,12 +650,12 @@ describe('reviewsService', () => {
       {
         reply_review_id: 21,
         parent_review_id: null,
-        film_omdb_id: 'tt',
-        film_title: 'Ignored',
-        comment: 'x',
+        film_omdb_id: "tt",
+        film_title: "Ignored",
+        comment: "x",
         created_at: new Date(),
         replier_id: 3,
-        replier_name: 'X',
+        replier_name: "X",
         replier_image: null,
       },
     ]);
@@ -325,56 +664,144 @@ describe('reviewsService', () => {
       from: jest.fn().mockReturnValue({
         innerJoin: jest.fn().mockReturnValue({
           innerJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+            where: jest
+              .fn()
+              .mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({ limit }),
+              }),
           }),
         }),
       }),
     });
 
-    const result = await getUserCommentReplyNotifications({ userId: 1, limit: 999 });
+    const result = await getUserCommentReplyNotifications({
+      userId: 1,
+      limit: 999,
+    });
 
     expect(limit).toHaveBeenCalledWith(100);
     expect(result).toHaveLength(1);
-    expect(result[0].replier.name).toBe('Utilisateur');
-    expect(result[0].comment).toBe('');
+    expect(result[0].replier.name).toBe("Utilisateur");
+    expect(result[0].comment).toBe("");
   });
 
-  it('createReviewReply throw si parent absent', async () => {
+  it("getUserCommentReplyNotifications applique limit par defaut et createdAt null", async () => {
+    mockDb.select.mockReturnValueOnce({
+      from: jest
+        .fn()
+        .mockReturnValue({ where: jest.fn().mockResolvedValue([{ review_id: 10 }]) }),
+    });
+
+    const limit = jest.fn().mockResolvedValue([
+      {
+        reply_review_id: 20,
+        parent_review_id: 10,
+        film_omdb_id: "tt1",
+        film_title: "Film",
+        comment: "ok",
+        created_at: null,
+        replier_id: 2,
+        replier_name: "Bob",
+        replier_image: null,
+      },
+    ]);
+
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        innerJoin: jest.fn().mockReturnValue({
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest
+              .fn()
+              .mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+          }),
+        }),
+      }),
+    });
+
+    const result = await getUserCommentReplyNotifications({ userId: 1 });
+
+    expect(limit).toHaveBeenCalledWith(20);
+    expect(result[0].createdAt).toBeNull();
+  });
+
+  it("createReviewReply throw si parent absent", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
     await expect(
-      createReviewReply({ omdbId: 'tt3', userId: 1, parentReviewId: 7, comment: 'ok' })
+      createReviewReply({
+        omdbId: "tt3",
+        userId: 1,
+        parentReviewId: 7,
+        comment: "ok",
+      }),
     ).rejects.toBeInstanceOf(ReviewNotFoundError);
   });
 
-  it('createReviewReply throw si profondeur depassee', async () => {
+  it("createReviewReply throw si profondeur depassee", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 7, user_id: 2, film_id: 3, parent_review_id: 1, rating: 0, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 7,
+          user_id: 2,
+          film_id: 3,
+          parent_review_id: 1,
+          rating: 0,
+          comment: "x",
+        },
+      ]),
+    );
 
     await expect(
-      createReviewReply({ omdbId: 'tt3', userId: 1, parentReviewId: 7, comment: 'ok' })
+      createReviewReply({
+        omdbId: "tt3",
+        userId: 1,
+        parentReviewId: 7,
+        comment: "ok",
+      }),
     ).rejects.toBeInstanceOf(ReplyDepthExceededError);
   });
 
-  it('createReviewReply throw si commentaire vide', async () => {
+  it("createReviewReply throw si commentaire vide", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 7, user_id: 2, film_id: 3, parent_review_id: null, rating: 0, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 7,
+          user_id: 2,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 0,
+          comment: "x",
+        },
+      ]),
+    );
 
     await expect(
-      createReviewReply({ omdbId: 'tt3', userId: 1, parentReviewId: 7, comment: '   ' })
-    ).rejects.toThrow('La réponse ne peut pas être vide');
+      createReviewReply({
+        omdbId: "tt3",
+        userId: 1,
+        parentReviewId: 7,
+        comment: "   ",
+      }),
+    ).rejects.toThrow("La réponse ne peut pas être vide");
   });
 
-  it('createReviewReply reussit et mappe la reponse', async () => {
+  it("createReviewReply reussit et mappe la reponse", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 7, user_id: 2, film_id: 3, parent_review_id: null, rating: 0, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 7,
+          user_id: 2,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 0,
+          comment: "x",
+        },
+      ]),
+    );
 
     mockDb.insert.mockReturnValue({
       values: jest.fn().mockReturnValue({
@@ -393,10 +820,10 @@ describe('reviewsService', () => {
                 film_id: 3,
                 parent_review_id: 7,
                 rating: 0,
-                comment: 'hello',
-                created_at: new Date('2024-01-01T00:00:00.000Z'),
-                updated_at: new Date('2024-01-01T00:00:00.000Z'),
-                user_name: 'Me',
+                comment: "hello",
+                created_at: new Date("2024-01-01T00:00:00.000Z"),
+                updated_at: new Date("2024-01-01T00:00:00.000Z"),
+                user_name: "Me",
                 user_image: null,
               },
             ]),
@@ -406,91 +833,160 @@ describe('reviewsService', () => {
     });
 
     const result = await createReviewReply({
-      omdbId: 'tt3',
+      omdbId: "tt3",
       userId: 1,
       parentReviewId: 7,
-      comment: 'hello',
+      comment: "hello",
     });
 
     expect(result.reviewId).toBe(15);
     expect(result.parentReviewId).toBe(7);
   });
 
-  it('updateReviewComment throw not found', async () => {
+  it("updateReviewComment throw not found", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
     await expect(
-      updateReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2, comment: 'x' })
+      updateReviewComment({
+        omdbId: "tt3",
+        userId: 1,
+        reviewId: 2,
+        comment: "x",
+      }),
     ).rejects.toBeInstanceOf(ReviewNotFoundError);
   });
 
-  it('updateReviewComment throw forbidden', async () => {
+  it("updateReviewComment throw forbidden", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 2, user_id: 999, film_id: 3, parent_review_id: null, rating: 2, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 2,
+          user_id: 999,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 2,
+          comment: "x",
+        },
+      ]),
+    );
 
     await expect(
-      updateReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2, comment: 'x' })
+      updateReviewComment({
+        omdbId: "tt3",
+        userId: 1,
+        reviewId: 2,
+        comment: "x",
+      }),
     ).rejects.toBeInstanceOf(ForbiddenReviewActionError);
   });
 
-  it('updateReviewComment throw commentaire vide', async () => {
+  it("updateReviewComment throw commentaire vide", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 2, user_id: 1, film_id: 3, parent_review_id: null, rating: 2, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 2,
+          user_id: 1,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 2,
+          comment: "x",
+        },
+      ]),
+    );
 
     await expect(
-      updateReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2, comment: '   ' })
-    ).rejects.toThrow('Le commentaire ne peut pas être vide');
+      updateReviewComment({
+        omdbId: "tt3",
+        userId: 1,
+        reviewId: 2,
+        comment: "   ",
+      }),
+    ).rejects.toThrow("Le commentaire ne peut pas être vide");
   });
 
-  it('updateReviewComment reussit', async () => {
+  it("updateReviewComment reussit", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 2, user_id: 1, film_id: 3, parent_review_id: null, rating: 2, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 2,
+          user_id: 1,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 2,
+          comment: "x",
+        },
+      ]),
+    );
 
     mockDb.update.mockReturnValue({
-      set: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) }),
+      set: jest
+        .fn()
+        .mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) }),
     });
 
-    await updateReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2, comment: 'ok' });
+    await updateReviewComment({
+      omdbId: "tt3",
+      userId: 1,
+      reviewId: 2,
+      comment: "ok",
+    });
 
     expect(mockDb.update).toHaveBeenCalledTimes(1);
   });
 
-  it('deleteReviewComment throw not found', async () => {
+  it("deleteReviewComment throw not found", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([]));
 
     await expect(
-      deleteReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2 })
+      deleteReviewComment({ omdbId: "tt3", userId: 1, reviewId: 2 }),
     ).rejects.toBeInstanceOf(ReviewNotFoundError);
   });
 
-  it('deleteReviewComment throw forbidden', async () => {
+  it("deleteReviewComment throw forbidden", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 2, user_id: 4, film_id: 3, parent_review_id: null, rating: 2, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 2,
+          user_id: 4,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 2,
+          comment: "x",
+        },
+      ]),
+    );
 
     await expect(
-      deleteReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2 })
+      deleteReviewComment({ omdbId: "tt3", userId: 1, reviewId: 2 }),
     ).rejects.toBeInstanceOf(ForbiddenReviewActionError);
   });
 
-  it('deleteReviewComment reussit', async () => {
+  it("deleteReviewComment reussit", async () => {
     mockDb.select.mockReturnValueOnce(selectWhereLimitResult([{ film_id: 3 }]));
-    mockDb.select.mockReturnValueOnce(selectWhereLimitResult([
-      { review_id: 2, user_id: 1, film_id: 3, parent_review_id: null, rating: 2, comment: 'x' },
-    ]));
+    mockDb.select.mockReturnValueOnce(
+      selectWhereLimitResult([
+        {
+          review_id: 2,
+          user_id: 1,
+          film_id: 3,
+          parent_review_id: null,
+          rating: 2,
+          comment: "x",
+        },
+      ]),
+    );
 
-    mockDb.delete.mockReturnValue({ where: jest.fn().mockResolvedValue(undefined) });
+    mockDb.delete.mockReturnValue({
+      where: jest.fn().mockResolvedValue(undefined),
+    });
 
-    await deleteReviewComment({ omdbId: 'tt3', userId: 1, reviewId: 2 });
+    await deleteReviewComment({ omdbId: "tt3", userId: 1, reviewId: 2 });
 
     expect(mockDb.delete).toHaveBeenCalledTimes(1);
   });

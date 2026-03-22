@@ -1,4 +1,4 @@
-import http from 'http';
+import http from "http";
 
 const getSessionMock = jest.fn();
 const createMessageMock = jest.fn();
@@ -19,7 +19,7 @@ class FakeSocketServer {
   }
 
   on(event: string, fn: any) {
-    if (event === 'connection') {
+    if (event === "connection") {
       ioState.connectionHandler = fn;
     }
   }
@@ -28,9 +28,11 @@ class FakeSocketServer {
   emit = ioState.emitMock;
 }
 
-jest.mock('socket.io', () => ({ Server: jest.fn(() => new FakeSocketServer()) }));
+jest.mock("socket.io", () => ({
+  Server: jest.fn(() => new FakeSocketServer()),
+}));
 
-jest.mock('../auth.js', () => ({
+jest.mock("../auth.js", () => ({
   auth: {
     api: {
       getSession: (...args: unknown[]) => getSessionMock(...args),
@@ -38,18 +40,18 @@ jest.mock('../auth.js', () => ({
   },
 }));
 
-jest.mock('../services/messagesService.js', () => ({
+jest.mock("../services/messagesService.js", () => ({
   createMessage: (...args: unknown[]) => createMessageMock(...args),
 }));
 
-import { initSocket } from '../socket.js';
+import { initSocket } from "../socket.js";
 
-describe('socket init', () => {
+describe("socket init", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('middleware refuse utilisateur non authentifie', async () => {
+  it("middleware refuse utilisateur non authentifie", async () => {
     initSocket(http.createServer());
     getSessionMock.mockResolvedValue(null);
 
@@ -58,28 +60,28 @@ describe('socket init', () => {
 
     expect(next).toHaveBeenCalled();
     const err = next.mock.calls[0][0] as Error;
-    expect(err.message).toBe('Non authentifié');
+    expect(err.message).toBe("Non authentifié");
   });
 
-  it('middleware set socket.data et passe', async () => {
+  it("middleware set socket.data et passe", async () => {
     initSocket(http.createServer());
-    getSessionMock.mockResolvedValue({ user: { id: '12', name: 'Bob' } });
+    getSessionMock.mockResolvedValue({ user: { id: "12", name: "Bob" } });
 
-    const socket: any = { handshake: { headers: { cookie: 'a=b' } }, data: {} };
+    const socket: any = { handshake: { headers: { cookie: "a=b" } }, data: {} };
     const next = jest.fn();
 
     await ioState.middleware?.(socket, next);
 
     expect(socket.data.userId).toBe(12);
-    expect(socket.data.userName).toBe('Bob');
+    expect(socket.data.userName).toBe("Bob");
     expect(next).toHaveBeenCalledWith();
   });
 
-  it('middleware force userName a null si absent', async () => {
+  it("middleware force userName a null si absent", async () => {
     initSocket(http.createServer());
-    getSessionMock.mockResolvedValue({ user: { id: '2', name: undefined } });
+    getSessionMock.mockResolvedValue({ user: { id: "2", name: undefined } });
 
-    const socket: any = { handshake: { headers: { cookie: 'a=b' } }, data: {} };
+    const socket: any = { handshake: { headers: { cookie: "a=b" } }, data: {} };
     const next = jest.fn();
 
     await ioState.middleware?.(socket, next);
@@ -88,9 +90,9 @@ describe('socket init', () => {
     expect(next).toHaveBeenCalledWith();
   });
 
-  it('middleware renvoie erreur si exception auth', async () => {
+  it("middleware renvoie erreur si exception auth", async () => {
     initSocket(http.createServer());
-    getSessionMock.mockRejectedValue(new Error('boom'));
+    getSessionMock.mockRejectedValue(new Error("boom"));
 
     const next = jest.fn();
     await ioState.middleware?.({ handshake: { headers: {} }, data: {} }, next);
@@ -99,7 +101,7 @@ describe('socket init', () => {
     expect(err.message).toBe("Erreur d'authentification");
   });
 
-  it('connection: dm:send envoie dm:new au destinataire et emetteur', async () => {
+  it("connection: dm:send envoie dm:new au destinataire et emetteur", async () => {
     ioState.toMock.mockReturnValue({ emit: jest.fn() });
     createMessageMock.mockResolvedValue({ message_id: 1 });
 
@@ -117,16 +119,18 @@ describe('socket init', () => {
 
     ioState.connectionHandler?.(socket);
 
-    expect(socket.join).toHaveBeenCalledWith('user:7');
+    expect(socket.join).toHaveBeenCalledWith("user:7");
 
-    await socketEvents['dm:send']({ toUserId: 9, content: ' hello ' });
+    await socketEvents["dm:send"]({ toUserId: 9, content: " hello " });
 
-    expect(createMessageMock).toHaveBeenCalledWith(7, 9, 'hello');
-    expect(ioState.toMock).toHaveBeenCalledWith('user:9');
-    expect(socket.emit).toHaveBeenCalledWith('dm:new', { message: { message_id: 1 } });
+    expect(createMessageMock).toHaveBeenCalledWith(7, 9, "hello");
+    expect(ioState.toMock).toHaveBeenCalledWith("user:9");
+    expect(socket.emit).toHaveBeenCalledWith("dm:new", {
+      message: { message_id: 1 },
+    });
   });
 
-  it('connection: dm:send ignore payload invalide', async () => {
+  it("connection: dm:send ignore payload invalide", async () => {
     initSocket(http.createServer());
 
     const socketEvents: Record<string, Function> = {};
@@ -141,14 +145,14 @@ describe('socket init', () => {
 
     ioState.connectionHandler?.(socket);
 
-    await socketEvents['dm:send']({ toUserId: 0, content: 'x' });
-    await socketEvents['dm:send']({ toUserId: 2, content: '   ' });
+    await socketEvents["dm:send"]({ toUserId: 0, content: "x" });
+    await socketEvents["dm:send"]({ toUserId: 2, content: "   " });
 
     expect(createMessageMock).not.toHaveBeenCalled();
   });
 
-  it('connection: dm:send emet dm:error si createMessage echoue', async () => {
-    createMessageMock.mockRejectedValue(new Error('fail'));
+  it("connection: dm:send emet dm:error si createMessage echoue", async () => {
+    createMessageMock.mockRejectedValue(new Error("fail"));
     ioState.toMock.mockReturnValue({ emit: jest.fn() });
 
     initSocket(http.createServer());
@@ -164,14 +168,14 @@ describe('socket init', () => {
     };
 
     ioState.connectionHandler?.(socket);
-    await socketEvents['dm:send']({ toUserId: 9, content: 'ok' });
+    await socketEvents["dm:send"]({ toUserId: 9, content: "ok" });
 
-    expect(socket.emit).toHaveBeenCalledWith('dm:error', {
+    expect(socket.emit).toHaveBeenCalledWith("dm:error", {
       error: "Impossible d'envoyer le message",
     });
   });
 
-  it('connection: dm:seen et disconnect et presence online', () => {
+  it("connection: dm:seen et disconnect et presence online", () => {
     ioState.toMock.mockReturnValue({ emit: jest.fn() });
 
     initSocket(http.createServer());
@@ -188,11 +192,15 @@ describe('socket init', () => {
 
     ioState.connectionHandler?.(socket);
 
-    socketEvents['dm:seen']({ fromUserId: 3 });
-    socketEvents['disconnect']();
+    socketEvents["dm:seen"]({ fromUserId: 3 });
+    socketEvents["disconnect"]();
 
-    expect(ioState.toMock).toHaveBeenCalledWith('user:3');
-    expect(ioState.emitMock).toHaveBeenCalledWith('presence:offline', { userId: 7 });
-    expect(ioState.emitMock).toHaveBeenCalledWith('presence:online', { userId: 7 });
+    expect(ioState.toMock).toHaveBeenCalledWith("user:3");
+    expect(ioState.emitMock).toHaveBeenCalledWith("presence:offline", {
+      userId: 7,
+    });
+    expect(ioState.emitMock).toHaveBeenCalledWith("presence:online", {
+      userId: 7,
+    });
   });
 });

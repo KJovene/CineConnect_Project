@@ -3,70 +3,312 @@ const mockDb = {
   insert: jest.fn(),
 };
 
-jest.mock('../db/index.js', () => ({ db: mockDb }));
+jest.mock("../db/index.js", () => ({ db: mockDb }));
 
 import {
   searchFilms,
   getFilmDetail,
   getTopRatedFilms,
   getFilmsByGenre,
-} from '../services/filmsService.js';
+} from "../services/filmsService.js";
 
-describe('filmsService', () => {
+describe("filmsService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn() as unknown as typeof fetch;
   });
 
-  it('searchFilms retourne vide quand OMDB repond False', async () => {
+  it("searchFilms retourne vide quand OMDB repond False", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ Response: 'False' }),
+      json: async () => ({ Response: "False" }),
     });
 
-    const result = await searchFilms('abc', 1);
+    const result = await searchFilms("abc", 1);
 
     expect(result).toEqual({ results: [], totalResults: 0, page: 1 });
   });
 
-  it('searchFilms recupere existants + manquants', async () => {
+  it("searchFilms utilise page par defaut", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ Response: "False" }),
+    });
+
+    const result = await searchFilms("abc");
+
+    expect(result.page).toBe(1);
+  });
+
+  it("searchFilms throw si OMDB_API_KEY manquante", async () => {
+    jest.resetModules();
+    delete process.env.OMDB_API_KEY;
+
+    let mod: typeof import("../services/filmsService.js");
+    jest.isolateModules(() => {
+      jest.doMock("../db/index.js", () => ({
+        db: {
+          select: jest.fn(),
+          insert: jest.fn(),
+        },
+      }));
+
+      mod = require("../services/filmsService.js");
+    });
+
+    await expect(mod!.searchFilms("abc")).rejects.toThrow(
+      "OMDB_API_KEY manquante dans .env",
+    );
+
+    process.env.OMDB_API_KEY = "test-omdb-key";
+  });
+
+  it("searchFilms mappe totalResults invalide sur 0", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ Response: "True", totalResults: "nope", Search: [] }),
+    });
+
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue([]) }),
+    });
+
+    const result = await searchFilms("abc", 1);
+
+    expect(result.totalResults).toBe(0);
+  });
+
+  it("searchFilms recupere existants + manquants", async () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          Response: 'True',
-          totalResults: '2',
+          Response: "True",
+          totalResults: "2",
           Search: [
-            { imdbID: 'tt1', Title: 'A', Year: '2000', Type: 'movie', Poster: 'P' },
-            { imdbID: 'tt2', Title: 'B', Year: '2001', Type: 'movie', Poster: 'P' },
+            {
+              imdbID: "tt1",
+              Title: "A",
+              Year: "2000",
+              Type: "movie",
+              Poster: "P",
+            },
+            {
+              imdbID: "tt2",
+              Title: "B",
+              Year: "2001",
+              Type: "movie",
+              Poster: "P",
+            },
           ],
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          Response: 'True',
-          imdbID: 'tt2',
-          Title: 'B',
-          Year: '2001',
-          Type: 'movie',
-          Poster: 'N/A',
-          Genre: 'Action',
-          Director: 'N/A',
-          Plot: 'N/A',
-          Runtime: 'N/A',
-          Language: 'N/A',
-          Country: 'N/A',
-          imdbRating: 'N/A',
-          imdbVotes: '0',
-          Awards: 'N/A',
-          Rated: 'N/A',
+          Response: "True",
+          imdbID: "tt2",
+          Title: "B",
+          Year: "2001",
+          Type: "movie",
+          Poster: "N/A",
+          Genre: "Action",
+          Director: "N/A",
+          Plot: "N/A",
+          Runtime: "N/A",
+          Language: "N/A",
+          Country: "N/A",
+          imdbRating: "N/A",
+          imdbVotes: "0",
+          Awards: "N/A",
+          Rated: "N/A",
         }),
       });
 
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
-        where: jest.fn().mockResolvedValue([{ film_id: 1, omdb_id: 'tt1', title: 'A', year: 2000, type: 'movie', poster_url: 'x' }]),
+        where: jest
+          .fn()
+          .mockResolvedValue([
+            {
+              film_id: 1,
+              omdb_id: "tt1",
+              title: "A",
+              year: 2000,
+              type: "movie",
+              poster_url: "x",
+            },
+          ]),
+      }),
+    });
+
+    mockDb.insert.mockReturnValue({
+      values: jest.fn().mockReturnValue({
+        onConflictDoUpdate: jest.fn().mockReturnValue({
+          returning: jest
+            .fn()
+            .mockResolvedValue([
+              {
+                film_id: 2,
+                omdb_id: "tt2",
+                title: "B",
+                year: 2001,
+                type: "movie",
+                poster_url: null,
+              },
+            ]),
+        }),
+      }),
+    });
+
+    const result = await searchFilms("abc", 2);
+
+    expect(result.totalResults).toBe(2);
+    expect(result.results).toHaveLength(2);
+    expect(result.page).toBe(2);
+  });
+
+  it("searchFilms filtre detail OMDB False et type non-movie", async () => {
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          Response: "True",
+          totalResults: "2",
+          Search: [
+            { imdbID: "tt10", Title: "A", Year: "N/A", Type: "movie", Poster: "   " },
+            { imdbID: "tt11", Title: "B", Year: "2001-2002", Type: "movie", Poster: "N/A" },
+          ],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ Response: "False" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          Response: "True",
+          imdbID: "tt11",
+          Title: "B",
+          Year: "abcd",
+          Type: "series",
+          Poster: "",
+          Genre: "N/A",
+          Director: "N/A",
+          Plot: "N/A",
+          Runtime: "N/A",
+          Language: "N/A",
+          Country: "N/A",
+          imdbRating: "N/A",
+          imdbVotes: "0",
+          Awards: "N/A",
+          Rated: "N/A",
+        }),
+      });
+
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([]),
+      }),
+    });
+
+    const result = await searchFilms("abc", 1);
+
+    expect(result.results).toEqual([]);
+    expect(result.totalResults).toBe(2);
+  });
+
+  it("searchFilms throw si HTTP search non OK", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 });
+
+    await expect(searchFilms("abc", 1)).rejects.toThrow("OMDB search HTTP 500");
+  });
+
+  it("getFilmDetail retourne film existant movie", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          limit: jest
+            .fn()
+            .mockResolvedValue([{ film_id: 1, omdb_id: "tt1", type: "movie" }]),
+        }),
+      }),
+    });
+
+    const result = await getFilmDetail("tt1");
+
+    expect(result?.omdb_id).toBe("tt1");
+  });
+
+  it("getFilmDetail retourne null si existant non movie", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          limit: jest
+            .fn()
+            .mockResolvedValue([
+              { film_id: 1, omdb_id: "tt1", type: "series" },
+            ]),
+        }),
+      }),
+    });
+
+    const result = await getFilmDetail("tt1");
+
+    expect(result).toBeNull();
+  });
+
+  it("getFilmDetail appelle OMDB si absent puis retourne null si False", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+      }),
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ Response: "False" }),
+    });
+
+    const result = await getFilmDetail("tt2");
+
+    expect(result).toBeNull();
+  });
+
+  it("getFilmDetail retourne null si detail OMDB non movie", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+      }),
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        Response: "True",
+        imdbID: "tt2",
+        Title: "B",
+        Year: "2001",
+        Type: "series",
+      }),
+    });
+
+    const result = await getFilmDetail("tt2");
+
+    expect(result).toBeNull();
+  });
+
+  it("getFilmDetail upsert un detail OMDB movie", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
       }),
     });
 
@@ -74,91 +316,191 @@ describe('filmsService', () => {
       values: jest.fn().mockReturnValue({
         onConflictDoUpdate: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([
-            { film_id: 2, omdb_id: 'tt2', title: 'B', year: 2001, type: 'movie', poster_url: null },
+            { film_id: 3, omdb_id: "tt3", title: "Movie", type: "movie", poster_url: "P" },
           ]),
         }),
       }),
     });
 
-    const result = await searchFilms('abc', 2);
-
-    expect(result.totalResults).toBe(2);
-    expect(result.results).toHaveLength(2);
-    expect(result.page).toBe(2);
-  });
-
-  it('searchFilms throw si HTTP search non OK', async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 });
-
-    await expect(searchFilms('abc', 1)).rejects.toThrow('OMDB search HTTP 500');
-  });
-
-  it('getFilmDetail retourne film existant movie', async () => {
-    mockDb.select.mockReturnValue({
-      from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([{ film_id: 1, omdb_id: 'tt1', type: 'movie' }]),
-        }),
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        Response: "True",
+        imdbID: "tt3",
+        Title: "Movie",
+        Year: "2001",
+        Type: "movie",
+        Poster: "P",
+        Genre: "Drama",
+        Director: "John",
+        Plot: "Plot",
+        Runtime: "120 min",
+        Language: "EN",
+        Country: "US",
+        imdbRating: "7.1",
+        imdbVotes: "100",
+        Awards: "None",
+        Rated: "PG",
       }),
     });
 
-    const result = await getFilmDetail('tt1');
+    const result = await getFilmDetail("tt3");
 
-    expect(result?.omdb_id).toBe('tt1');
+    expect(result?.omdb_id).toBe("tt3");
   });
 
-  it('getFilmDetail retourne null si existant non movie', async () => {
+  it("getFilmDetail upsert avec year N/A et genre N/A", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([{ film_id: 1, omdb_id: 'tt1', type: 'series' }]),
-        }),
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
       }),
     });
 
-    const result = await getFilmDetail('tt1');
-
-    expect(result).toBeNull();
-  });
-
-  it('getFilmDetail appelle OMDB si absent puis retourne null si False', async () => {
-    mockDb.select.mockReturnValue({
-      from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+    const values = jest.fn().mockReturnValue({
+      onConflictDoUpdate: jest.fn().mockReturnValue({
+        returning: jest.fn().mockResolvedValue([
+          { film_id: 4, omdb_id: "tt4", title: "Movie", type: "movie", poster_url: null },
+        ]),
       }),
     });
+    mockDb.insert.mockReturnValue({ values });
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ Response: 'False' }),
+      json: async () => ({
+        Response: "True",
+        imdbID: "tt4",
+        Title: "Movie",
+        Year: "N/A",
+        Type: "movie",
+        Poster: "N/A",
+        Genre: "N/A",
+        Director: "N/A",
+        Plot: "N/A",
+        Runtime: "N/A",
+        Language: "EN",
+        Country: "US",
+        imdbRating: "N/A",
+        imdbVotes: "100",
+        Awards: "N/A",
+        Rated: "PG",
+      }),
     });
 
-    const result = await getFilmDetail('tt2');
+    await getFilmDetail("tt4");
 
-    expect(result).toBeNull();
+    const inserted = values.mock.calls[0][0] as { year: number | null; genre: string | null };
+    expect(inserted.year).toBeNull();
+    expect(inserted.genre).toBeNull();
   });
 
-  it('getFilmDetail throw si HTTP detail non OK', async () => {
+  it("getFilmDetail upsert avec year invalide retourne null", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
+      }),
+    });
+
+    const values = jest.fn().mockReturnValue({
+      onConflictDoUpdate: jest.fn().mockReturnValue({
+        returning: jest.fn().mockResolvedValue([
+          { film_id: 5, omdb_id: "tt5", title: "Movie", type: "movie", poster_url: "P" },
+        ]),
+      }),
+    });
+    mockDb.insert.mockReturnValue({ values });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        Response: "True",
+        imdbID: "tt5",
+        Title: "Movie",
+        Year: "abcd",
+        Type: "movie",
+        Poster: "P",
+        Genre: "Drama",
+        Director: "John",
+        Plot: "Plot",
+        Runtime: "120 min",
+        Language: "EN",
+        Country: "US",
+        imdbRating: "7.1",
+        imdbVotes: "100",
+        Awards: "None",
+        Rated: "PG",
+      }),
+    });
+
+    await getFilmDetail("tt5");
+
+    const inserted = values.mock.calls[0][0] as { year: number | null };
+    expect(inserted.year).toBeNull();
+  });
+
+  it("getFilmDetail throw si HTTP detail non OK", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest
+          .fn()
+          .mockReturnValue({ limit: jest.fn().mockResolvedValue([]) }),
       }),
     });
 
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404 });
 
-    await expect(getFilmDetail('tt2')).rejects.toThrow('OMDB detail HTTP 404');
+    await expect(getFilmDetail("tt2")).rejects.toThrow("OMDB detail HTTP 404");
   });
 
-  it('getTopRatedFilms retourne films enrichis ratings', async () => {
+  it("getFilmDetail throw si OMDB_API_KEY manquante", async () => {
+    jest.resetModules();
+    delete process.env.OMDB_API_KEY;
+
+    let mod: typeof import("../services/filmsService.js");
+    jest.isolateModules(() => {
+      jest.doMock("../db/index.js", () => ({
+        db: {
+          select: jest.fn().mockReturnValue({
+            from: jest.fn().mockReturnValue({
+              where: jest.fn().mockReturnValue({
+                limit: jest.fn().mockResolvedValue([]),
+              }),
+            }),
+          }),
+          insert: jest.fn(),
+        },
+      }));
+
+      mod = require("../services/filmsService.js");
+    });
+
+    await expect(mod!.getFilmDetail("tt2")).rejects.toThrow(
+      "OMDB_API_KEY manquante dans .env",
+    );
+
+    process.env.OMDB_API_KEY = "test-omdb-key";
+  });
+
+  it("getTopRatedFilms retourne films enrichis ratings", async () => {
     mockDb.select
       .mockReturnValueOnce({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
             orderBy: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([
-                { film_id: 1, omdb_id: 'tt1', imdb_rating: '8.1', type: 'movie' },
-              ]),
+              limit: jest
+                .fn()
+                .mockResolvedValue([
+                  {
+                    film_id: 1,
+                    omdb_id: "tt1",
+                    imdb_rating: "8.1",
+                    type: "movie",
+                  },
+                ]),
             }),
           }),
         }),
@@ -166,9 +508,11 @@ describe('filmsService', () => {
       .mockReturnValueOnce({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
-            groupBy: jest.fn().mockResolvedValue([
-              { film_id: 1, average_rating: '4.50', ratings_count: 2 },
-            ]),
+            groupBy: jest
+              .fn()
+              .mockResolvedValue([
+                { film_id: 1, average_rating: "4.50", ratings_count: 2 },
+              ]),
           }),
         }),
       });
@@ -179,9 +523,56 @@ describe('filmsService', () => {
     expect(result[0].ratings_count).toBe(2);
   });
 
-  it('getFilmsByGenre ignore genres vides et garde ceux avec films', async () => {
+  it("getTopRatedFilms utilise la limite par defaut", async () => {
+    const limit = jest.fn().mockResolvedValue([]);
+    mockDb.select
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+        }),
+      });
+
+    await getTopRatedFilms();
+
+    expect(limit).toHaveBeenCalledWith(10);
+  });
+
+  it("getTopRatedFilms met aggregate absent a null/0", async () => {
+    mockDb.select
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue([
+                { film_id: 1, omdb_id: "tt1", imdb_rating: "8.1", type: "movie" },
+              ]),
+            }),
+          }),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            groupBy: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+    const result = await getTopRatedFilms(5);
+
+    expect(result[0].average_rating).toBeNull();
+    expect(result[0].ratings_count).toBe(0);
+  });
+
+  it("getFilmsByGenre ignore genres vides et garde ceux avec films", async () => {
     const firstFilm = [
-      { film_id: 1, omdb_id: 'tt1', imdb_rating: '8.0', type: 'movie', title: 'A' },
+      {
+        film_id: 1,
+        omdb_id: "tt1",
+        imdb_rating: "8.0",
+        type: "movie",
+        title: "A",
+      },
     ];
     const queue: unknown[] = [
       firstFilm,
@@ -214,5 +605,21 @@ describe('filmsService', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].films).toHaveLength(1);
+  });
+
+  it("getFilmsByGenre utilise la limite par defaut", async () => {
+    const limit = jest.fn().mockResolvedValue([]);
+    mockDb.select.mockImplementation(() => ({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          orderBy: jest.fn().mockReturnValue({ limit }),
+          groupBy: jest.fn().mockResolvedValue([]),
+        }),
+      }),
+    }));
+
+    await getFilmsByGenre();
+
+    expect(limit).toHaveBeenCalledWith(24);
   });
 });

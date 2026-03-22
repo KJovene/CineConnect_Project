@@ -78,7 +78,7 @@ function parseType(
 //  Appels OMDB
 async function fetchOmdbSearch(
   query: string,
-  page = 1,
+  page: number,
 ): Promise<OmdbSearchResponse> {
   if (!OMDB_API_KEY) throw new Error("OMDB_API_KEY manquante dans .env");
 
