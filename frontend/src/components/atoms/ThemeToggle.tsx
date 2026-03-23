@@ -27,7 +27,7 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Changer le thème"
-      className="p-2 rounded-lg transition-colors hover:bg-white/5"
+      className="p-2 rounded-lg transition-colors hover:bg-white/5 cursor-pointer"
       style={{
         color: "var(--color-text-muted)"
       }}

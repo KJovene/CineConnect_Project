@@ -105,7 +105,7 @@ export function AppHeader({
           <button
             type="button"
             onClick={() => setIsNotificationsOpen((previous) => !previous)}
-            className="relative p-2 transition-colors"
+            className="relative p-2 transition-colors cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
           >
             <HiBell size={22} />
@@ -121,7 +121,7 @@ export function AppHeader({
 
           {isNotificationsOpen && (
             <div
-              className="absolute right-0 mt-2 w-[340px] max-h-[70vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-2xl z-50"
+              className="fixed sm:absolute right-0 sm:right-0 left-0 sm:left-auto mx-4 sm:mx-0 mt-2 sm:w-[340px] max-h-[70vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-2xl z-50"
               style={{
                 background: "var(--color-bg)",
                 border: "1px solid var(--color-border)",
