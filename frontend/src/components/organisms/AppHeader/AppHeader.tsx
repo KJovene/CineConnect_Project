@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
-import { MobileMenuToggle, AuthNavButton } from "@/components/molecules";
+import { AuthNavButton } from "@/components/molecules";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useNotificationsFeed } from "@/features/notifications/hooks";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 
 export interface AppHeaderProps {
-  onMobileMenuToggle: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
   onLogout: () => void;
 }
 
 export function AppHeader({
-  onMobileMenuToggle,
   isAuthenticated,
   isLoading,
   onLogout,
@@ -102,7 +100,6 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-5 ml-auto">
-        <MobileMenuToggle onClick={onMobileMenuToggle} />
 
         <div className="relative" ref={notificationsRef}>
           <button

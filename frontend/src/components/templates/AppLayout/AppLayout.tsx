@@ -40,7 +40,6 @@ export function AppLayout({
         style={{ background: "var(--color-bg)" }}
       >
         <AppHeader
-          onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}
           onLogout={onLogout}
