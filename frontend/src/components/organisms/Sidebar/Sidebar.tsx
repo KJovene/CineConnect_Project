@@ -63,7 +63,7 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
                 key={item.id}
                 href={item.href}
                 to={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group"
+                className="flex items-center justify-center lg:justify-start gap-3 px-3 py-2.5 rounded-lg transition-all group"
                 style={{
                   background: isItemActive(item.href)
                     ? "var(--color-surface)"

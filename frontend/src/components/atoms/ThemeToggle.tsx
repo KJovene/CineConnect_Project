@@ -29,8 +29,7 @@ export function ThemeToggle() {
       aria-label="Changer le thème"
       className="p-2 rounded-lg transition-colors hover:bg-white/5"
       style={{
-        color: "var(--color-text-muted)",
-        border: "1px solid var(--color-border)",
+        color: "var(--color-text-muted)"
       }}
     >
       {theme === "dark" ? (

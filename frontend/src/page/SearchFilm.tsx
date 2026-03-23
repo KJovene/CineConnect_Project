@@ -148,7 +148,6 @@ const SearchPage: React.FC = () => {
                       }}
                     >
                       <HiChevronLeft size={20} />
-                      Précédent
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -173,7 +172,6 @@ const SearchPage: React.FC = () => {
                         color: "var(--color-text-muted)",
                       }}
                     >
-                      Suivant
                       <HiChevronRight size={20} />
                     </button>
                   </div>
