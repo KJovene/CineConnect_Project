@@ -19,7 +19,11 @@ export function ConversationList({
     return (
       <div className="space-y-1 px-2 py-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-14 rounded-xl bg-white/5 animate-pulse" />
+          <div
+            key={i}
+            className="h-14 rounded-xl animate-pulse"
+            style={{ background: "var(--color-surface)" }}
+          />
         ))}
       </div>
     );
@@ -27,9 +31,14 @@ export function ConversationList({
 
   if (friends.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 text-neutral-600 px-4 py-10">
+      <div
+        className="flex flex-col items-center justify-center flex-1 px-4 py-10"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         <HiChatBubbleLeftRight size={28} className="mb-2 opacity-30" />
-        <p className="text-xs text-center">Ajoutez des amis pour commencer à discuter</p>
+        <p className="text-xs text-center">
+          Ajoutez des amis pour commencer à discuter
+        </p>
       </div>
     );
   }
@@ -45,18 +54,25 @@ export function ConversationList({
           <button
             key={rel.friend_id}
             onClick={() => onSelect(friend)}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
-              isSelected
-                ? 'bg-white/5 border-r-2 border-indigo-500'
-                : 'hover:bg-white/[0.03] border-r-2 border-transparent'
+            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-r-2 ${
+              isSelected ? 'border-indigo-500' : 'border-transparent hover:bg-white/[0.03]'
             }`}
+            style={isSelected ? { background: "var(--color-surface)" } : undefined}
           >
             <Avatar image={friend.image} name={friend.name} size="md" />
             <div className="overflow-hidden flex-1 min-w-0">
-              <div className="text-sm font-medium text-white truncate">
+              <div
+                className="text-sm font-medium truncate"
+                style={{ color: "var(--color-text)" }}
+              >
                 {friend.name ?? 'Utilisateur'}
               </div>
-              <div className="text-[11px] text-neutral-500 truncate">{friend.email}</div>
+              <div
+                className="text-[11px] truncate"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                {friend.email}
+              </div>
             </div>
           </button>
         );
