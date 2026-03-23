@@ -27,20 +27,17 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Changer le thème"
+      className="p-2 rounded-lg transition-colors hover:bg-white/5"
+      style={{
+        color: "var(--color-text-muted)",
+        border: "1px solid var(--color-border)",
+      }}
     >
       {theme === "dark" ? (
-        <HiOutlineSun
-          size={20}
-          className="stroke-current text-gray-800 dark:text-gray-200"
-          style={{ fill: "none", strokeWidth: 1.5 }}
-        />
+        <HiOutlineSun size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
       ) : (
-        <HiOutlineMoon
-          size={20}
-          className="stroke-current text-gray-800 dark:text-gray-200"
-          style={{ fill: "none", strokeWidth: 1.5 }}
-        />
+        <HiOutlineMoon size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
       )}
-    </button>
+  </button>
   );
 }
