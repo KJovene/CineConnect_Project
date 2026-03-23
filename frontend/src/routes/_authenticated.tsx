@@ -7,7 +7,7 @@ import {
 import { AppLayout } from "@/components/templates";
 import type { SidebarNavSection } from "@/components/organisms";
 import { useAuth } from "@/hooks/useAuth";
-import { HiOutlineFilm, HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
+import { HiOutlineHome, HiOutlineFilm, HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import { getSession, useSession } from "@/lib/auth-client";
 
 const SIDEBAR_SECTIONS: SidebarNavSection[] = [
@@ -16,7 +16,7 @@ const SIDEBAR_SECTIONS: SidebarNavSection[] = [
     items: [
       {
         id: "discover",
-        icon: <HiOutlineFilm size={20} />,
+        icon: <HiOutlineHome size={20} />,
         label: "Découvrir",
         href: "/",
         isActive: true,

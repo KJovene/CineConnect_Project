@@ -194,6 +194,7 @@ export function AppHeader({
           style={{ background: "var(--color-border)" }}
         />
         <ThemeToggle />
+        <div className="h-6 w-px mx-1" style={{ background: 'var(--color-border)' }} />
         <AuthNavButton
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}
