@@ -1,2 +1,2 @@
-export { Input, inputClassName } from "./Input";
+export { Input } from "./Input";
 export type { InputProps } from "./Input";

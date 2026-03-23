@@ -161,7 +161,7 @@ const Profil: React.FC = () => {
                 type="button"
                 onClick={handleChoosePhoto}
                 disabled={isUpdatingPhoto}
-                className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed hover:bg-indigo-500/10 hover:border-indigo-500/40"
+                className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed hover:bg-indigo-500/10 hover:border-indigo-500/40 cursor-pointer"
                 style={{
                   border: "1px solid var(--color-border)",
                   color: "var(--color-text)",

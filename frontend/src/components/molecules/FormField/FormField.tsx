@@ -27,7 +27,8 @@ export function FormField({
     <div>
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-neutral-400 mb-1.5"
+        className="block text-sm font-medium mb-1.5"
+        style={{ color: "var(--color-text-muted)" }}
       >
         {label}
       </label>

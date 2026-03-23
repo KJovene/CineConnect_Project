@@ -1,4 +1,5 @@
 import React from "react";
+import { HiOutlineSun, HiOutlineMoon } from "react-icons/hi2";
 
 export function ThemeToggle() {
   const [theme, setTheme] = React.useState(() => {
@@ -25,10 +26,17 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="ml-2 px-3 py-2 rounded bg-gray-200 dark:bg-gray-400 text-gray-800 dark:text-gray-200 transition-colors"
       aria-label="Changer le thème"
+      className="p-2 rounded-lg transition-colors hover:bg-white/5 cursor-pointer"
+      style={{
+        color: "var(--color-text-muted)"
+      }}
     >
-      {theme === "dark" ? "Light" : "Dark"}
-    </button>
+      {theme === "dark" ? (
+        <HiOutlineSun size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
+      ) : (
+        <HiOutlineMoon size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
+      )}
+  </button>
   );
 }

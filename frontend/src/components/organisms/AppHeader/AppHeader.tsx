@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
-import { MobileMenuToggle, AuthNavButton } from "@/components/molecules";
+import { AuthNavButton } from "@/components/molecules";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useNotificationsFeed } from "@/features/notifications/hooks";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 
 export interface AppHeaderProps {
-  onMobileMenuToggle: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
   onLogout: () => void;
 }
 
 export function AppHeader({
-  onMobileMenuToggle,
   isAuthenticated,
   isLoading,
   onLogout,
@@ -102,13 +100,12 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-5 ml-auto">
-        <MobileMenuToggle onClick={onMobileMenuToggle} />
 
         <div className="relative" ref={notificationsRef}>
           <button
             type="button"
             onClick={() => setIsNotificationsOpen((previous) => !previous)}
-            className="relative p-2 transition-colors"
+            className="relative p-2 transition-colors cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
           >
             <HiBell size={22} />
@@ -124,7 +121,7 @@ export function AppHeader({
 
           {isNotificationsOpen && (
             <div
-              className="absolute right-0 mt-2 w-[340px] max-h-[70vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-2xl z-50"
+              className="fixed sm:absolute right-0 sm:right-0 left-0 sm:left-auto mx-4 sm:mx-0 mt-2 sm:w-[340px] max-h-[70vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-2xl z-50"
               style={{
                 background: "var(--color-bg)",
                 border: "1px solid var(--color-border)",
@@ -194,6 +191,7 @@ export function AppHeader({
           style={{ background: "var(--color-border)" }}
         />
         <ThemeToggle />
+        <div className="h-6 w-px mx-1" style={{ background: 'var(--color-border)' }} />
         <AuthNavButton
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}

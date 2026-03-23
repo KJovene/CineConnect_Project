@@ -173,14 +173,14 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                     type="button"
                     onClick={() => void handleSaveEdit(item.reviewId)}
                     disabled={updateComment.isPending || !editingText.trim()}
-                    className="rounded-lg bg-white text-black px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                    className="rounded-lg bg-white text-black px-3 py-1.5 text-xs font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     Enregistrer
                   </button>
                   <button
                     type="button"
                     onClick={() => { setEditingReviewId(null); setEditingText(""); }}
-                    className="rounded-lg px-3 py-1.5 text-xs"
+                    className="rounded-lg px-3 py-1.5 text-xs cursor-pointer"
                     style={{
                       border: "1px solid var(--color-border)",
                       color: "var(--color-text)",
@@ -192,7 +192,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
               </div>
             ) : (
               <p
-                className="mt-2 text-sm leading-relaxed whitespace-pre-wrap"
+                className="mt-2 text-sm leading-relaxed whitespace-pre-wrap cursor-pointer"
                 style={{ color: "var(--color-text)" }}
               >
                 {item.comment}
@@ -211,7 +211,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   setReplyTargetId(item.reviewId);
                   setReplyText("");
                 }}
-                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium hover:text-indigo-400 transition-colors"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium hover:text-indigo-400 transition-colors cursor-pointer"
                 style={{ color: "var(--color-text-muted)" }}
               >
                 <HiChatBubbleLeftRight size={14} />
@@ -227,7 +227,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                 onClick={() =>
                   setOpenedMenuId((prev) => prev === item.reviewId ? null : item.reviewId)
                 }
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition-colors cursor-pointer"
                 style={{ color: "var(--color-text-muted)" }}
               >
                 <HiEllipsisHorizontal size={18} />
@@ -244,7 +244,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   <button
                     type="button"
                     onClick={() => handleStartEdit(item)}
-                    className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs hover:bg-white/5 transition-colors"
+                    className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs hover:bg-white/5 transition-colors cursor-pointer"
                     style={{ color: "var(--color-text)" }}
                   >
                     <HiPencilSquare size={14} />
@@ -253,7 +253,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   <button
                     type="button"
                     onClick={() => void handleDelete(item.reviewId)}
-                    className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-red-400 hover:bg-white/5 transition-colors"
+                    className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <HiTrash size={14} />
                     Supprimer
@@ -309,7 +309,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                     type="button"
                     onClick={() => void handleRateFilm(value)}
                     disabled={upsertRating.isPending}
-                    className="rounded-md p-1 transition hover:bg-white/10 disabled:opacity-50"
+                    className="rounded-md p-1 transition hover:bg-white/10 disabled:opacity-50 cursor-pointer"
                     aria-label={`Noter ${value} sur 5`}
                   >
                     <HiStar
@@ -351,7 +351,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
               type="button"
               onClick={() => void handleCreateComment()}
               disabled={createComment.isPending || !newComment.trim() || selectedRating === 0}
-              className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
+              className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50 cursor-pointer"
             >
               Publier
             </button>

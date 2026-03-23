@@ -53,7 +53,7 @@ export function ProfileLatestComments({
               key={item.reviewId}
               type="button"
               onClick={() => onOpenFilm(item.omdbId)}
-              className="w-full text-left rounded-xl px-3 py-2 hover:bg-indigo-500/5 hover:border-indigo-500/30 transition-colors"
+              className="w-full text-left rounded-xl px-3 py-2 hover:bg-indigo-500/5 hover:border-indigo-500/30 transition-colors cursor-pointer"
               style={{
                 background: "var(--color-bg)",
                 border: "1px solid var(--color-border)",

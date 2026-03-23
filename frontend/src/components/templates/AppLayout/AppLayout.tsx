@@ -40,13 +40,12 @@ export function AppLayout({
         style={{ background: "var(--color-bg)" }}
       >
         <AppHeader
-          onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}
           onLogout={onLogout}
         />
 
-        <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-16 lg:pb-0">
           {children}
         </div>
       </main>

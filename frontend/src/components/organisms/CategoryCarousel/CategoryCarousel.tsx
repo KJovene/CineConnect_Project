@@ -57,7 +57,7 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             aria-label={`Section précédente – ${genre}`}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             style={{
               border: "1px solid var(--color-border)",
               color: "var(--color-text-muted)",
@@ -69,7 +69,7 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             aria-label={`Section suivante – ${genre}`}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             style={{
               border: "1px solid var(--color-border)",
               color: "var(--color-text-muted)",

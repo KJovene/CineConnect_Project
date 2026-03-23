@@ -72,14 +72,14 @@ export function FriendList({
                   {/* Boutons accept/reject — couleurs sémantiques, gardées */}
                   <button
                     onClick={() => onAccept(req.user_id)}
-                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
+                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors cursor-pointer"
                     title="Accepter"
                   >
                     <HiCheck size={16} />
                   </button>
                   <button
                     onClick={() => onReject(req.user_id)}
-                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer"
                     title="Refuser"
                   >
                     <HiXMark size={16} />
@@ -137,7 +137,7 @@ export function FriendList({
                   {onMessage && rel.friend && (
                     <button
                       onClick={() => onMessage(rel.friend!)}
-                      className="p-2 rounded-lg hover:bg-indigo-500/10 hover:text-indigo-400 transition-colors"
+                      className="p-2 rounded-lg hover:bg-indigo-500/10 hover:text-indigo-400 transition-colors cursor-pointer"
                       style={{ color: "var(--color-text-muted)" }}
                       title="Envoyer un message"
                     >
@@ -146,7 +146,7 @@ export function FriendList({
                   )}
                   <button
                     onClick={() => onRemove(rel.friend?.id ?? 0)}
-                    className="p-2 rounded-lg hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+                    className="p-2 rounded-lg hover:bg-rose-500/10 hover:text-rose-400 transition-colors cursor-pointer"
                     style={{ color: "var(--color-text-muted)" }}
                     title="Retirer de mes amis"
                   >

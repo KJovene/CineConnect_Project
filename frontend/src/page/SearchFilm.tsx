@@ -141,14 +141,13 @@ const SearchPage: React.FC = () => {
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={!hasPrevPage}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       style={{
                         border: "1px solid var(--color-border)",
                         color: "var(--color-text-muted)",
                       }}
                     >
                       <HiChevronLeft size={20} />
-                      Précédent
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -167,13 +166,12 @@ const SearchPage: React.FC = () => {
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={!hasNextPage}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       style={{
                         border: "1px solid var(--color-border)",
                         color: "var(--color-text-muted)",
                       }}
                     >
-                      Suivant
                       <HiChevronRight size={20} />
                     </button>
                   </div>
