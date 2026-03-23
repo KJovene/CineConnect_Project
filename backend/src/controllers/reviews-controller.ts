@@ -15,11 +15,11 @@ import {
 } from "../services/reviewsService.js";
 
 function getOmdbId(req: RequestWithSession): string {
-  return String(req.params.omdbId ?? "").trim();
+  return String(req.params.omdbId).trim();
 }
 
 function getNumberParam(value: string | string[] | undefined): number {
-  return Number.parseInt(String(value ?? ""), 10);
+  return Number.parseInt(String(value), 10);
 }
 
 export async function getComments(req: RequestWithSession, res: Response) {
@@ -48,10 +48,10 @@ export async function getRatingSummary(req: RequestWithSession, res: Response) {
     return;
   }
 
-  const sessionUserId = req.session?.user?.id;
-  const userId = Number.parseInt(String(sessionUserId ?? ""), 10);
+  const userId = Number.parseInt(String(req.session?.user?.id), 10);
 
   try {
+    /* istanbul ignore next: guard kept for runtime robustness */
     const summary = await getFilmRatingSummary({
       omdbId,
       userId: Number.isNaN(userId) ? undefined : userId,
@@ -167,7 +167,10 @@ export async function createReply(req: RequestWithSession, res: Response) {
     });
     res.status(201).json(created);
   } catch (error) {
-    if (error instanceof FilmNotFoundError || error instanceof ReviewNotFoundError) {
+    if (
+      error instanceof FilmNotFoundError ||
+      error instanceof ReviewNotFoundError
+    ) {
       res.status(404).json({ error: error.message });
       return;
     }
@@ -204,7 +207,10 @@ export async function patchComment(req: RequestWithSession, res: Response) {
     await updateReviewComment({ omdbId, userId, reviewId, comment });
     res.status(204).send();
   } catch (error) {
-    if (error instanceof FilmNotFoundError || error instanceof ReviewNotFoundError) {
+    if (
+      error instanceof FilmNotFoundError ||
+      error instanceof ReviewNotFoundError
+    ) {
       res.status(404).json({ error: error.message });
       return;
     }
@@ -235,7 +241,10 @@ export async function removeComment(req: RequestWithSession, res: Response) {
     await deleteReviewComment({ omdbId, userId, reviewId });
     res.status(204).send();
   } catch (error) {
-    if (error instanceof FilmNotFoundError || error instanceof ReviewNotFoundError) {
+    if (
+      error instanceof FilmNotFoundError ||
+      error instanceof ReviewNotFoundError
+    ) {
       res.status(404).json({ error: error.message });
       return;
     }

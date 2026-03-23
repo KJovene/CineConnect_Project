@@ -1,14 +1,12 @@
 import { Router } from "express";
-import {
-  attachSession,
-} from "../middlewares/authMiddleware.js";
+import { attachSession } from "../middlewares/authMiddleware.js";
 import {
   getByGenre,
   getByOmdbId,
   getCommunityReviews,
   getTopRated,
   search,
-} from "../controllers/filmsController.js";
+} from "../controllers/films-controller.js";
 import reviewsRouter from "./reviews.js";
 
 const router = Router();

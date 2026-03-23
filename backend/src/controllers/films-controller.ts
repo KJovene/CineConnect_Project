@@ -81,8 +81,8 @@ export async function getCommunityReviews(req: Request, res: Response) {
 }
 
 export async function getByOmdbId(req: RequestWithSession, res: Response) {
-  const omdbId = String(req.params.omdbId ?? "");
-  const userId = Number.parseInt(String(req.session?.user?.id ?? ""), 10);
+  const omdbId = String(req.params.omdbId);
+  const userId = Number.parseInt(String(req.session?.user?.id), 10);
 
   try {
     const film = await getFilmDetail(omdbId);

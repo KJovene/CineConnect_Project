@@ -47,7 +47,10 @@ export async function getLatestRatings(req: RequestWithSession, res: Response) {
   }
 }
 
-export async function getLatestComments(req: RequestWithSession, res: Response) {
+export async function getLatestComments(
+  req: RequestWithSession,
+  res: Response,
+) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
 
@@ -90,12 +93,18 @@ export async function getLatestComments(req: RequestWithSession, res: Response) 
   }
 }
 
-export async function getCommentReplies(req: RequestWithSession, res: Response) {
+export async function getCommentReplies(
+  req: RequestWithSession,
+  res: Response,
+) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
     const limit = parseInt((req.query.limit as string) ?? "20", 10);
 
-    const rows = await getUserCommentReplyNotifications({ userId: myId, limit });
+    const rows = await getUserCommentReplyNotifications({
+      userId: myId,
+      limit,
+    });
     res.json(rows);
   } catch (_err) {
     res.status(500).json({ error: "Erreur serveur" });

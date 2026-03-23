@@ -9,7 +9,12 @@ export async function getConversation(req: RequestWithSession, res: Response) {
     const page = parseInt((req.query.page as string) ?? "1", 10);
     const limit = parseInt((req.query.limit as string) ?? "50", 10);
 
-    const data = await messagesService.getConversation(myId, otherId, page, limit);
+    const data = await messagesService.getConversation(
+      myId,
+      otherId,
+      page,
+      limit,
+    );
     res.json(data);
   } catch (_err) {
     res.status(500).json({ error: "Erreur serveur" });
@@ -29,7 +34,10 @@ export async function getRecentConversations(
   }
 }
 
-export async function getIncomingMessages(req: RequestWithSession, res: Response) {
+export async function getIncomingMessages(
+  req: RequestWithSession,
+  res: Response,
+) {
   try {
     const myId = parseInt(req.session!.user.id, 10);
     const limit = parseInt((req.query.limit as string) ?? "20", 10);

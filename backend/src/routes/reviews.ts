@@ -1,8 +1,5 @@
 import { Router } from "express";
-import {
-  attachSession,
-  requireAuth,
-} from "../middlewares/authMiddleware.js";
+import { attachSession, requireAuth } from "../middlewares/authMiddleware.js";
 import {
   createComment,
   createReply,
@@ -11,7 +8,7 @@ import {
   patchComment,
   removeComment,
   setRating,
-} from "../controllers/reviewsController.js";
+} from "../controllers/reviews-controller.js";
 
 const router = Router({ mergeParams: true });
 router.get("/", getComments);

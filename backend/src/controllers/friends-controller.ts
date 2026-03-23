@@ -25,7 +25,10 @@ export async function getPendingRequests(
   }
 }
 
-export async function sendFriendRequest(req: RequestWithSession, res: Response) {
+export async function sendFriendRequest(
+  req: RequestWithSession,
+  res: Response,
+) {
   const rawId = req.session!.user.id;
   const userId = parseInt(String(rawId), 10);
   const { friendUserId } = req.body as { friendUserId: unknown };
@@ -67,7 +70,10 @@ export async function acceptFriendRequest(
       return;
     }
 
-    const result = await friendsService.acceptFriendRequest(userId, friendUserId);
+    const result = await friendsService.acceptFriendRequest(
+      userId,
+      friendUserId,
+    );
     res.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";
@@ -88,7 +94,10 @@ export async function rejectFriendRequest(
       return;
     }
 
-    const result = await friendsService.rejectFriendRequest(userId, friendUserId);
+    const result = await friendsService.rejectFriendRequest(
+      userId,
+      friendUserId,
+    );
     res.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";

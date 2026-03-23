@@ -1,14 +1,11 @@
 import { Router } from "express";
-import {
-  attachSession,
-  requireAuth,
-} from "../middlewares/authMiddleware.js";
+import { attachSession, requireAuth } from "../middlewares/authMiddleware.js";
 import {
   getCommentReplies,
   getLatestComments,
   getLatestRatings,
   searchUsers,
-} from "../controllers/usersController.js";
+} from "../controllers/users-controller.js";
 
 const router = Router();
 
