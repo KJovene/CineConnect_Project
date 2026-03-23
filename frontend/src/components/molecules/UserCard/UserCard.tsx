@@ -15,7 +15,10 @@ export function UserCard({
   onClick,
 }: UserCardProps) {
   return (
-    <div className="p-4 border-t border-white/5 shrink-0">
+    <div
+      className="p-4 shrink-0"
+      style={{ borderTop: "1px solid var(--color-border)" }}
+    >
       <Link
         to="/profil"
         onClick={onClick}
@@ -23,8 +26,16 @@ export function UserCard({
       >
         <Avatar image={userAvatar} name={userName} size="lg" />
         <div className="hidden lg:block overflow-hidden">
-          <p className="text-sm font-medium text-white truncate">{userName}</p>
-          <p className="text-[11px] text-neutral-500 truncate group-hover:text-indigo-300 transition-colors">
+          <p
+            className="text-sm font-medium truncate"
+            style={{ color: "var(--color-text)" }}
+          >
+            {userName}
+          </p>
+          <p
+            className="text-[11px] truncate group-hover:text-indigo-300 transition-colors"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             {userBadge}
           </p>
         </div>

@@ -13,7 +13,10 @@ export function Logo({ showText = true }: LogoProps) {
         </div>
       </div>
       {showText && (
-        <span className="font-bold text-xl tracking-tight text-white">
+        <span
+          className="font-bold text-xl tracking-tight"
+          style={{ color: "var(--color-text)" }}
+        >
           CineConnect
         </span>
       )}
