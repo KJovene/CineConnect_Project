@@ -7,8 +7,17 @@ import {
   ProfileLatestComments,
   ProfileLatestRatings,
 } from "@/components/organisms";
-import { ProfileNameEditor, SearchUserRow } from "@/components/molecules";
-import { getSession, updateCurrentUser, useSession } from "@/lib/auth-client";
+import {
+  DangerPasswordSection,
+  ProfileNameEditor,
+  SearchUserRow,
+} from "@/components/molecules";
+import {
+  changeCurrentUserPassword,
+  getSession,
+  updateCurrentUser,
+  useSession,
+} from "@/lib/auth-client";
 import {
   useFriends,
   usePendingRequests,
@@ -144,6 +153,14 @@ const Profil: React.FC = () => {
       setIsUpdatingPhoto(false);
       e.target.value = "";
     }
+  };
+
+  const handleChangePassword = async (payload: {
+    currentPassword: string;
+    newPassword: string;
+  }) => {
+    await changeCurrentUserPassword(payload);
+    await getSession();
   };
 
   return (
@@ -352,6 +369,8 @@ const Profil: React.FC = () => {
           onMessage={handleMessage}
         />
       </section>
+
+      <DangerPasswordSection onChangePassword={handleChangePassword} />
     </div>
   );
 };
