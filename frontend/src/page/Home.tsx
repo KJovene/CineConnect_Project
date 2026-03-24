@@ -7,7 +7,7 @@ import type { Film } from "@cineconnect/shared";
 import type { MovieCardProps } from "@/components/molecules";
 
 const Home: React.FC = () => {
-  const { data: topFilms, isLoading } = useTopRatedMovies(5);
+  const { data: topFilms, isLoading } = useTopRatedMovies(10);
   const { data: communityReviews = [], isLoading: isLoadingCommunityReviews } =
     useLatestCommunityReviews(4);
 
@@ -20,8 +20,16 @@ const Home: React.FC = () => {
     omdb_id: film.omdb_id,
   });
 
-  const featuredFilm = topFilms?.[0];
-  const trendingFilms = topFilms?.slice(1, 5).map(convertToMovieCard) || [];
+  const featuredFilm = React.useMemo(() => {
+    if (!topFilms?.length) {
+      return undefined;
+    }
+
+    const randomIndex = Math.floor(Math.random() * topFilms.length);
+    return topFilms[randomIndex];
+  }, [topFilms]);
+
+  const trendingFilms = topFilms?.map(convertToMovieCard) || [];
   const recentReviews = communityReviews.slice(0, 4).map((review) => ({
     avatar: review.author.image,
     name: review.author.name,
