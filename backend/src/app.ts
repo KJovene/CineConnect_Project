@@ -20,6 +20,8 @@ export function createApp(): express.Express {
     }),
   );
 
+  app.use(express.json());
+
   const authHandler = toNodeHandler(auth);
 
   function wrapAuthHandler(
@@ -39,8 +41,6 @@ export function createApp(): express.Express {
   // Better Auth doit etre monte avant express.json().
   app.all("/api/auth", wrapAuthHandler);
   app.all("/api/auth/{*any}", wrapAuthHandler);
-
-  app.use(express.json());
 
   app.get("/", (_req, res) => {
     res.json({ message: "CineConnect API is running!" });
