@@ -7,7 +7,7 @@ import {
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi2";
-import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/features/media/utils/poster";
 import type { FilmSearchResult } from "@cineconnect/shared";
 
 const SearchPage: React.FC = () => {
@@ -40,7 +40,6 @@ const SearchPage: React.FC = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-4xl mx-auto pt-24 px-6 pb-20 z-10">
-
         <div className="mb-10">
           <SearchBar
             placeholder="Rechercher un film"
@@ -52,7 +51,6 @@ const SearchPage: React.FC = () => {
 
         {searchQuery.length >= 3 && (
           <div className="mb-16">
-
             {/* Error */}
             {error && (
               <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl mb-6">
@@ -64,7 +62,10 @@ const SearchPage: React.FC = () => {
             {isLoading && (
               <div className="text-center py-12">
                 <div className="inline-block w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4" />
-                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   Recherche en cours...
                 </p>
               </div>
@@ -80,11 +81,20 @@ const SearchPage: React.FC = () => {
                     border: "1px solid var(--color-border)",
                   }}
                 >
-                  <HiMagnifyingGlass size={32} style={{ color: "var(--color-text-muted)" }} />
+                  <HiMagnifyingGlass
+                    size={32}
+                    style={{ color: "var(--color-text-muted)" }}
+                  />
                 </div>
-                <p className="text-lg" style={{ color: "var(--color-text-muted)" }}>
+                <p
+                  className="text-lg"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   Aucun résultat pour{" "}
-                  <span className="font-medium" style={{ color: "var(--color-text)" }}>
+                  <span
+                    className="font-medium"
+                    style={{ color: "var(--color-text)" }}
+                  >
                     "{searchQuery}"
                   </span>
                 </p>
@@ -95,7 +105,10 @@ const SearchPage: React.FC = () => {
             {!isLoading && results.length > 0 && (
               <>
                 <div className="mb-4 px-2">
-                  <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     {data?.totalResults
                       ? `${data.totalResults} résultats trouvés`
                       : `${results.length} résultats`}
@@ -117,7 +130,6 @@ const SearchPage: React.FC = () => {
                       <img
                         src={getPosterUrl(movie.poster_url)}
                         alt={movie.title}
-                        onError={handlePosterError}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       {/* Gradient overlay — reste sombre quel que soit le thème, c'est sur une image */}
@@ -157,14 +169,21 @@ const SearchPage: React.FC = () => {
                       >
                         {currentPage}
                       </span>
-                      <span style={{ color: "var(--color-text-muted)" }}>sur</span>
-                      <span className="font-medium" style={{ color: "var(--color-text)" }}>
+                      <span style={{ color: "var(--color-text-muted)" }}>
+                        sur
+                      </span>
+                      <span
+                        className="font-medium"
+                        style={{ color: "var(--color-text)" }}
+                      >
                         {totalPages}
                       </span>
                     </div>
 
                     <button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
                       disabled={!hasNextPage}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       style={{

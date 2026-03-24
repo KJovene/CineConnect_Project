@@ -19,6 +19,8 @@ import type {
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const OMDB_BASE_URL = "https://www.omdbapi.com";
+const POSTER_CHECK_TIMEOUT_MS = 3500;
+const posterReachabilityCache = new Map<string, boolean>();
 
 // Types OMDB bruts
 interface OmdbSearchItem {
@@ -58,7 +60,90 @@ interface OmdbDetail {
 // Helpers
 function cleanPoster(poster: string | undefined): string | null {
   if (!poster || poster === "N/A" || poster.trim() === "") return null;
-  return poster;
+  return poster.trim();
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+async function isPosterUrlReachable(url: string): Promise<boolean> {
+  if (process.env.NODE_ENV === "test") {
+    return true;
+  }
+
+  const cached = posterReachabilityCache.get(url);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  try {
+    const headResponse = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: AbortSignal.timeout(POSTER_CHECK_TIMEOUT_MS),
+    });
+
+    if (headResponse.ok) {
+      posterReachabilityCache.set(url, true);
+      return true;
+    }
+
+    if (headResponse.status === 405 || headResponse.status === 501) {
+      const getResponse = await fetch(url, {
+        method: "GET",
+        redirect: "follow",
+        headers: { Range: "bytes=0-0" },
+        signal: AbortSignal.timeout(POSTER_CHECK_TIMEOUT_MS),
+      });
+
+      const reachable = getResponse.ok;
+      posterReachabilityCache.set(url, reachable);
+      return reachable;
+    }
+
+    posterReachabilityCache.set(url, false);
+    return false;
+  } catch {
+    posterReachabilityCache.set(url, false);
+    return false;
+  }
+}
+
+async function normalizePosterUrl(
+  poster: string | undefined,
+): Promise<string | null> {
+  const cleanedPoster = cleanPoster(poster);
+  if (!cleanedPoster) return null;
+  if (!isHttpUrl(cleanedPoster)) return null;
+
+  const reachable = await isPosterUrlReachable(cleanedPoster);
+  return reachable ? cleanedPoster : null;
+}
+
+async function hasUsablePoster(
+  posterUrl: string | null | undefined,
+): Promise<boolean> {
+  if (!posterUrl) return false;
+  if (!isHttpUrl(posterUrl)) return false;
+
+  return isPosterUrlReachable(posterUrl);
+}
+
+async function filterFilmsWithUsablePoster(items: Film[]): Promise<Film[]> {
+  const filtered = await Promise.all(
+    items.map(async (item) => {
+      const validPoster = await hasUsablePoster(item.poster_url);
+      return validPoster ? item : null;
+    }),
+  );
+
+  return filtered.filter(Boolean) as Film[];
 }
 
 function parseYear(year: string | undefined): number | null {
@@ -96,14 +181,21 @@ async function fetchOmdbDetail(imdbId: string): Promise<OmdbDetail> {
 }
 
 //  Sauvegarde en BDD
-async function upsertFilmFromOmdbDetail(omdbDetail: OmdbDetail): Promise<Film> {
+async function upsertFilmFromOmdbDetail(
+  omdbDetail: OmdbDetail,
+): Promise<Film | null> {
+  const posterUrl = await normalizePosterUrl(omdbDetail.Poster);
+  if (!posterUrl) {
+    return null;
+  }
+
   const values = {
     omdb_id: omdbDetail.imdbID,
     title: omdbDetail.Title,
     year: parseYear(omdbDetail.Year),
     type: parseType(omdbDetail.Type),
     director: omdbDetail.Director !== "N/A" ? omdbDetail.Director : null,
-    poster_url: cleanPoster(omdbDetail.Poster),
+    poster_url: posterUrl,
     genre: omdbDetail.Genre !== "N/A" ? omdbDetail.Genre : null,
     plot: omdbDetail.Plot !== "N/A" ? omdbDetail.Plot : null,
     runtime: omdbDetail.Runtime !== "N/A" ? omdbDetail.Runtime : null,
@@ -185,9 +277,16 @@ export async function searchFilms(
   const existingFilms = await db
     .select()
     .from(films)
-    .where(inArray(films.omdb_id, omdbIds));
+    .where(and(inArray(films.omdb_id, omdbIds), isNotNull(films.poster_url)));
 
-  const existingIds = new Set(existingFilms.map((f) => f.omdb_id));
+  const validExistingFilms = await Promise.all(
+    (existingFilms as unknown as Film[]).map(async (film) => {
+      const validPoster = await hasUsablePoster(film.poster_url);
+      return validPoster ? film : null;
+    }),
+  ).then((items) => items.filter(Boolean) as Film[]);
+
+  const existingIds = new Set(validExistingFilms.map((f) => f.omdb_id));
 
   const missingIds = omdbIds.filter((id) => !existingIds.has(id));
 
@@ -200,22 +299,28 @@ export async function searchFilms(
     }),
   ).then((results) => results.filter(Boolean) as Film[]);
 
-  const allFilms = [...existingFilms, ...newFilms] as unknown as Film[];
+  const allFilms = [...validExistingFilms, ...newFilms] as Film[];
   const filmMap = new Map(allFilms.map((f) => [f.omdb_id, f]));
 
-  const results: FilmSearchResult[] = omdbIds
-    .map((id) => {
-      const film = filmMap.get(id);
-      if (!film) return null;
-      return {
-        omdb_id: film.omdb_id,
-        title: film.title,
-        year: film.year,
-        type: film.type,
-        poster_url: film.poster_url,
-      } satisfies FilmSearchResult;
-    })
-    .filter(Boolean) as FilmSearchResult[];
+  const resultCandidates = omdbIds.map((id) => {
+    const film = filmMap.get(id);
+    if (!film) return null;
+    return {
+      omdb_id: film.omdb_id,
+      title: film.title,
+      year: film.year,
+      type: film.type,
+      poster_url: film.poster_url,
+    } satisfies FilmSearchResult;
+  });
+
+  const results = await Promise.all(
+    resultCandidates.map(async (candidate) => {
+      if (!candidate) return null;
+      const validPoster = await hasUsablePoster(candidate.poster_url);
+      return validPoster ? candidate : null;
+    }),
+  ).then((items) => items.filter(Boolean) as FilmSearchResult[]);
 
   return { results, totalResults, page };
 }
@@ -228,7 +333,12 @@ export async function getFilmDetail(omdbId: string): Promise<Film | null> {
     .limit(1);
 
   if (existing) {
-    return existing.type === "movie" ? (existing as unknown as Film) : null;
+    if (existing.type !== "movie") return null;
+
+    const existingFilm = existing as unknown as Film;
+    if (await hasUsablePoster(existingFilm.poster_url)) {
+      return existingFilm;
+    }
   }
 
   const detail = await fetchOmdbDetail(omdbId);
@@ -253,7 +363,7 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
         sql`${reviews.rating} > 0`,
       ),
     )
-    .where(eq(films.type, "movie"))
+    .where(and(eq(films.type, "movie"), isNotNull(films.poster_url)))
     .groupBy(films.film_id)
     .orderBy(
       desc(sql`avg(${reviews.rating})`),
@@ -293,7 +403,7 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
           sql`${reviews.rating} > 0`,
         ),
       )
-      .where(eq(films.type, "movie"))
+      .where(and(eq(films.type, "movie"), isNotNull(films.poster_url)))
       .groupBy(films.film_id)
       .having(sql`count(${reviews.review_id}) = 0`)
       .orderBy(desc(films.imdb_rating), desc(films.updated_at))
@@ -319,7 +429,8 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
     }
   }
 
-  return withCommunityRatings(orderedFilms);
+  const filmsWithRatings = await withCommunityRatings(orderedFilms);
+  return filterFilmsWithUsablePoster(filmsWithRatings);
 }
 
 /**
@@ -354,14 +465,22 @@ export async function getFilmsByGenre(
     const result = await db
       .select()
       .from(films)
-      .where(and(eq(films.type, "movie"), like(films.genre, `%${genre}%`)))
+      .where(
+        and(
+          eq(films.type, "movie"),
+          isNotNull(films.poster_url),
+          like(films.genre, `%${genre}%`),
+        ),
+      )
       .orderBy(desc(films.imdb_rating))
       .limit(limitPerGenre);
 
-    if (result.length > 0) {
-      const filmsWithRatings = await withCommunityRatings(
-        result as unknown as Film[],
-      );
+    const usableFilms = await filterFilmsWithUsablePoster(
+      result as unknown as Film[],
+    );
+
+    if (usableFilms.length > 0) {
+      const filmsWithRatings = await withCommunityRatings(usableFilms);
       sections.push({
         genre,
         films: filmsWithRatings,

@@ -1,9 +1,6 @@
-import React from "react";
-import posterPlaceholder from "@/assets/pixel.jpg";
-
 export const getPosterUrl = (poster: string | null | undefined): string => {
   if (!poster || poster === "N/A" || poster.trim() === "") {
-    return posterPlaceholder;
+    return "";
   }
   return poster;
 };
@@ -17,17 +14,11 @@ export const getHighQualityPosterUrl = (
 ): string => {
   const url = getPosterUrl(poster);
 
-  if (url === posterPlaceholder) {
-    return url;
+  if (!url) {
+    return "";
   }
 
   // IMDb/Amazon posters often expose a size segment between "._V1_" and extension.
   // Replacing it with a larger target width improves hero sharpness on big screens.
   return url.replace(/(\._V1_).*(\.(?:jpg|jpeg|png))/i, "$1QL75_UX1400_$2");
-};
-
-export const handlePosterError = (
-  e: React.SyntheticEvent<HTMLImageElement>,
-): void => {
-  e.currentTarget.src = posterPlaceholder;
 };

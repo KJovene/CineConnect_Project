@@ -1,5 +1,5 @@
 import type { LatestUserRating } from "@/features/reviews/hooks";
-import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/features/media/utils/poster";
 
 interface ProfileLatestRatingsProps {
   ratings: LatestUserRating[];
@@ -65,7 +65,6 @@ export function ProfileLatestRatings({
                 <img
                   src={getPosterUrl(rating.posterUrl)}
                   alt={rating.filmTitle}
-                  onError={handlePosterError}
                   className="w-10 h-14 rounded-md object-cover shrink-0"
                   style={{ border: "1px solid var(--color-border)" }}
                 />

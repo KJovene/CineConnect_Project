@@ -1,8 +1,5 @@
 import { RatingStars } from "@/components/atoms";
-import {
-  getHighQualityPosterUrl,
-  handlePosterError,
-} from "@/features/media/utils/poster";
+import { getHighQualityPosterUrl } from "@/features/media/utils/poster";
 
 export interface FilmDetailMovie {
   title: string;
@@ -41,7 +38,6 @@ export function FilmDetailOverview({ movie }: FilmDetailOverviewProps) {
           src={getHighQualityPosterUrl(movie.poster_url ?? undefined)}
           className="w-full h-full object-cover object-center"
           alt={movie.title}
-          onError={handlePosterError}
         />
         <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
         <div className="absolute inset-0 bg-linear-to-r from-black/40 to-transparent" />
