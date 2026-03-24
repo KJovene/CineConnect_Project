@@ -11,7 +11,7 @@ const secret = process.env.BETTER_AUTH_SECRET;
 
 if (!secret || secret.length < 32) {
   console.warn(
-    "[Better Auth] BETTER_AUTH_SECRET manquant ou trop court (min 32 caractères). Générez avec: openssl rand -base64 32"
+    "[Better Auth] BETTER_AUTH_SECRET manquant ou trop court (min 32 caractères). Générez avec: openssl rand -base64 32",
   );
 }
 
@@ -34,6 +34,11 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+  },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
   },
   advanced: {
     database: {

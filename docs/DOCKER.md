@@ -7,7 +7,6 @@ Configuration Docker simple pour le développement. Tout est containerisé avec 
 - **Frontend React**: Container avec Vite + hot reload
 - **Backend Express**: Container avec tsx watch + hot reload
 - **PostgreSQL**: Base de données
-- **Redis**: Cache et sessions
 
 ## Démarrage ultra-simple
 
@@ -30,7 +29,6 @@ docker-compose logs -f
 - ✅ Frontend: http://localhost:5173
 - ✅ Backend: http://localhost:3000
 - ✅ PostgreSQL: localhost:5433
-- ✅ Redis: localhost:6379
 
 ## Commandes principales
 

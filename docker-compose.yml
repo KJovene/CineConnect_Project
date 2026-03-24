@@ -19,15 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis
-  redis:
-    image: redis:7-alpine
-    container_name: cineconnect-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - cineconnect-network
-
   # Backend avec hot reload
   backend:
     build:
@@ -36,6 +27,8 @@ services:
     container_name: cineconnect-backend
     env_file:
       - ./backend/.env
+    environment:
+      DRIZZLE_DATABASE_URL: postgres://postgres:password@postgres:5432/cineconnect
     ports:
       - "3000:3000"
     volumes:

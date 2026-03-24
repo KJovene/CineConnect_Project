@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HiChatBubbleLeftRight, HiArrowLeft, HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import { HiChatBubbleLeftRight, HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
@@ -116,35 +116,11 @@ const Discussion: React.FC = () => {
         </div>
       </aside>
 
-      {/* Bouton retour mobile — toujours dans le flux, jamais caché avec main */}
-      {selectedFriend && mobileView === "chat" && (
-        <div
-          className="lg:hidden fixed top-20 left-0 right-0 z-10 flex items-center gap-3 px-4 shrink-0"
-          style={{
-            height: "3.5rem",
-            borderBottom: "1px solid var(--color-border)",
-            background: "var(--color-surface)",
-          }}
-        >
-          <button
-            onClick={handleBack}
-            className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            <HiArrowLeft size={20} />
-          </button>
-          <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-            {selectedFriend.name}
-          </span>
-        </div>
-      )}
-
       {/* fenêtre de chat */}
       <main
         className={`
           flex-1 overflow-hidden flex flex-col
           ${mobileView === "list" ? "hidden lg:flex" : "flex"}
-          ${selectedFriend && mobileView === "chat" ? "lg:pt-0 pt-14" : ""}
         `}
       >
         {selectedFriend && currentUserId ? (
@@ -154,6 +130,7 @@ const Discussion: React.FC = () => {
             currentUserId={currentUserId}
             isLoading={messagesLoading}
             onSend={handleSend}
+            onBack={handleBack}
           />
         ) : (
           <div

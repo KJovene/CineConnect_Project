@@ -8,6 +8,10 @@ import type { RequestWithSession } from "../middlewares/authMiddleware.js";
 export async function getLatestRatings(req: RequestWithSession, res: Response) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
+    const parsedLimit = parseInt((req.query.limit as string) ?? "100", 10);
+    const normalizedLimit = Number.isNaN(parsedLimit)
+      ? 100
+      : Math.min(Math.max(Math.trunc(parsedLimit), 1), 200);
 
     const rows = await db
       .select({
@@ -29,7 +33,7 @@ export async function getLatestRatings(req: RequestWithSession, res: Response) {
         ),
       )
       .orderBy(desc(reviews.created_at))
-      .limit(5);
+      .limit(normalizedLimit);
 
     res.json(
       rows.map((row) => ({
@@ -53,6 +57,10 @@ export async function getLatestComments(
 ) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
+    const parsedLimit = parseInt((req.query.limit as string) ?? "100", 10);
+    const normalizedLimit = Number.isNaN(parsedLimit)
+      ? 100
+      : Math.min(Math.max(Math.trunc(parsedLimit), 1), 200);
 
     const rows = await db
       .select({
@@ -74,7 +82,7 @@ export async function getLatestComments(
         ),
       )
       .orderBy(desc(reviews.created_at))
-      .limit(5);
+      .limit(normalizedLimit);
 
     res.json(
       rows.map((row) => ({

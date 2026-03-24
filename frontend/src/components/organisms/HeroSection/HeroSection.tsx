@@ -1,7 +1,7 @@
 import { HiStar, HiInformationCircle } from "react-icons/hi2";
 import { Badge } from "@/components/atoms";
 import { Link } from "@tanstack/react-router";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import { getHighQualityPosterUrl } from "@/features/media/utils/poster";
 import type { Film } from "@cineconnect/shared";
 
 export interface HeroSectionProps {
@@ -30,7 +30,7 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
     );
   }
 
-  const posterUrl = getPosterUrl(film.poster_url);
+  const posterUrl = getHighQualityPosterUrl(film.poster_url);
   const communityRating =
     typeof film.average_rating === "number" && film.average_rating > 0
       ? film.average_rating
@@ -39,16 +39,22 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
     communityRating !== null
       ? (Math.round(communityRating * 10) / 10).toFixed(1)
       : null;
+  const titleSizeClass =
+    film.title.length > 30
+      ? "text-3xl md:text-4xl lg:text-5xl"
+      : film.title.length > 20
+        ? "text-4xl md:text-5xl lg:text-6xl"
+        : "text-5xl md:text-6xl lg:text-7xl";
 
   return (
-    <div
-      className="relative w-full h-128 flex items-end"
-      style={{
-        backgroundImage: `url("${posterUrl}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="relative w-full h-128 flex items-end overflow-hidden bg-neutral-900">
+      <img
+        src={posterUrl}
+        alt={film.title}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+        loading="eager"
+        decoding="async"
+      />
       <div
         className="absolute inset-0"
         style={{
@@ -81,7 +87,9 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
           </span>
         </div>
 
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl">
+        <h1
+          className={`${titleSizeClass} whitespace-nowrap font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl`}
+        >
           {film.title}
         </h1>
 

@@ -1,4 +1,3 @@
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { Badge } from "@/components/atoms";
 import { MovieCard, type MovieCardProps } from "@/components/molecules";
 
@@ -28,18 +27,14 @@ export function MediaGrid({ title, badge, movies }: MediaGridProps) {
               border: "1px solid var(--color-border)",
               color: "var(--color-text-muted)",
             }}
-          >
-            <HiChevronLeft className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5"  />
-          </button>
+          ></button>
           <button
             className="w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition"
             style={{
               border: "1px solid var(--color-border)",
               color: "var(--color-text-muted)",
             }}
-          >
-            <HiChevronRight className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
-          </button>
+          ></button>
         </div>
       </div>
 

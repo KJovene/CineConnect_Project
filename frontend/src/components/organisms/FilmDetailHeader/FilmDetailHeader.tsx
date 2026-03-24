@@ -6,7 +6,7 @@ export function FilmDetailHeader() {
     <header className="h-20 flex items-center justify-between px-6 lg:px-12 fixed top-0 w-full z-50 bg-linear-to-b from-black/80 to-transparent backdrop-blur-sm">
       <div className="flex items-center gap-6">
         <Link
-          to="/"
+          to="/film"
           className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
         >
           <HiArrowLeft size={20} className="text-white" />

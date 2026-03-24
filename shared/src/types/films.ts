@@ -103,3 +103,16 @@ export interface GenreSection {
 }
 
 export type FilmsByGenreResponse = GenreSection[];
+
+export interface Category {
+  category_id: number;
+  name: string;
+  description: string | null;
+}
+
+export interface CategorySection {
+  category: Category;
+  films: Film[];
+}
+
+export type FilmsByCategoryResponse = CategorySection[];

@@ -8,6 +8,11 @@ dist/
 .DS_Store
 CLAUDE.md
 
+# test coverage
+coverage/
+backend/coverage/
+frontend/coverage/
+
 # fichiers de test temporaires pour l'api omdb
 frontend/src/features/media/api/test-api.ts
 frontend/src/features/media/schemas/test-moviesSchema.ts

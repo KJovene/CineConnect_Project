@@ -1,11 +1,15 @@
+import { useEffect, useMemo, useState } from "react";
 import type { LatestUserRating } from "@/features/reviews/hooks";
-import { getPosterUrl, handlePosterError } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/features/media/utils/poster";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-interface ProfileLatestRatingsProps {
+export interface ProfileLatestRatingsProps {
   ratings: LatestUserRating[];
   isLoading: boolean;
   onOpenFilm: (omdbId: string) => void;
 }
+
+const ITEMS_PER_PAGE = 5;
 
 function formatDate(dateLike?: string | null): string {
   if (!dateLike) return "-";
@@ -25,6 +29,28 @@ export function ProfileLatestRatings({
   isLoading,
   onOpenFilm,
 }: ProfileLatestRatingsProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(ratings.length / ITEMS_PER_PAGE);
+  const safeTotalPages = Math.max(1, totalPages);
+  const hasPrevPage = currentPage > 1;
+  const hasNextPage = currentPage < safeTotalPages;
+
+  const paginatedRatings = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return ratings.slice(start, end);
+  }, [currentPage, ratings]);
+
+  useEffect(() => {
+    if (totalPages === 0) {
+      setCurrentPage(1);
+      return;
+    }
+
+    setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
+  }, [totalPages]);
+
   return (
     <div
       className="rounded-2xl p-5"
@@ -50,7 +76,7 @@ export function ProfileLatestRatings({
         </p>
       ) : (
         <div className="space-y-2">
-          {ratings.map((rating) => (
+          {paginatedRatings.map((rating) => (
             <button
               key={rating.reviewId}
               type="button"
@@ -65,7 +91,6 @@ export function ProfileLatestRatings({
                 <img
                   src={getPosterUrl(rating.posterUrl)}
                   alt={rating.filmTitle}
-                  onError={handlePosterError}
                   className="w-10 h-14 rounded-md object-cover shrink-0"
                   style={{ border: "1px solid var(--color-border)" }}
                 />
@@ -86,6 +111,45 @@ export function ProfileLatestRatings({
               </div>
             </button>
           ))}
+
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={!hasPrevPage}
+              className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              style={{
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
+              aria-label="Page précédente des notes"
+            >
+              <HiChevronLeft size={18} />
+            </button>
+
+            <span
+              className="text-xs"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              {currentPage} / {safeTotalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentPage((page) => Math.min(safeTotalPages, page + 1))
+              }
+              disabled={!hasNextPage}
+              className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              style={{
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
+              aria-label="Page suivante des notes"
+            >
+              <HiChevronRight size={18} />
+            </button>
+          </div>
         </div>
       )}
     </div>

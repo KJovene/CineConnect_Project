@@ -5,3 +5,4 @@ export * from "./Badge";
 export * from "./ErrorAlert";
 export * from "./RatingStars";
 export * from "./Logo";
+export * from "./ThemeToggle";

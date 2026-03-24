@@ -18,7 +18,8 @@
     "db:seed": "pnpm db:seed-users && pnpm db:seed-films && pnpm db:seed-community",
     "db:seed-users": "tsx src/db/seed.ts",
     "db:seed-films": "tsx src/db/seedFilms.ts",
-    "db:seed-community": "tsx src/db/seedCommunity.ts"
+    "db:seed-community": "tsx src/db/seedCommunity.ts",
+    "db:seed-categories": "tsx src/db/seedCategories.ts"
   },
   "keywords": [],
   "author": "",

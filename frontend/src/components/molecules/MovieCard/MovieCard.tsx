@@ -1,9 +1,6 @@
 import { HiStar } from "react-icons/hi2";
 import { Link } from "@tanstack/react-router";
-import {
-  getPosterUrl,
-  handlePosterError,
-} from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/features/media/utils/poster";
 
 export interface MovieCardProps {
   image: string;
@@ -33,7 +30,6 @@ export function MovieCard({
         src={getPosterUrl(image)}
         alt={title}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        onError={handlePosterError}
       />
       {/* Overlays sur image — restent noirs dans les deux thèmes */}
       <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
