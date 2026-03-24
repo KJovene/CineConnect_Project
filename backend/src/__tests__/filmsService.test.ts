@@ -97,14 +97,14 @@ describe("filmsService", () => {
               Title: "A",
               Year: "2000",
               Type: "movie",
-              Poster: "P",
+              Poster: "https://images.example.com/tt1.jpg",
             },
             {
               imdbID: "tt2",
               Title: "B",
               Year: "2001",
               Type: "movie",
-              Poster: "P",
+              Poster: "https://images.example.com/tt2.jpg",
             },
           ],
         }),
@@ -117,7 +117,7 @@ describe("filmsService", () => {
           Title: "B",
           Year: "2001",
           Type: "movie",
-          Poster: "N/A",
+          Poster: "https://images.example.com/tt2.jpg",
           Genre: "Action",
           Director: "N/A",
           Plot: "N/A",
@@ -140,7 +140,7 @@ describe("filmsService", () => {
             title: "A",
             year: 2000,
             type: "movie",
-            poster_url: "x",
+            poster_url: "https://images.example.com/tt1.jpg",
           },
         ]),
       }),
@@ -156,7 +156,7 @@ describe("filmsService", () => {
               title: "B",
               year: 2001,
               type: "movie",
-              poster_url: null,
+              poster_url: "https://images.example.com/tt2.jpg",
             },
           ]),
         }),
@@ -243,9 +243,14 @@ describe("filmsService", () => {
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
         where: jest.fn().mockReturnValue({
-          limit: jest
-            .fn()
-            .mockResolvedValue([{ film_id: 1, omdb_id: "tt1", type: "movie" }]),
+          limit: jest.fn().mockResolvedValue([
+            {
+              film_id: 1,
+              omdb_id: "tt1",
+              type: "movie",
+              poster_url: "https://images.example.com/tt1.jpg",
+            },
+          ]),
         }),
       }),
     });
@@ -329,17 +334,15 @@ describe("filmsService", () => {
     mockDb.insert.mockReturnValue({
       values: jest.fn().mockReturnValue({
         onConflictDoUpdate: jest.fn().mockReturnValue({
-          returning: jest
-            .fn()
-            .mockResolvedValue([
-              {
-                film_id: 3,
-                omdb_id: "tt3",
-                title: "Movie",
-                type: "movie",
-                poster_url: "P",
-              },
-            ]),
+          returning: jest.fn().mockResolvedValue([
+            {
+              film_id: 3,
+              omdb_id: "tt3",
+              title: "Movie",
+              type: "movie",
+              poster_url: "https://images.example.com/tt3.jpg",
+            },
+          ]),
         }),
       }),
     });
@@ -352,7 +355,7 @@ describe("filmsService", () => {
         Title: "Movie",
         Year: "2001",
         Type: "movie",
-        Poster: "P",
+        Poster: "https://images.example.com/tt3.jpg",
         Genre: "Drama",
         Director: "John",
         Plot: "Plot",
@@ -371,7 +374,7 @@ describe("filmsService", () => {
     expect(result?.omdb_id).toBe("tt3");
   });
 
-  it("getFilmDetail upsert avec year N/A et genre N/A", async () => {
+  it("getFilmDetail ignore un detail OMDB sans poster valide", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
         where: jest
@@ -380,21 +383,7 @@ describe("filmsService", () => {
       }),
     });
 
-    const values = jest.fn().mockReturnValue({
-      onConflictDoUpdate: jest.fn().mockReturnValue({
-        returning: jest
-          .fn()
-          .mockResolvedValue([
-            {
-              film_id: 4,
-              omdb_id: "tt4",
-              title: "Movie",
-              type: "movie",
-              poster_url: null,
-            },
-          ]),
-      }),
-    });
+    const values = jest.fn();
     mockDb.insert.mockReturnValue({ values });
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -419,14 +408,10 @@ describe("filmsService", () => {
       }),
     });
 
-    await getFilmDetail("tt4");
+    const result = await getFilmDetail("tt4");
 
-    const inserted = values.mock.calls[0][0] as {
-      year: number | null;
-      genre: string | null;
-    };
-    expect(inserted.year).toBeNull();
-    expect(inserted.genre).toBeNull();
+    expect(result).toBeNull();
+    expect(values).not.toHaveBeenCalled();
   });
 
   it("getFilmDetail upsert avec year invalide retourne null", async () => {
@@ -440,17 +425,15 @@ describe("filmsService", () => {
 
     const values = jest.fn().mockReturnValue({
       onConflictDoUpdate: jest.fn().mockReturnValue({
-        returning: jest
-          .fn()
-          .mockResolvedValue([
-            {
-              film_id: 5,
-              omdb_id: "tt5",
-              title: "Movie",
-              type: "movie",
-              poster_url: "P",
-            },
-          ]),
+        returning: jest.fn().mockResolvedValue([
+          {
+            film_id: 5,
+            omdb_id: "tt5",
+            title: "Movie",
+            type: "movie",
+            poster_url: "https://images.example.com/tt5.jpg",
+          },
+        ]),
       }),
     });
     mockDb.insert.mockReturnValue({ values });
@@ -463,7 +446,7 @@ describe("filmsService", () => {
         Title: "Movie",
         Year: "abcd",
         Type: "movie",
-        Poster: "P",
+        Poster: "https://images.example.com/tt5.jpg",
         Genre: "Drama",
         Director: "John",
         Plot: "Plot",
@@ -530,18 +513,28 @@ describe("filmsService", () => {
     mockDb.select
       .mockReturnValueOnce({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            orderBy: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([
-                {
-                  film_id: 1,
-                  omdb_id: "tt1",
-                  imdb_rating: "8.1",
-                  type: "movie",
-                },
-              ]),
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  limit: jest.fn().mockResolvedValue([{ film_id: 1 }]),
+                }),
+              }),
             }),
           }),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([
+            {
+              film_id: 1,
+              omdb_id: "tt1",
+              imdb_rating: "8.1",
+              type: "movie",
+              poster_url: "https://images.example.com/tt1.jpg",
+            },
+          ]),
         }),
       })
       .mockReturnValueOnce({
@@ -556,7 +549,7 @@ describe("filmsService", () => {
         }),
       });
 
-    const result = await getTopRatedFilms(5);
+    const result = await getTopRatedFilms(1);
 
     expect(result[0].average_rating).toBe(4.5);
     expect(result[0].ratings_count).toBe(2);
@@ -566,9 +559,28 @@ describe("filmsService", () => {
     const limit = jest.fn().mockResolvedValue([]);
     mockDb.select.mockReturnValueOnce({
       from: jest.fn().mockReturnValue({
-        where: jest
-          .fn()
-          .mockReturnValue({ orderBy: jest.fn().mockReturnValue({ limit }) }),
+        innerJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            groupBy: jest.fn().mockReturnValue({
+              orderBy: jest.fn().mockReturnValue({ limit }),
+            }),
+          }),
+        }),
+      }),
+    });
+    mockDb.select.mockReturnValueOnce({
+      from: jest.fn().mockReturnValue({
+        leftJoin: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            groupBy: jest.fn().mockReturnValue({
+              having: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  limit: jest.fn().mockResolvedValue([]),
+                }),
+              }),
+            }),
+          }),
+        }),
       }),
     });
 
@@ -581,20 +593,28 @@ describe("filmsService", () => {
     mockDb.select
       .mockReturnValueOnce({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            orderBy: jest.fn().mockReturnValue({
-              limit: jest
-                .fn()
-                .mockResolvedValue([
-                  {
-                    film_id: 1,
-                    omdb_id: "tt1",
-                    imdb_rating: "8.1",
-                    type: "movie",
-                  },
-                ]),
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  limit: jest.fn().mockResolvedValue([{ film_id: 1 }]),
+                }),
+              }),
             }),
           }),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([
+            {
+              film_id: 1,
+              omdb_id: "tt1",
+              imdb_rating: "8.1",
+              type: "movie",
+              poster_url: "https://images.example.com/tt1.jpg",
+            },
+          ]),
         }),
       })
       .mockReturnValueOnce({
@@ -605,7 +625,7 @@ describe("filmsService", () => {
         }),
       });
 
-    const result = await getTopRatedFilms(5);
+    const result = await getTopRatedFilms(1);
 
     expect(result[0].average_rating).toBeNull();
     expect(result[0].ratings_count).toBe(0);
@@ -619,6 +639,7 @@ describe("filmsService", () => {
         imdb_rating: "8.0",
         type: "movie",
         title: "A",
+        poster_url: "https://images.example.com/tt1.jpg",
       },
     ];
     const queue: unknown[] = [

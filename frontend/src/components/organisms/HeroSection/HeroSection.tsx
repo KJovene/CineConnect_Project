@@ -1,7 +1,7 @@
 import { HiStar, HiInformationCircle } from "react-icons/hi2";
 import { Badge } from "@/components/atoms";
 import { Link } from "@tanstack/react-router";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import { getHighQualityPosterUrl } from "@/features/media/utils/poster";
 import type { Film } from "@cineconnect/shared";
 
 export interface HeroSectionProps {
@@ -30,7 +30,7 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
     );
   }
 
-  const posterUrl = getPosterUrl(film.poster_url);
+  const posterUrl = getHighQualityPosterUrl(film.poster_url);
   const communityRating =
     typeof film.average_rating === "number" && film.average_rating > 0
       ? film.average_rating
@@ -41,14 +41,14 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
       : null;
 
   return (
-    <div
-      className="relative w-full h-128 flex items-end"
-      style={{
-        backgroundImage: `url("${posterUrl}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="relative w-full h-128 flex items-end overflow-hidden bg-neutral-900">
+      <img
+        src={posterUrl}
+        alt={film.title}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+        loading="eager"
+        decoding="async"
+      />
       <div
         className="absolute inset-0"
         style={{
