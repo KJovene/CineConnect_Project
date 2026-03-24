@@ -104,7 +104,7 @@ export function DangerPasswordSection({
           color: "rgb(252, 165, 165)",
         }}
       >
-        {isFormVisible ? "Annuler" : "Changer son mot de passe"}
+        {isFormVisible ? "Annuler" : "Changer votre mot de passe"}
       </button>
 
       {isFormVisible && (
