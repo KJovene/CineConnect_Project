@@ -29,7 +29,7 @@ docker-compose logs -f
 
 - ✅ Frontend: http://localhost:5173
 - ✅ Backend: http://localhost:3000
-- ✅ PostgreSQL: localhost:5432
+- ✅ PostgreSQL: localhost:5433
 - ✅ Redis: localhost:6379
 
 ## Commandes principales
