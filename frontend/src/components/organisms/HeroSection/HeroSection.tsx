@@ -39,6 +39,12 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
     communityRating !== null
       ? (Math.round(communityRating * 10) / 10).toFixed(1)
       : null;
+  const titleSizeClass =
+    film.title.length > 30
+      ? "text-3xl md:text-4xl lg:text-5xl"
+      : film.title.length > 20
+        ? "text-4xl md:text-5xl lg:text-6xl"
+        : "text-5xl md:text-6xl lg:text-7xl";
 
   return (
     <div className="relative w-full h-128 flex items-end overflow-hidden bg-neutral-900">
@@ -81,7 +87,9 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
           </span>
         </div>
 
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl">
+        <h1
+          className={`${titleSizeClass} whitespace-nowrap font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl`}
+        >
           {film.title}
         </h1>
 

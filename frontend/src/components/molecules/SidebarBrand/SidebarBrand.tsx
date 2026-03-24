@@ -1,8 +1,10 @@
 import { HiOutlinePlayCircle } from "react-icons/hi2";
+import { Link } from "@tanstack/react-router";
 
 export function SidebarBrand() {
   return (
-    <div
+    <Link
+      to="/"
       className="h-20 flex items-center justify-center lg:justify-start lg:px-6 shrink-0"
       style={{ borderBottom: "1px solid var(--color-border)" }}
     >
@@ -31,6 +33,6 @@ export function SidebarBrand() {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
