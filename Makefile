@@ -52,7 +52,6 @@ up: ## Démarrer tous les services en arrière-plan
 	@echo "Frontend: http://localhost:5173"
 	@echo "Backend:  http://localhost:3000"
 	@echo "PostgreSQL: localhost:5432"
-	@echo "Redis: localhost:6379"
 
 start: up ## Alias pour 'up'
 
@@ -133,10 +132,6 @@ shell-frontend: ## Accéder au shell du conteneur frontend
 shell-db: ## Accéder au shell PostgreSQL
 	@echo "$(GREEN)Connexion à PostgreSQL...$(NC)"
 	@$(DOCKER_COMPOSE) exec postgres psql -U postgres -d cineconnect
-
-shell-redis: ## Accéder au shell Redis
-	@echo "$(GREEN)Connexion à Redis...$(NC)"
-	@$(DOCKER_COMPOSE) exec redis redis-cli
 
 # ========================================
 # BASE DE DONNÉES

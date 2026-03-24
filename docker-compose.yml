@@ -19,15 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis
-  redis:
-    image: redis:7-alpine
-    container_name: cineconnect-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - cineconnect-network
-
   # Backend avec hot reload
   backend:
     build:
