@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HiChatBubbleLeftRight, HiArrowLeft } from "react-icons/hi2";
+import { HiChatBubbleLeftRight, HiArrowLeft, HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
@@ -20,6 +20,7 @@ const Discussion: React.FC = () => {
   const [selectedFriend, setSelectedFriend] = useState<FriendUser | null>(null);
   // "list" | "chat" — contrôle la vue active sur mobile
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const { data: friends = [], isLoading: friendsLoading } = useFriends();
   const { data: messages = [], isLoading: messagesLoading } = useMessages(
@@ -66,8 +67,9 @@ const Discussion: React.FC = () => {
       {/* liste des conversations */}
       <aside
         className={`
-          shrink-0 flex flex-col
-          w-full lg:w-72
+          shrink-0 flex flex-col overflow-hidden
+          transition-[width] duration-200 ease-in-out
+          w-full ${sidebarCollapsed ? "lg:w-14" : "lg:w-72"}
           ${mobileView === "chat" ? "hidden lg:flex" : "flex"}
         `}
         style={{
@@ -75,15 +77,36 @@ const Discussion: React.FC = () => {
           borderRight: "1px solid var(--color-border)",
         }}
       >
+        {/* Header sidebar */}
         <div
-          className="px-4 py-4 shrink-0"
+          className="h-16 flex items-center justify-between shrink-0 px-3 gap-2"
           style={{ borderBottom: "1px solid var(--color-border)" }}
         >
-          <h2 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
+          <h2
+            className="text-sm font-semibold whitespace-nowrap overflow-hidden transition-opacity duration-200"
+            style={{
+              color: "var(--color-text)",
+              opacity: sidebarCollapsed ? 0 : 1,
+              maxWidth: sidebarCollapsed ? 0 : "100%",
+            }}
+          >
             Messages
           </h2>
+          <button
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            className="hidden lg:flex shrink-0 p-1.5 rounded-lg transition-colors hover:bg-white/5"
+            style={{ color: "var(--color-text-muted)" }}
+            title={sidebarCollapsed ? "Ouvrir la liste" : "Réduire la liste"}
+          >
+            {sidebarCollapsed ? <HiChevronRight size={18} /> : <HiChevronLeft size={18} />}
+          </button>
         </div>
-        <div className="flex-1 overflow-y-auto no-scrollbar">
+
+        {/* Liste */}
+        <div
+          className="flex-1 overflow-y-auto no-scrollbar transition-opacity duration-200"
+          style={{ opacity: sidebarCollapsed ? 0 : 1, pointerEvents: sidebarCollapsed ? "none" : "auto" }}
+        >
           <ConversationList
             friends={friends}
             isLoading={friendsLoading}
@@ -93,43 +116,45 @@ const Discussion: React.FC = () => {
         </div>
       </aside>
 
+      {/* Bouton retour mobile — toujours dans le flux, jamais caché avec main */}
+      {selectedFriend && mobileView === "chat" && (
+        <div
+          className="lg:hidden fixed top-20 left-0 right-0 z-10 flex items-center gap-3 px-4 shrink-0"
+          style={{
+            height: "3.5rem",
+            borderBottom: "1px solid var(--color-border)",
+            background: "var(--color-surface)",
+          }}
+        >
+          <button
+            onClick={handleBack}
+            className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            <HiArrowLeft size={20} />
+          </button>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
+            {selectedFriend.name}
+          </span>
+        </div>
+      )}
+
       {/* fenêtre de chat */}
       <main
         className={`
           flex-1 overflow-hidden flex flex-col
           ${mobileView === "list" ? "hidden lg:flex" : "flex"}
+          ${selectedFriend && mobileView === "chat" ? "lg:pt-0 pt-14" : ""}
         `}
       >
         {selectedFriend && currentUserId ? (
-          <>
-            {/* Bouton retour, visible uniquement sur mobile */}
-            <div
-              className="lg:hidden flex items-center gap-3 px-4 py-3 shrink-0"
-              style={{
-                borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface)",
-              }}
-            >
-              <button
-                onClick={handleBack}
-                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-                style={{ color: "var(--color-text-muted)" }}
-              >
-                <HiArrowLeft size={20} />
-              </button>
-              <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                {selectedFriend.name}
-              </span>
-            </div>
-
-            <ChatWindow
-              friend={selectedFriend}
-              messages={messages}
-              currentUserId={currentUserId}
-              isLoading={messagesLoading}
-              onSend={handleSend}
-            />
-          </>
+          <ChatWindow
+            friend={selectedFriend}
+            messages={messages}
+            currentUserId={currentUserId}
+            isLoading={messagesLoading}
+            onSend={handleSend}
+          />
         ) : (
           <div
             className="flex flex-col items-center justify-center h-full"
