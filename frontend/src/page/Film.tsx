@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet, useRouterState } from "@tanstack/react-router";
-import { useFilmsByGenre } from "@/hooks/useFilmsByGenre";
+import { useFilmsByCategory } from "@/hooks/useFilmsByCategory";
 import { CategoryCarousel } from "@/components/organisms";
-import type { GenreSection } from "@cineconnect/shared";
+import type { CategorySection } from "@cineconnect/shared";
 
 const Film: React.FC = () => {
   // Détecter si on est sur la route enfant /film/$id
@@ -13,7 +13,7 @@ const Film: React.FC = () => {
   });
 
   // ⚠️ Le hook doit être avant tout return conditionnel (règles de React)
-  const { data: sections, isLoading, error } = useFilmsByGenre(24);
+  const { data: sections, isLoading, error } = useFilmsByCategory(24);
 
   if (isOnDetail) return <Outlet />;
 
@@ -70,10 +70,10 @@ const Film: React.FC = () => {
         )}
 
         {sections &&
-          sections.map((section: GenreSection) => (
+          sections.map((section: CategorySection) => (
             <CategoryCarousel
-              key={section.genre}
-              genre={section.genre}
+              key={section.category.category_id}
+              genre={section.category.name}
               films={section.films}
             />
           ))}
