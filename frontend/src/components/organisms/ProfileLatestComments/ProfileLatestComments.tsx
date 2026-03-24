@@ -1,11 +1,15 @@
+import { useEffect, useMemo, useState } from "react";
 import type { LatestUserComment } from "@/features/reviews/hooks";
 import { getPosterUrl } from "@/features/media/utils/poster";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
 interface ProfileLatestCommentsProps {
   comments: LatestUserComment[];
   isLoading: boolean;
   onOpenFilm: (omdbId: string) => void;
 }
+
+const ITEMS_PER_PAGE = 5;
 
 function formatDate(dateLike?: string | null): string {
   if (!dateLike) return "-";
@@ -23,6 +27,28 @@ export function ProfileLatestComments({
   isLoading,
   onOpenFilm,
 }: ProfileLatestCommentsProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(comments.length / ITEMS_PER_PAGE);
+  const safeTotalPages = Math.max(1, totalPages);
+  const hasPrevPage = currentPage > 1;
+  const hasNextPage = currentPage < safeTotalPages;
+
+  const paginatedComments = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return comments.slice(start, end);
+  }, [comments, currentPage]);
+
+  useEffect(() => {
+    if (totalPages === 0) {
+      setCurrentPage(1);
+      return;
+    }
+
+    setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
+  }, [totalPages]);
+
   return (
     <div
       className="rounded-2xl p-5"
@@ -48,7 +74,7 @@ export function ProfileLatestComments({
         </p>
       ) : (
         <div className="space-y-2">
-          {comments.map((item) => (
+          {paginatedComments.map((item) => (
             <button
               key={item.reviewId}
               type="button"
@@ -90,6 +116,45 @@ export function ProfileLatestComments({
               </div>
             </button>
           ))}
+
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={!hasPrevPage}
+              className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              style={{
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
+              aria-label="Page précédente des commentaires"
+            >
+              <HiChevronLeft size={18} />
+            </button>
+
+            <span
+              className="text-xs"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              {currentPage} / {safeTotalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentPage((page) => Math.min(safeTotalPages, page + 1))
+              }
+              disabled={!hasNextPage}
+              className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              style={{
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
+              aria-label="Page suivante des commentaires"
+            >
+              <HiChevronRight size={18} />
+            </button>
+          </div>
         </div>
       )}
     </div>

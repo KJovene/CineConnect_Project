@@ -72,6 +72,8 @@ interface CreateFilmReplyRequest {
   comment: string;
 }
 
+const PROFILE_HISTORY_LIMIT = 100;
+
 function reviewsQueryKey(omdbId: string) {
   return ["films", omdbId, "reviews"] as const;
 }
@@ -96,7 +98,9 @@ export function useMyLatestRatings() {
   return useQuery({
     queryKey: latestRatingsQueryKey(),
     queryFn: () =>
-      apiClient.get<LatestUserRating[]>("/users/me/latest-ratings"),
+      apiClient.get<LatestUserRating[]>(
+        `/users/me/latest-ratings?limit=${PROFILE_HISTORY_LIMIT}`,
+      ),
   });
 }
 
@@ -104,7 +108,9 @@ export function useMyLatestComments() {
   return useQuery({
     queryKey: latestCommentsQueryKey(),
     queryFn: () =>
-      apiClient.get<LatestUserComment[]>("/users/me/latest-comments"),
+      apiClient.get<LatestUserComment[]>(
+        `/users/me/latest-comments?limit=${PROFILE_HISTORY_LIMIT}`,
+      ),
   });
 }
 

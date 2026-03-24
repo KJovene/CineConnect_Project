@@ -283,39 +283,18 @@ export async function createFilmComment(params: {
   if (!comment) throw new Error("Le commentaire ne peut pas être vide");
 
   const optionalRating = normalizeOptionalRating(params.rating);
-  const existingParent = await getParentReviewByUserAndFilm({
-    userId: params.userId,
-    filmId,
-  });
+  const [inserted] = await db
+    .insert(reviews)
+    .values({
+      user_id: params.userId,
+      film_id: filmId,
+      parent_review_id: null,
+      rating: optionalRating ?? 0,
+      comment,
+    })
+    .returning({ review_id: reviews.review_id });
 
-  let reviewId: number;
-
-  if (existingParent) {
-    await db
-      .update(reviews)
-      .set({
-        comment,
-        rating:
-          optionalRating !== null ? optionalRating : existingParent.rating,
-        updated_at: new Date(),
-      })
-      .where(eq(reviews.review_id, existingParent.review_id));
-
-    reviewId = existingParent.review_id;
-  } else {
-    const [inserted] = await db
-      .insert(reviews)
-      .values({
-        user_id: params.userId,
-        film_id: filmId,
-        parent_review_id: null,
-        rating: optionalRating ?? 0,
-        comment,
-      })
-      .returning({ review_id: reviews.review_id });
-
-    reviewId = inserted.review_id;
-  }
+  const reviewId = inserted.review_id;
 
   const created = await getReviewWithAuthorById(reviewId);
   if (!created) {
@@ -408,6 +387,16 @@ export async function getLatestCommunityReviews(
     .select({
       review_id: reviews.review_id,
       rating: reviews.rating,
+      effective_rating: sql<number | null>`(
+        select r2.rating
+        from "reviews" r2
+        where r2.user_id = ${reviews.user_id}
+          and r2.film_id = ${reviews.film_id}
+          and r2.parent_review_id is null
+          and r2.rating > 0
+        order by coalesce(r2.updated_at, r2.created_at) desc
+        limit 1
+      )`,
       comment: reviews.comment,
       created_at: reviews.created_at,
       user_id: user.id,
@@ -422,8 +411,15 @@ export async function getLatestCommunityReviews(
     .where(
       and(
         isNull(reviews.parent_review_id),
-        sql`${reviews.rating} > 0`,
         sql`coalesce(length(trim(${reviews.comment})), 0) > 0`,
+        sql`exists (
+          select 1
+          from "reviews" r2
+          where r2.user_id = ${reviews.user_id}
+            and r2.film_id = ${reviews.film_id}
+            and r2.parent_review_id is null
+            and r2.rating > 0
+        )`,
       ),
     )
     .orderBy(desc(reviews.created_at))
@@ -431,7 +427,7 @@ export async function getLatestCommunityReviews(
 
   return rows.map((row) => ({
     reviewId: row.review_id,
-    rating: row.rating,
+    rating: row.effective_rating ?? row.rating,
     comment: row.comment ?? "",
     createdAt: row.created_at ? row.created_at.toISOString() : null,
     author: {
