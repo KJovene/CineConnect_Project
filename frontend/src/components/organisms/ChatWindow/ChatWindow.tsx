@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { HiPaperAirplane } from 'react-icons/hi2';
+import { HiPaperAirplane, HiArrowLeft } from 'react-icons/hi2';
 import { Avatar } from '@/components/atoms';
 import type { FriendUser } from '@/features/friends/hooks';
 import type { Message } from '@/features/messages/hooks';
@@ -10,6 +10,7 @@ export interface ChatWindowProps {
   currentUserId: number;
   isLoading?: boolean;
   onSend: (content: string) => void;
+  onBack?: () => void;
 }
 
 function formatTime(sentAt: string | null): string {
@@ -107,7 +108,6 @@ function MyBubble({ msg, isLast }: { msg: Message; isLast: boolean }) {
   return (
     <div className="flex w-full justify-end">
       <div className="flex flex-col items-end gap-1 max-w-[65%]">
-        {/* Bulle indigo — gardée, couleur d'accentuation */}
         <div className="bg-indigo-600 text-white px-4 py-2.5 text-sm leading-relaxed break-words rounded-2xl rounded-tr-md shadow-lg shadow-indigo-950/50">
           {msg.content}
         </div>
@@ -131,6 +131,7 @@ export function ChatWindow({
   currentUserId,
   isLoading,
   onSend,
+  onBack,
 }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -176,14 +177,18 @@ export function ChatWindow({
           >
             {friend.name ?? 'Utilisateur'}
           </p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>
-              En ligne
-            </span>
-          </div>
         </div>
+
+        <button
+          onClick={onBack}
+          className="lg:hidden p-1.5 rounded-lg transition-colors hover:bg-white/5"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          <HiArrowLeft size={20} />
+        </button>
       </div>
+
+      
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-6">
