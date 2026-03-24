@@ -68,6 +68,14 @@ const Profil: React.FC = () => {
     navigate({ to: "/discussion", search: { friendId: String(friend.id) } });
   };
 
+  const handleRemoveFriend = (friend: FriendUser) => {
+    const shouldRemove = window.confirm(
+      `Retirer ${friend.name ?? "cet utilisateur"} de vos amis ?`,
+    );
+    if (!shouldRemove) return;
+    removeFriend.mutate(friend.id);
+  };
+
   const currentUser = session?.user;
 
   const formatDate = (dateLike?: string | Date) => {
@@ -380,7 +388,7 @@ const Profil: React.FC = () => {
           isLoading={friendsLoading}
           onAccept={(uid) => acceptRequest.mutate(uid)}
           onReject={(uid) => rejectRequest.mutate(uid)}
-          onRemove={(uid) => removeFriend.mutate(uid)}
+          onRemove={handleRemoveFriend}
           onMessage={handleMessage}
         />
       </section>
