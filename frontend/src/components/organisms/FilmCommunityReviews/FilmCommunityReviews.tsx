@@ -38,7 +38,8 @@ function formatCommentDate(value: string | null): string {
 
 export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   const { data: session } = useSession();
-  const { data: reviews = [], isLoading: reviewsLoading } = useFilmReviews(omdbId);
+  const { data: reviews = [], isLoading: reviewsLoading } =
+    useFilmReviews(omdbId);
   const { data: ratingSummary } = useFilmRatingSummary(omdbId);
   const createComment = useCreateFilmComment(omdbId);
   const createReply = useCreateFilmReply(omdbId);
@@ -54,7 +55,9 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   }, [session?.user?.id]);
 
   const [newComment, setNewComment] = useState("");
-  const [localRatingOverride, setLocalRatingOverride] = useState<number | null>(null);
+  const [localRatingOverride, setLocalRatingOverride] = useState<number | null>(
+    null,
+  );
   const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
@@ -77,10 +80,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   const handleCreateComment = async () => {
     const comment = newComment.trim();
     if (!comment) return;
-    await createComment.mutateAsync({
-      comment,
-      rating: selectedRating > 0 ? selectedRating : undefined,
-    });
+    await createComment.mutateAsync({ comment });
     setNewComment("");
   };
 
@@ -93,7 +93,10 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
   const handleCreateReply = async (parentReviewId: number) => {
     const comment = replyText.trim();
     if (!comment) return;
-    await createReply.mutateAsync({ reviewId: parentReviewId, payload: { comment } });
+    await createReply.mutateAsync({
+      reviewId: parentReviewId,
+      payload: { comment },
+    });
     setReplyTargetId(null);
     setReplyText("");
   };
@@ -150,10 +153,16 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
+              <p
+                className="text-sm font-medium"
+                style={{ color: "var(--color-text)" }}
+              >
                 {item.author.name}
               </p>
-              <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 {formatCommentDate(item.createdAt)}
               </span>
             </div>
@@ -179,7 +188,10 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setEditingReviewId(null); setEditingText(""); }}
+                    onClick={() => {
+                      setEditingReviewId(null);
+                      setEditingText("");
+                    }}
                     className="rounded-lg px-3 py-1.5 text-xs cursor-pointer"
                     style={{
                       border: "1px solid var(--color-border)",
@@ -225,7 +237,9 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
               <button
                 type="button"
                 onClick={() =>
-                  setOpenedMenuId((prev) => prev === item.reviewId ? null : item.reviewId)
+                  setOpenedMenuId((prev) =>
+                    prev === item.reviewId ? null : item.reviewId,
+                  )
                 }
                 className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition-colors cursor-pointer"
                 style={{ color: "var(--color-text-muted)" }}
@@ -282,7 +296,6 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
       </div>
 
       <div className="space-y-6">
-
         {/* Bloc note */}
         <div
           className="rounded-2xl p-4 md:p-5"
@@ -296,8 +309,12 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
               <p className="text-sm" style={{ color: "var(--color-text)" }}>
                 Votre note
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                Une seule note par film, vous pouvez la modifier quand vous voulez.
+              <p
+                className="text-xs"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Une seule note par film, vous pouvez la modifier quand vous
+                voulez.
               </p>
             </div>
 
@@ -314,13 +331,20 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   >
                     <HiStar
                       size={24}
-                      className={value <= selectedRating ? "text-amber-400" : "text-neutral-500"}
+                      className={
+                        value <= selectedRating
+                          ? "text-amber-400"
+                          : "text-neutral-500"
+                      }
                     />
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              <p
+                className="text-xs"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 Connectez-vous pour noter ce film.
               </p>
             )}
@@ -335,16 +359,20 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
             border: "1px solid var(--color-border)",
           }}
         >
-          <label className="block text-sm mb-2" style={{ color: "var(--color-text)" }}>
+          <label
+            className="block text-sm mb-2"
+            style={{ color: "var(--color-text)" }}
+          >
             Partage ton avis
           </label>
           {selectedRating === 0 && (
             <p
               className="mb-3 text-xs"
               style={{
-                color: newComment.trim().length > 0
-                  ? "#ef4444"
-                  : "var(--color-text-muted)",
+                color:
+                  newComment.trim().length > 0
+                    ? "#ef4444"
+                    : "var(--color-text-muted)",
               }}
             >
               {session?.user?.id
@@ -364,7 +392,11 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
             <button
               type="button"
               onClick={() => void handleCreateComment()}
-              disabled={createComment.isPending || !newComment.trim() || selectedRating === 0}
+              disabled={
+                createComment.isPending ||
+                !newComment.trim() ||
+                selectedRating === 0
+              }
               className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50 cursor-pointer"
             >
               Publier
@@ -373,7 +405,11 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
         </div>
 
         {/* Erreur */}
-        {(createComment.error || upsertRating.error || createReply.error || updateComment.error || deleteComment.error) && (
+        {(createComment.error ||
+          upsertRating.error ||
+          createReply.error ||
+          updateComment.error ||
+          deleteComment.error) && (
           <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">
             Une erreur est survenue pendant l'opération sur les commentaires.
           </div>
@@ -381,7 +417,10 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
 
         {/* Liste des avis */}
         {reviewsLoading ? (
-          <div className="text-center py-8" style={{ color: "var(--color-text-muted)" }}>
+          <div
+            className="text-center py-8"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             Chargement des avis...
           </div>
         ) : reviews.length === 0 ? (
@@ -425,7 +464,10 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                     <div className="mt-3 flex items-center justify-end gap-2">
                       <button
                         type="button"
-                        onClick={() => { setReplyTargetId(null); setReplyText(""); }}
+                        onClick={() => {
+                          setReplyTargetId(null);
+                          setReplyText("");
+                        }}
                         className="rounded-lg px-3 py-1.5 text-xs"
                         style={{
                           border: "1px solid var(--color-border)",
@@ -451,7 +493,9 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                     className="ml-4 md:ml-10 space-y-3 pl-4"
                     style={{ borderLeft: "1px solid var(--color-border)" }}
                   >
-                    {review.replies.map((reply) => renderReviewRow(reply, { isReply: true }))}
+                    {review.replies.map((reply) =>
+                      renderReviewRow(reply, { isReply: true }),
+                    )}
                   </div>
                 )}
               </div>
