@@ -46,11 +46,7 @@ const Home: React.FC = () => {
 
       <div className="px-8 py-8">
         {trendingFilms.length > 0 && (
-          <MediaGrid
-            title="Tendances Actuelles"
-            badge="Cette semaine"
-            movies={trendingFilms}
-          />
+          <MediaGrid title="Tendances Actuelles" movies={trendingFilms} />
         )}
         <ReviewList
           title="Derniers Avis de la communauté"
