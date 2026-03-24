@@ -7,6 +7,7 @@ import friendsRouter from "./routes/friends.js";
 import messagesRouter from "./routes/messages.js";
 import usersRouter from "./routes/users.js";
 import filmsRouter from "./routes/films.js";
+import categoriesRouter from "./routes/categories.js";
 import { initSocket } from "./socket.js";
 
 export function createApp(): express.Express {
@@ -50,6 +51,7 @@ export function createApp(): express.Express {
   app.use("/api/messages", messagesRouter);
   app.use("/api/users", usersRouter);
   app.use("/api/films", filmsRouter);
+  app.use("/api/categories", categoriesRouter);
 
   return app;
 }

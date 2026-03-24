@@ -1,5 +1,5 @@
 import { db } from "../db/index.js";
-import { films, reviews } from "../db/schema.js";
+import { films, reviews, categories, filmsCategories } from "../db/schema.js";
 import {
   and,
   eq,
@@ -180,6 +180,39 @@ async function fetchOmdbDetail(imdbId: string): Promise<OmdbDetail> {
   return await res.json();
 }
 
+// Lie un film à ses catégories (crée la catégorie si elle n'existe pas encore)
+async function linkFilmCategories(
+  filmId: number,
+  genreString: string,
+): Promise<void> {
+  const genres = genreString
+    .split(",")
+    .map((g) => g.trim())
+    .filter(Boolean);
+
+  for (const genre of genres) {
+    // Trouver ou créer la catégorie
+    let [category] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.name, genre))
+      .limit(1);
+
+    if (!category) {
+      [category] = await db
+        .insert(categories)
+        .values({ name: genre })
+        .returning();
+    }
+
+    // Lier le film à la catégorie (ignore si le lien existe déjà)
+    await db
+      .insert(filmsCategories)
+      .values({ film_id: filmId, category_id: category.category_id })
+      .onConflictDoNothing();
+  }
+}
+
 //  Sauvegarde en BDD
 async function upsertFilmFromOmdbDetail(
   omdbDetail: OmdbDetail,
@@ -212,10 +245,14 @@ async function upsertFilmFromOmdbDetail(
     })
     .returning();
 
+  if (values.genre) {
+    await linkFilmCategories(film.film_id, values.genre);
+  }
+
   return film as unknown as Film;
 }
 
-async function withCommunityRatings(items: Film[]): Promise<Film[]> {
+export async function withCommunityRatings(items: Film[]): Promise<Film[]> {
   if (items.length === 0) return items;
 
   const filmIds = items.map((film) => film.film_id);

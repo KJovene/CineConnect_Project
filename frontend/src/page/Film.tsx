@@ -1,19 +1,23 @@
 import React from "react";
 import { Outlet, useRouterState } from "@tanstack/react-router";
-import { useFilmsByGenre } from "@/hooks/useFilmsByGenre";
+import { useFilmsByCategory } from "@/hooks/useFilmsByCategory";
 import { CategoryCarousel } from "@/components/organisms";
-import type { GenreSection } from "@cineconnect/shared";
+import type { CategorySection } from "@cineconnect/shared";
 
 const Film: React.FC = () => {
   // Détecter si on est sur la route enfant /film/$id
   // Si oui, déléguer le rendu à <Outlet /> (FilmDetail)
   const isOnDetail = useRouterState({
     select: (s) =>
-      s.matches.some((m) => m.routeId === "/_authenticated/film/$id"),
+      s.matches.some(
+        (m) =>
+          m.routeId === "/_authenticated/film/$id" ||
+          m.routeId === "/_authenticated/film/category/$categoryId",
+      ),
   });
 
   // ⚠️ Le hook doit être avant tout return conditionnel (règles de React)
-  const { data: sections, isLoading, error } = useFilmsByGenre(24);
+  const { data: sections, isLoading, error } = useFilmsByCategory(24);
 
   if (isOnDetail) return <Outlet />;
 
@@ -70,10 +74,11 @@ const Film: React.FC = () => {
         )}
 
         {sections &&
-          sections.map((section: GenreSection) => (
+          sections.map((section: CategorySection) => (
             <CategoryCarousel
-              key={section.genre}
-              genre={section.genre}
+              key={section.category.category_id}
+              categoryId={section.category.category_id}
+              genre={section.category.name}
               films={section.films}
             />
           ))}
