@@ -9,7 +9,18 @@
   --hero-gradient-from: rgba(245, 245, 245, 0);
   --hero-gradient-to: #f5f5f5;
   --color-text: #111111;
-   --color-text-muted: #888888;
+  --color-text-muted: #888888;
+  --danger-surface: rgba(220, 38, 38, 0.08);
+  --danger-border: rgba(185, 28, 28, 0.28);
+  --danger-title: #9f1239;
+  --danger-text: #881337;
+  --danger-text-muted: #9f1239;
+  --danger-button-bg: rgba(220, 38, 38, 0.12);
+  --danger-button-border: rgba(185, 28, 28, 0.38);
+  --danger-button-text: #9f1239;
+  --danger-input-border: rgba(190, 24, 93, 0.28);
+  --danger-error: #be123c;
+  --danger-success: #059669;
 }
 
 .dark {
@@ -20,6 +31,17 @@
   --hero-gradient-to: #050505;
   --color-text: #f5f5f5;
   --color-text-muted: #737373;
+  --danger-surface: rgba(220, 38, 38, 0.08);
+  --danger-border: rgba(248, 113, 113, 0.35);
+  --danger-title: #fb7185;
+  --danger-text: #fda4af;
+  --danger-text-muted: #fecdd3;
+  --danger-button-bg: rgba(220, 38, 38, 0.18);
+  --danger-button-border: rgba(248, 113, 113, 0.45);
+  --danger-button-text: #fca5a5;
+  --danger-input-border: rgba(248, 113, 113, 0.35);
+  --danger-error: #fda4af;
+  --danger-success: #6ee7b7;
 }
 
 body {

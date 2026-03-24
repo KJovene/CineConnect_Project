@@ -44,9 +44,9 @@ export function DangerDeleteAccountSection({
   return (
     <div
       className="pt-4"
-      style={{ borderTop: "1px solid rgba(248, 113, 113, 0.25)" }}
+      style={{ borderTop: "1px solid var(--danger-border)" }}
     >
-      <h3 className="text-base font-semibold text-rose-300">
+      <h3 className="text-base font-semibold" style={{ color: "var(--danger-title)" }}>
         Suppression du compte
       </h3>
 
@@ -56,16 +56,16 @@ export function DangerDeleteAccountSection({
           onClick={handleDeleteStart}
           className="mt-3 px-4 py-2 text-sm rounded-xl transition-colors cursor-pointer"
           style={{
-            background: "rgba(190, 24, 93, 0.15)",
-            border: "1px solid rgba(251, 113, 133, 0.5)",
-            color: "rgb(253, 164, 175)",
+            background: "var(--danger-button-bg)",
+            border: "1px solid var(--danger-button-border)",
+            color: "var(--danger-button-text)",
           }}
         >
           Supprimer votre compte
         </button>
       ) : (
         <div className="mt-3 space-y-3">
-          <p className="text-sm text-rose-200">
+          <p className="text-sm" style={{ color: "var(--danger-text-muted)" }}>
             Êtes-vous sûr de vouloir supprimer votre profil, cette action est
             irréversible ?
           </p>
@@ -76,9 +76,9 @@ export function DangerDeleteAccountSection({
               disabled={isDeleting}
               className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               style={{
-                background: "rgba(220, 38, 38, 0.25)",
-                border: "1px solid rgba(248, 113, 113, 0.6)",
-                color: "rgb(254, 202, 202)",
+                background: "var(--danger-button-bg)",
+                border: "1px solid var(--danger-button-border)",
+                color: "var(--danger-button-text)",
               }}
             >
               {isDeleting ? "Suppression..." : "Oui, supprimer mon compte"}
@@ -90,8 +90,8 @@ export function DangerDeleteAccountSection({
               className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               style={{
                 background: "transparent",
-                border: "1px solid rgba(248, 113, 113, 0.45)",
-                color: "rgb(254, 205, 211)",
+                border: "1px solid var(--danger-button-border)",
+                color: "var(--danger-button-text)",
               }}
             >
               Annuler
@@ -101,10 +101,14 @@ export function DangerDeleteAccountSection({
       )}
 
       {deleteError && (
-        <p className="text-xs text-rose-300 mt-2">{deleteError}</p>
+        <p className="text-xs mt-2" style={{ color: "var(--danger-error)" }}>
+          {deleteError}
+        </p>
       )}
       {deleteSuccess && (
-        <p className="text-xs text-emerald-300 mt-2">{deleteSuccess}</p>
+        <p className="text-xs mt-2" style={{ color: "var(--danger-success)" }}>
+          {deleteSuccess}
+        </p>
       )}
     </div>
   );

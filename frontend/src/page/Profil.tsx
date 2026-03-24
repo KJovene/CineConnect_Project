@@ -389,11 +389,13 @@ const Profil: React.FC = () => {
         <div
           className="p-6 rounded-2xl space-y-6"
           style={{
-            background: "rgba(220, 38, 38, 0.08)",
-            border: "1px solid rgba(248, 113, 113, 0.35)",
+            background: "var(--danger-surface)",
+            border: "1px solid var(--danger-border)",
           }}
         >
-          <h2 className="text-lg font-semibold text-rose-400">Danger</h2>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--danger-title)" }}>
+            Danger
+          </h2>
           <DangerPasswordSection onChangePassword={handleChangePassword} />
           <DangerDeleteAccountSection onDeleteAccount={handleDeleteAccount} />
         </div>

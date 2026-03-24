@@ -86,10 +86,10 @@ export function DangerPasswordSection({
 
   return (
     <div>
-      <h3 className="text-base font-semibold text-rose-300">
+      <h3 className="text-base font-semibold" style={{ color: "var(--danger-title)" }}>
         Modification du mot de passe
       </h3>
-      <p className="text-sm mt-1 text-rose-300/90">
+      <p className="text-sm mt-1" style={{ color: "var(--danger-text)" }}>
         Mettez à jour votre mot de passe en confirmant les nouveaux
         identifiants.
       </p>
@@ -99,9 +99,9 @@ export function DangerPasswordSection({
         onClick={handleToggleForm}
         className="mt-4 px-4 py-2 text-sm rounded-xl transition-colors cursor-pointer"
         style={{
-          background: "rgba(220, 38, 38, 0.18)",
-          border: "1px solid rgba(248, 113, 113, 0.45)",
-          color: "rgb(252, 165, 165)",
+          background: "var(--danger-button-bg)",
+          border: "1px solid var(--danger-button-border)",
+          color: "var(--danger-button-text)",
         }}
       >
         {isFormVisible ? "Annuler" : "Changer votre mot de passe"}
@@ -111,7 +111,8 @@ export function DangerPasswordSection({
         <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
           <div>
             <label
-              className="block text-sm mb-1 text-rose-200"
+              className="block text-sm mb-1"
+              style={{ color: "var(--danger-text-muted)" }}
               htmlFor="current-password"
             >
               Mot de passe actuel
@@ -128,7 +129,7 @@ export function DangerPasswordSection({
               className="w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-rose-400/30"
               style={{
                 background: "var(--color-surface)",
-                border: "1px solid rgba(248, 113, 113, 0.35)",
+                border: "1px solid var(--danger-input-border)",
                 color: "var(--color-text)",
               }}
             />
@@ -136,7 +137,8 @@ export function DangerPasswordSection({
 
           <div>
             <label
-              className="block text-sm mb-1 text-rose-200"
+              className="block text-sm mb-1"
+              style={{ color: "var(--danger-text-muted)" }}
               htmlFor="new-password"
             >
               Nouveau mot de passe
@@ -153,7 +155,7 @@ export function DangerPasswordSection({
               className="w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-rose-400/30"
               style={{
                 background: "var(--color-surface)",
-                border: "1px solid rgba(248, 113, 113, 0.35)",
+                border: "1px solid var(--danger-input-border)",
                 color: "var(--color-text)",
               }}
             />
@@ -161,7 +163,8 @@ export function DangerPasswordSection({
 
           <div>
             <label
-              className="block text-sm mb-1 text-rose-200"
+              className="block text-sm mb-1"
+              style={{ color: "var(--danger-text-muted)" }}
               htmlFor="confirm-new-password"
             >
               Confirmer le nouveau mot de passe
@@ -178,7 +181,7 @@ export function DangerPasswordSection({
               className="w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-rose-400/30"
               style={{
                 background: "var(--color-surface)",
-                border: "1px solid rgba(248, 113, 113, 0.35)",
+                border: "1px solid var(--danger-input-border)",
                 color: "var(--color-text)",
               }}
             />
@@ -189,16 +192,24 @@ export function DangerPasswordSection({
             disabled={isSubmitting}
             className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             style={{
-              background: "rgba(220, 38, 38, 0.18)",
-              border: "1px solid rgba(248, 113, 113, 0.45)",
-              color: "rgb(252, 165, 165)",
+              background: "var(--danger-button-bg)",
+              border: "1px solid var(--danger-button-border)",
+              color: "var(--danger-button-text)",
             }}
           >
             {isSubmitting ? "Mise à jour..." : "Modifier le mot de passe"}
           </button>
 
-          {error && <p className="text-xs text-rose-300">{error}</p>}
-          {success && <p className="text-xs text-emerald-300">{success}</p>}
+          {error && (
+            <p className="text-xs" style={{ color: "var(--danger-error)" }}>
+              {error}
+            </p>
+          )}
+          {success && (
+            <p className="text-xs" style={{ color: "var(--danger-success)" }}>
+              {success}
+            </p>
+          )}
         </form>
       )}
     </div>
