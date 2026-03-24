@@ -393,7 +393,10 @@ const Profil: React.FC = () => {
             border: "1px solid var(--danger-border)",
           }}
         >
-          <h2 className="text-lg font-semibold" style={{ color: "var(--danger-title)" }}>
+          <h2
+            className="text-lg font-semibold"
+            style={{ color: "var(--danger-title)" }}
+          >
             Danger
           </h2>
           <DangerPasswordSection onChangePassword={handleChangePassword} />

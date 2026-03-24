@@ -46,7 +46,10 @@ export function DangerDeleteAccountSection({
       className="pt-4"
       style={{ borderTop: "1px solid var(--danger-border)" }}
     >
-      <h3 className="text-base font-semibold" style={{ color: "var(--danger-title)" }}>
+      <h3
+        className="text-base font-semibold"
+        style={{ color: "var(--danger-title)" }}
+      >
         Suppression du compte
       </h3>
 

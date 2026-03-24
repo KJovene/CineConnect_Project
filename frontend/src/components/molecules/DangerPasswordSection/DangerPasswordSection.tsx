@@ -86,7 +86,10 @@ export function DangerPasswordSection({
 
   return (
     <div>
-      <h3 className="text-base font-semibold" style={{ color: "var(--danger-title)" }}>
+      <h3
+        className="text-base font-semibold"
+        style={{ color: "var(--danger-title)" }}
+      >
         Modification du mot de passe
       </h3>
       <p className="text-sm mt-1" style={{ color: "var(--danger-text)" }}>

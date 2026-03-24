@@ -49,11 +49,16 @@ body {
   background-color: var(--color-bg); /* ← remplace #050505 */
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 .glass-panel {
-  background: var(--color-surface);      /* ← remplace rgba(20,20,20,0.6) */
+  background: var(--color-surface); /* ← remplace rgba(20,20,20,0.6) */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border); /* ← remplace rgba(255,255,255,0.08) */
@@ -63,6 +68,6 @@ body {
   background: linear-gradient(
     180deg,
     var(--hero-gradient-from) 0%,
-    var(--hero-gradient-to) 100%   /* ← remplace les valeurs hardcodées */
+    var(--hero-gradient-to) 100% /* ← remplace les valeurs hardcodées */
   );
 }
