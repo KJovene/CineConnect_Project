@@ -571,11 +571,9 @@ describe("filmsService", () => {
       from: jest.fn().mockReturnValue({
         innerJoin: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
-            groupBy: jest
-              .fn()
-              .mockReturnValue({
-                orderBy: jest.fn().mockReturnValue({ limit }),
-              }),
+            groupBy: jest.fn().mockReturnValue({
+              orderBy: jest.fn().mockReturnValue({ limit }),
+            }),
           }),
         }),
       }),

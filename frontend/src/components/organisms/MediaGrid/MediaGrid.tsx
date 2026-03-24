@@ -1,4 +1,3 @@
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { Badge } from "@/components/atoms";
 import { MovieCard, type MovieCardProps } from "@/components/molecules";
 
