@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Logo } from "@/components/atoms";
-import { ThemeToggle } from "@/components/atoms/ThemeToggle";
+import { ThemeToggle } from "@/components/atoms";
 
 export interface AuthPageLayoutProps {
   title: string;

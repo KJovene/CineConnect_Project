@@ -3,7 +3,7 @@ import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
 import { AuthNavButton } from "@/components/molecules";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useNotificationsFeed } from "@/features/notifications/hooks";
-import { ThemeToggle } from "@/components/atoms/ThemeToggle";
+import { ThemeToggle } from "@/components/atoms";
 
 export interface AppHeaderProps {
   isAuthenticated: boolean;
