@@ -88,7 +88,7 @@ export function HeroSection({ film, isLoading }: HeroSectionProps) {
         </div>
 
         <h1
-          className={`${titleSizeClass} whitespace-nowrap font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl`}
+          className={`${titleSizeClass} font-semibold tracking-tighter text-white mb-6 leading-tight drop-shadow-2xl`}
         >
           {film.title}
         </h1>
