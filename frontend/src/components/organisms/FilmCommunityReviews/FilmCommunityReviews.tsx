@@ -338,6 +338,20 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
           <label className="block text-sm mb-2" style={{ color: "var(--color-text)" }}>
             Partage ton avis
           </label>
+          {selectedRating === 0 && (
+            <p
+              className="mb-3 text-xs"
+              style={{
+                color: newComment.trim().length > 0
+                  ? "#ef4444"
+                  : "var(--color-text-muted)",
+              }}
+            >
+              {session?.user?.id
+                ? "Vous devez noter ce film avant de pouvoir laisser un commentaire."
+                : "Connectez-vous et notez ce film avant de pouvoir laisser un commentaire."}
+            </p>
+          )}
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
