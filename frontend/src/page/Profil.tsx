@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { HiMagnifyingGlass } from "react-icons/hi2";
+import { HiMagnifyingGlass, HiPencilSquare } from "react-icons/hi2";
 import { useNavigate } from "@tanstack/react-router";
 import { Avatar } from "@/components/atoms";
 import {
@@ -158,12 +158,27 @@ const Profil: React.FC = () => {
           }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-            <div className="shrink-0">
+            <div className="shrink-0 relative">
               <Avatar
                 image={currentUser?.image ?? null}
                 name={currentUser?.name ?? "Utilisateur"}
                 size="xl"
               />
+              <button
+                type="button"
+                onClick={handleChoosePhoto}
+                disabled={isUpdatingPhoto}
+                className="absolute -top-1 -right-1 z-10 p-1.5 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed hover:bg-indigo-500/20 cursor-pointer"
+                style={{
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                  background: "var(--color-surface)",
+                }}
+                aria-label="Modifier la photo de profil"
+                title={isUpdatingPhoto ? "Mise à jour..." : "Modifier la photo"}
+              >
+                <HiPencilSquare size={14} />
+              </button>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -187,27 +202,13 @@ const Profil: React.FC = () => {
               </p>
             </div>
 
-            <div>
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="hidden"
-              />
-              <button
-                type="button"
-                onClick={handleChoosePhoto}
-                disabled={isUpdatingPhoto}
-                className="px-4 py-2 text-sm rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed hover:bg-indigo-500/10 hover:border-indigo-500/40 cursor-pointer"
-                style={{
-                  border: "1px solid var(--color-border)",
-                  color: "var(--color-text)",
-                }}
-              >
-                {isUpdatingPhoto ? "Mise à jour..." : "Changer la photo"}
-              </button>
-            </div>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="hidden"
+            />
           </div>
 
           {profileError && (
