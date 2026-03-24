@@ -123,7 +123,7 @@ async function upsertFilmFromOmdbDetail(omdbDetail: OmdbDetail): Promise<Film> {
   return film as unknown as Film;
 }
 
-async function withCommunityRatings(items: Film[]): Promise<Film[]> {
+export async function withCommunityRatings(items: Film[]): Promise<Film[]> {
   if (items.length === 0) return items;
 
   const filmIds = items.map((film) => film.film_id);
