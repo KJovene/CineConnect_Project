@@ -1,0 +1,42 @@
+import React from "react";
+import { HiOutlineSun, HiOutlineMoon } from "react-icons/hi2";
+
+export function ThemeToggle() {
+  const [theme, setTheme] = React.useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") || "light";
+    }
+    return "light";
+  });
+
+  React.useEffect(() => {
+    const root = window.document.body;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label="Changer le thème"
+      className="p-2 rounded-lg transition-colors hover:bg-white/5 cursor-pointer"
+      style={{
+        color: "var(--color-text-muted)"
+      }}
+    >
+      {theme === "dark" ? (
+        <HiOutlineSun size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
+      ) : (
+        <HiOutlineMoon size={20} style={{ fill: "none", strokeWidth: 1.5 }} />
+      )}
+  </button>
+  );
+}
