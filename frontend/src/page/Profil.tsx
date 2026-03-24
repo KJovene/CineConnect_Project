@@ -8,13 +8,16 @@ import {
   ProfileLatestRatings,
 } from "@/components/organisms";
 import {
+  DangerDeleteAccountSection,
   DangerPasswordSection,
   ProfileNameEditor,
   SearchUserRow,
 } from "@/components/molecules";
 import {
   changeCurrentUserPassword,
+  deleteCurrentUser,
   getSession,
+  signOut,
   updateCurrentUser,
   useSession,
 } from "@/lib/auth-client";
@@ -161,6 +164,18 @@ const Profil: React.FC = () => {
   }) => {
     await changeCurrentUserPassword(payload);
     await getSession();
+  };
+
+  const handleDeleteAccount = async () => {
+    await deleteCurrentUser();
+
+    try {
+      await signOut();
+    } catch {
+      // Le compte peut deja etre supprime cote serveur.
+    }
+
+    navigate({ to: "/login" });
   };
 
   return (
@@ -370,7 +385,19 @@ const Profil: React.FC = () => {
         />
       </section>
 
-      <DangerPasswordSection onChangePassword={handleChangePassword} />
+      <section className="mt-10">
+        <div
+          className="p-6 rounded-2xl space-y-6"
+          style={{
+            background: "rgba(220, 38, 38, 0.08)",
+            border: "1px solid rgba(248, 113, 113, 0.35)",
+          }}
+        >
+          <h2 className="text-lg font-semibold text-rose-400">Danger</h2>
+          <DangerPasswordSection onChangePassword={handleChangePassword} />
+          <DangerDeleteAccountSection onDeleteAccount={handleDeleteAccount} />
+        </div>
+      </section>
     </div>
   );
 };

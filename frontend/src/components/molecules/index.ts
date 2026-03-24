@@ -12,3 +12,4 @@ export * from "./SearchUserRow";
 export * from "./ConversationList";
 export * from "./ProfileNameEditor";
 export * from "./DangerPasswordSection";
+export * from "./DangerDeleteAccountSection";
