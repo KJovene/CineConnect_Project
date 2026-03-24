@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { MovieCard } from "@/components/molecules";
@@ -16,8 +16,15 @@ export interface CategoryCarouselProps {
  */
 export function CategoryCarousel({ categoryId, genre, films }: CategoryCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
+  }, []);
 
   /** Met à jour l'état des boutons de navigation */
   const updateScrollState = useCallback(() => {
@@ -37,7 +44,8 @@ export function CategoryCarousel({ categoryId, genre, films }: CategoryCarouselP
         left: direction === "right" ? el.clientWidth : -el.clientWidth,
         behavior: "smooth",
       });
-      setTimeout(updateScrollState, 350);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(updateScrollState, 350);
     },
     [updateScrollState],
   );

@@ -72,9 +72,10 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
     const targetId = window.location.hash.slice(1);
     const target = document.getElementById(targetId);
     if (!target) return;
-    window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 80);
+    return () => window.clearTimeout(timer);
   }, [reviews, reviewsLoading]);
 
   const handleCreateComment = async () => {
@@ -180,7 +181,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => void handleSaveEdit(item.reviewId)}
+                    onClick={() => handleSaveEdit(item.reviewId).catch(console.error)}
                     disabled={updateComment.isPending || !editingText.trim()}
                     className="rounded-lg bg-white text-black px-3 py-1.5 text-xs font-semibold disabled:opacity-50 cursor-pointer"
                   >
@@ -266,7 +267,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => void handleDelete(item.reviewId)}
+                    onClick={() => handleDelete(item.reviewId).catch(console.error)}
                     className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <HiTrash size={14} />
@@ -324,7 +325,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   <button
                     key={value}
                     type="button"
-                    onClick={() => void handleRateFilm(value)}
+                    onClick={() => handleRateFilm(value).catch(console.error)}
                     disabled={upsertRating.isPending}
                     className="rounded-md p-1 transition hover:bg-white/10 disabled:opacity-50 cursor-pointer"
                     aria-label={`Noter ${value} sur 5`}
@@ -391,7 +392,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
           <div className="mt-3 flex justify-end">
             <button
               type="button"
-              onClick={() => void handleCreateComment()}
+              onClick={() => handleCreateComment().catch(console.error)}
               disabled={
                 createComment.isPending ||
                 !newComment.trim() ||
@@ -478,7 +479,7 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => void handleCreateReply(review.reviewId)}
+                        onClick={() => handleCreateReply(review.reviewId).catch(console.error)}
                         disabled={createReply.isPending || !replyText.trim()}
                         className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black disabled:opacity-50"
                       >

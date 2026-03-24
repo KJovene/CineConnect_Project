@@ -19,6 +19,13 @@ export function AppHeader({
   const navigate = useNavigate();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement | null>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
+  }, []);
   const { notifications, unreadCount, markAsRead, markAllAsRead } =
     useNotificationsFeed();
 
@@ -48,7 +55,8 @@ export function AppHeader({
 
     if (target.kind === "friend-request") {
       await navigate({ to: "/profil" });
-      window.setTimeout(() => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = window.setTimeout(() => {
         window.location.hash = "friends-section";
         document
           .getElementById("friends-section")
@@ -66,7 +74,8 @@ export function AppHeader({
     }
 
     await navigate({ to: "/film/$id", params: { id: target.omdbId } });
-    window.setTimeout(() => {
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = window.setTimeout(() => {
       const elementId = `comment-${target.parentReviewId}`;
       window.location.hash = elementId;
       document
@@ -104,6 +113,7 @@ export function AppHeader({
         <div className="relative" ref={notificationsRef}>
           <button
             type="button"
+            aria-label="Notifications"
             onClick={() => setIsNotificationsOpen((previous) => !previous)}
             className="relative p-2 transition-colors cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
@@ -159,7 +169,7 @@ export function AppHeader({
                     <button
                       key={notification.id}
                       type="button"
-                      onClick={() => void handleNotificationClick(notification.id)}
+                      onClick={() => handleNotificationClick(notification.id).catch(console.error)}
                       className={`w-full text-left px-4 py-3 transition-colors ${
                         notification.isRead
                           ? "bg-transparent hover:bg-white/5"

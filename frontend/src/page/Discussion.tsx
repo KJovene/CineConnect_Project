@@ -15,7 +15,7 @@ import { connectSocket, disconnectSocket } from "@/lib/socket";
 const Discussion: React.FC = () => {
   const search = useSearch({ from: "/_authenticated/discussion" });
   const { data: session } = useSession();
-  const currentUserId = session?.user ? parseInt(session.user.id) : null;
+  const currentUserId = session?.user ? Number.parseInt(session.user.id, 10) : null;
 
   const [selectedFriend, setSelectedFriend] = useState<FriendUser | null>(null);
   // "list" | "chat" — contrôle la vue active sur mobile
