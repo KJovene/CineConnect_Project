@@ -239,14 +239,87 @@ export async function getFilmDetail(omdbId: string): Promise<Film | null> {
 }
 
 export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
-  const result = await db
-    .select()
-    .from(films)
-    .where(and(isNotNull(films.imdb_rating), eq(films.type, "movie")))
-    .orderBy(desc(films.imdb_rating))
-    .limit(limit);
+  const safeLimit =
+    Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 10;
 
-  return withCommunityRatings(result as unknown as Film[]);
+  const ratedRows = await db
+    .select({ film_id: films.film_id })
+    .from(films)
+    .innerJoin(
+      reviews,
+      and(
+        eq(reviews.film_id, films.film_id),
+        isNull(reviews.parent_review_id),
+        sql`${reviews.rating} > 0`,
+      ),
+    )
+    .where(eq(films.type, "movie"))
+    .groupBy(films.film_id)
+    .orderBy(
+      desc(sql`avg(${reviews.rating})`),
+      desc(sql`count(*)`),
+      desc(films.imdb_rating),
+    )
+    .limit(safeLimit);
+
+  const ratedIds = ratedRows.map((row) => row.film_id);
+
+  let orderedFilms: Film[] = [];
+  if (ratedIds.length > 0) {
+    const ratedFilms = await db
+      .select()
+      .from(films)
+      .where(inArray(films.film_id, ratedIds));
+
+    const ratedById = new Map(
+      (ratedFilms as unknown as Film[]).map((film) => [film.film_id, film]),
+    );
+
+    orderedFilms = ratedIds
+      .map((filmId) => ratedById.get(filmId))
+      .filter(Boolean) as Film[];
+  }
+
+  const remaining = safeLimit - orderedFilms.length;
+  if (remaining > 0) {
+    const unratedRows = await db
+      .select({ film_id: films.film_id })
+      .from(films)
+      .leftJoin(
+        reviews,
+        and(
+          eq(reviews.film_id, films.film_id),
+          isNull(reviews.parent_review_id),
+          sql`${reviews.rating} > 0`,
+        ),
+      )
+      .where(eq(films.type, "movie"))
+      .groupBy(films.film_id)
+      .having(sql`count(${reviews.review_id}) = 0`)
+      .orderBy(desc(films.imdb_rating), desc(films.updated_at))
+      .limit(remaining);
+
+    const unratedIds = unratedRows.map((row) => row.film_id);
+
+    if (unratedIds.length > 0) {
+      const unratedFilms = await db
+        .select()
+        .from(films)
+        .where(inArray(films.film_id, unratedIds));
+
+      const unratedById = new Map(
+        (unratedFilms as unknown as Film[]).map((film) => [film.film_id, film]),
+      );
+
+      const orderedUnrated = unratedIds
+        .map((filmId) => unratedById.get(filmId))
+        .filter(Boolean) as Film[];
+
+      orderedFilms = [...orderedFilms, ...orderedUnrated];
+    }
+  }
+
+  return withCommunityRatings(orderedFilms);
 }
 
 /**
