@@ -3,7 +3,7 @@ import type { LatestUserRating } from "@/features/reviews/hooks";
 import { getPosterUrl } from "@/features/media/utils/poster";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-interface ProfileLatestRatingsProps {
+export interface ProfileLatestRatingsProps {
   ratings: LatestUserRating[];
   isLoading: boolean;
   onOpenFilm: (omdbId: string) => void;

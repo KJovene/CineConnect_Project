@@ -22,7 +22,7 @@ import { useSession } from "@/lib/auth-client";
 
 type ReviewItem = FilmReviewComment | ReviewReply;
 
-interface FilmCommunityReviewsProps {
+export interface FilmCommunityReviewsProps {
   omdbId: string;
 }
 

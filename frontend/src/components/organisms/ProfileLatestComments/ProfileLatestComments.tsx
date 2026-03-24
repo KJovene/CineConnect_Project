@@ -3,7 +3,7 @@ import type { LatestUserComment } from "@/features/reviews/hooks";
 import { getPosterUrl } from "@/features/media/utils/poster";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-interface ProfileLatestCommentsProps {
+export interface ProfileLatestCommentsProps {
   comments: LatestUserComment[];
   isLoading: boolean;
   onOpenFilm: (omdbId: string) => void;
