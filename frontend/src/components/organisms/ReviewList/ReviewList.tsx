@@ -88,8 +88,8 @@ export function ReviewList({
                 />
               </div>
             ))
-          : reviews.map((review, index) => (
-              <ReviewCard key={index} {...review} />
+          : reviews.map((review) => (
+              <ReviewCard key={`${review.movie}-${review.name}-${review.commentedAt}`} {...review} />
             ))}
 
         {onWriteReview && (

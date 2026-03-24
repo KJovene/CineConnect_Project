@@ -55,7 +55,7 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
 
         <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto no-scrollbar">
           {sections.map((section, index) => (
-            <div key={index}>
+            <div key={section.title}>
               <div
                 className="text-[10px] font-semibold uppercase tracking-widest mb-3 px-3"
                 style={{ color: "var(--color-text-muted)" }}
