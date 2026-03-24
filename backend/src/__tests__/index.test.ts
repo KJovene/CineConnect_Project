@@ -4,7 +4,7 @@ const listenMock = jest.fn((_port, cb) => {
   return undefined;
 });
 const fakeServer = { listen: listenMock };
-const createHttpServerMock = jest.fn(() => fakeServer);
+const createHttpServerMock = jest.fn((_app: unknown) => fakeServer);
 
 jest.mock("../app.js", () => ({
   createApp: () => createAppMock(),
