@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HiChatBubbleLeftRight, HiArrowLeft } from "react-icons/hi2";
+import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
@@ -101,35 +101,14 @@ const Discussion: React.FC = () => {
         `}
       >
         {selectedFriend && currentUserId ? (
-          <>
-            {/* Bouton retour, visible uniquement sur mobile */}
-            <div
-              className="lg:hidden flex items-center gap-3 px-4 py-3 shrink-0"
-              style={{
-                borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface)",
-              }}
-            >
-              <button
-                onClick={handleBack}
-                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-                style={{ color: "var(--color-text-muted)" }}
-              >
-                <HiArrowLeft size={20} />
-              </button>
-              <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                {selectedFriend.name}
-              </span>
-            </div>
-
-            <ChatWindow
-              friend={selectedFriend}
-              messages={messages}
-              currentUserId={currentUserId}
-              isLoading={messagesLoading}
-              onSend={handleSend}
-            />
-          </>
+          <ChatWindow
+            friend={selectedFriend}
+            messages={messages}
+            currentUserId={currentUserId}
+            isLoading={messagesLoading}
+            onSend={handleSend}
+            onBack={handleBack}
+          />
         ) : (
           <div
             className="flex flex-col items-center justify-center h-full"
