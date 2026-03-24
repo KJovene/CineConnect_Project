@@ -1,9 +1,11 @@
 import { useRef, useState, useCallback } from "react";
+import { Link } from "@tanstack/react-router";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { MovieCard } from "@/components/molecules";
 import type { Film } from "@cineconnect/shared";
 
 export interface CategoryCarouselProps {
+  categoryId: number;
   genre: string;
   films: Film[];
 }
@@ -12,7 +14,7 @@ export interface CategoryCarouselProps {
  * Carousel horizontal pour une catégorie de films.
  * Affiche ~8 films visibles et permet de naviguer par groupe.
  */
-export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
+export function CategoryCarousel({ categoryId, genre, films }: CategoryCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -45,12 +47,15 @@ export function CategoryCarousel({ genre, films }: CategoryCarouselProps) {
   return (
     <section className="mb-10 md:mb-14">
       <div className="flex items-center justify-between mb-4 md:mb-6">
-        <h2
-          className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight"
+        <Link
+          to="/film/category/$categoryId"
+          params={{ categoryId: String(categoryId) }}
+          search={{ name: genre }}
+          className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight hover:underline"
           style={{ color: "var(--color-text)" }}
         >
           {genre}
-        </h2>
+        </Link>
 
         <div className="flex gap-2">
           <button

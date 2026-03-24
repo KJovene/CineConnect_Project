@@ -9,7 +9,11 @@ const Film: React.FC = () => {
   // Si oui, déléguer le rendu à <Outlet /> (FilmDetail)
   const isOnDetail = useRouterState({
     select: (s) =>
-      s.matches.some((m) => m.routeId === "/_authenticated/film/$id"),
+      s.matches.some(
+        (m) =>
+          m.routeId === "/_authenticated/film/$id" ||
+          m.routeId === "/_authenticated/film/category/$categoryId",
+      ),
   });
 
   // ⚠️ Le hook doit être avant tout return conditionnel (règles de React)
@@ -73,6 +77,7 @@ const Film: React.FC = () => {
           sections.map((section: CategorySection) => (
             <CategoryCarousel
               key={section.category.category_id}
+              categoryId={section.category.category_id}
               genre={section.category.name}
               films={section.films}
             />
