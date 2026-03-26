@@ -1,5 +1,5 @@
 import { RatingStars } from "@/components/atoms";
-import { getHighQualityPosterUrl } from "@/media/utils/poster";
+import { getHighQualityPosterUrl } from "@/utils/poster";
 
 export interface FilmDetailMovie {
   title: string;
