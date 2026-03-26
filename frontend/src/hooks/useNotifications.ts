@@ -4,12 +4,9 @@ import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/lib/apiClient";
 import { usePendingRequests } from "@/hooks/useFriends";
 
-export type AppNotificationType =
-  | "friend-request"
-  | "message"
-  | "comment-reply";
+type AppNotificationType = "friend-request" | "message" | "comment-reply";
 
-export interface AppNotification {
+interface AppNotification {
   id: string;
   type: AppNotificationType;
   title: string;

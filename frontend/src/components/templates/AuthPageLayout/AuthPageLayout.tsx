@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Logo, ThemeToggle } from "@/components/atoms";
 
-export interface AuthPageLayoutProps {
+interface AuthPageLayoutProps {
   title: string;
   children: ReactNode;
   footer?: ReactNode;

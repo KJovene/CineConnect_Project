@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { getHighQualityPosterUrl } from "@/utils/poster";
 import type { Film } from "@cineconnect/shared";
 
-export interface HeroSectionProps {
+interface HeroSectionProps {
   film?: Film;
   isLoading?: boolean;
 }

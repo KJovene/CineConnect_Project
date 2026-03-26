@@ -1,7 +1,7 @@
 import { HiArrowRight, HiOutlinePencil } from "react-icons/hi2";
 import { ReviewCard, type ReviewCardProps } from "@/components/molecules";
 
-export interface ReviewListProps {
+interface ReviewListProps {
   title: string;
   reviews: ReviewCardProps[];
   isLoading?: boolean;
@@ -74,9 +74,18 @@ export function ReviewList({
                   style={{ background: "var(--color-border)" }}
                 />
                 <div className="space-y-2 mb-4">
-                  <div className="h-3 w-full rounded" style={{ background: "var(--color-border)" }} />
-                  <div className="h-3 w-5/6 rounded" style={{ background: "var(--color-border)" }} />
-                  <div className="h-3 w-4/6 rounded" style={{ background: "var(--color-border)" }} />
+                  <div
+                    className="h-3 w-full rounded"
+                    style={{ background: "var(--color-border)" }}
+                  />
+                  <div
+                    className="h-3 w-5/6 rounded"
+                    style={{ background: "var(--color-border)" }}
+                  />
+                  <div
+                    className="h-3 w-4/6 rounded"
+                    style={{ background: "var(--color-border)" }}
+                  />
                 </div>
 
                 <div
@@ -89,7 +98,10 @@ export function ReviewList({
               </div>
             ))
           : reviews.map((review) => (
-              <ReviewCard key={`${review.movie}-${review.name}-${review.commentedAt}`} {...review} />
+              <ReviewCard
+                key={`${review.movie}-${review.name}-${review.commentedAt}`}
+                {...review}
+              />
             ))}
 
         {onWriteReview && (

@@ -6,7 +6,7 @@ import {
   type SidebarUser,
 } from "@/components/organisms";
 
-export interface AppLayoutProps {
+interface AppLayoutProps {
   children: React.ReactNode;
   sidebarSections: SidebarNavSection[];
   user: SidebarUser;

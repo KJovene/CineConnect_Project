@@ -3,7 +3,7 @@ import { SidebarBrand, UserCard } from "@/components/molecules";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Avatar } from "@/components/atoms";
 
-export interface SidebarNavItem {
+interface SidebarNavItem {
   id: string;
   icon: React.ReactNode;
   label: string;
@@ -23,7 +23,7 @@ export interface SidebarUser {
   avatar: string | null;
 }
 
-export interface SidebarProps {
+interface SidebarProps {
   sections: SidebarNavSection[];
   user: SidebarUser;
   onUserClick?: () => void;
@@ -141,18 +141,18 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
           </Link>
         ))}
 
-          <Link
-            to="/profil"
-            className="flex flex-col items-center justify-center gap-1 flex-1 py-2 rounded-lg transition-all"
-            style={{
-              color: isItemActive("/profil")
-                ? "var(--color-text)"
-                : "var(--color-text-muted)",
-            }}
-          >
-            <Avatar image={user.avatar} name={user.name} size="sm" />
-            <span className="text-[10px] font-medium truncate">Profil</span>
-          </Link>
+        <Link
+          to="/profil"
+          className="flex flex-col items-center justify-center gap-1 flex-1 py-2 rounded-lg transition-all"
+          style={{
+            color: isItemActive("/profil")
+              ? "var(--color-text)"
+              : "var(--color-text-muted)",
+          }}
+        >
+          <Avatar image={user.avatar} name={user.name} size="sm" />
+          <span className="text-[10px] font-medium truncate">Profil</span>
+        </Link>
       </nav>
     </>
   );
