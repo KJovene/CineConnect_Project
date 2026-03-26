@@ -9,7 +9,7 @@ export const authClient = createAuthClient({
   },
 });
 
-export const { signIn, signUp, signOut, useSession, getSession } = authClient;
+export const { signOut, useSession, getSession } = authClient;
 
 interface UpdateCurrentUserInput {
   name?: string;
