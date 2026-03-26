@@ -1,0 +1,1 @@
+export { FilmDetailHeader } from "./FilmDetailHeader";

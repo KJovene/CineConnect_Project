@@ -1,0 +1,123 @@
+import { useRef, useState, useCallback, useEffect } from "react";
+import { Link } from "@tanstack/react-router";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import { MovieCard } from "@/components/molecules";
+import type { Film } from "@cineconnect/shared";
+
+interface CategoryCarouselProps {
+  categoryId: number;
+  genre: string;
+  films: Film[];
+}
+
+/**
+ * Carousel horizontal pour une catégorie de films.
+ * Affiche ~8 films visibles et permet de naviguer par groupe.
+ */
+export function CategoryCarousel({
+  categoryId,
+  genre,
+  films,
+}: CategoryCarouselProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
+  }, []);
+
+  /** Met à jour l'état des boutons de navigation */
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  /** Scroll par blocs de la largeur visible */
+  const scroll = useCallback(
+    (direction: "left" | "right") => {
+      const el = scrollRef.current;
+      if (!el) return;
+      el.scrollBy({
+        left: direction === "right" ? el.clientWidth : -el.clientWidth,
+        behavior: "smooth",
+      });
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(updateScrollState, 350);
+    },
+    [updateScrollState],
+  );
+
+  if (films.length === 0) return null;
+
+  return (
+    <section className="mb-10 md:mb-14">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
+        <Link
+          to="/film/category/$categoryId"
+          params={{ categoryId: String(categoryId) }}
+          search={{ name: genre }}
+          className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight hover:underline"
+          style={{ color: "var(--color-text)" }}
+        >
+          {genre}
+        </Link>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => scroll("left")}
+            disabled={!canScrollLeft}
+            aria-label={`Section précédente – ${genre}`}
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            <HiChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            disabled={!canScrollRight}
+            aria-label={`Section suivante – ${genre}`}
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            style={{
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            <HiChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        onScroll={updateScrollState}
+        className="flex gap-3 md:gap-4 overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar snap-x snap-mandatory"
+      >
+        {films.map((film) => (
+          <div
+            key={film.omdb_id}
+            className="shrink-0 snap-start w-[45%] sm:w-[30%] md:w-[23%] lg:w-[calc((100%-7*1rem)/8)]"
+          >
+            <MovieCard
+              omdb_id={film.omdb_id}
+              image={film.poster_url ?? ""}
+              title={film.title}
+              director={film.director ?? "Inconnu"}
+              year={film.year?.toString() ?? ""}
+              rating={film.average_rating ?? null}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

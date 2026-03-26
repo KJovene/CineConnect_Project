@@ -1,0 +1,79 @@
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: cineconnect-postgres
+    environment:
+      POSTGRES_DB: cineconnect
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cineconnect-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cineconnect"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend avec hot reload
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cineconnect-backend
+    env_file:
+      - ./backend/.env
+    environment:
+      DRIZZLE_DATABASE_URL: postgres://postgres:password@postgres:5432/cineconnect
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/src:/app/backend/src
+      - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
+      - ./backend/package.json:/app/backend/package.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cineconnect-network
+    restart: unless-stopped
+
+  # Frontend avec hot reload
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: cineconnect-frontend
+    env_file:
+      - ./frontend/.env
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/frontend/src
+      - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
+      - ./frontend/package.json:/app/frontend/package.json
+      - ./frontend/vite.config.ts:/app/frontend/vite.config.ts
+      - ./frontend/tailwind.config.js:/app/frontend/tailwind.config.js
+      - ./frontend/index.html:/app/frontend/index.html
+    depends_on:
+      - backend
+    networks:
+      - cineconnect-network
+    restart: unless-stopped
+
+networks:
+  cineconnect-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

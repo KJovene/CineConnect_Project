@@ -1,0 +1,1 @@
+export { ProfileLatestRatings } from "./ProfileLatestRatings";
