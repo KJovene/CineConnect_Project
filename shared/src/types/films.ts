@@ -83,6 +83,10 @@ export const createFilmReplyRequestSchema = z.object({
   comment: z.string().min(1),
 });
 
+export const upsertRatingRequestSchema = z.object({
+  rating: z.number().min(1).max(10),
+});
+
 export const communityReviewSchema = z.object({
   reviewId: z.number(),
   rating: z.number(),

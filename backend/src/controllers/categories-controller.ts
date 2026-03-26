@@ -19,8 +19,8 @@ export async function listCategories(_req: Request, res: Response) {
 }
 
 export async function getFilms(req: Request, res: Response) {
-  const categoryId = parseInt(req.params.id, 10);
-  const limit = parseInt(req.query.limit as string, 10) || 24;
+  const categoryId = parseInt(typeof req.params.id === "string" ? req.params.id : "", 10);
+  const limit = parseInt(typeof req.query.limit === "string" ? req.query.limit : "24", 10) || 24;
 
   if (isNaN(categoryId)) {
     res.status(400).json({
@@ -43,7 +43,7 @@ export async function getFilms(req: Request, res: Response) {
 }
 
 export async function getAllFilms(req: Request, res: Response) {
-  const limit = parseInt(req.query.limit as string, 10) || 24;
+  const limit = parseInt(typeof req.query.limit === "string" ? req.query.limit : "24", 10) || 24;
 
   try {
     const data = await getFilmsByAllCategories(limit);
