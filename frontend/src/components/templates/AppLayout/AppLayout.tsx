@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { Sidebar, AppHeader } from "@/components/organisms";
-import type { SidebarNavSection, SidebarUser } from "@/components/organisms";
+import {
+  Sidebar,
+  AppHeader,
+  type SidebarNavSection,
+  type SidebarUser,
+} from "@/components/organisms";
 
 export interface AppLayoutProps {
   children: React.ReactNode;

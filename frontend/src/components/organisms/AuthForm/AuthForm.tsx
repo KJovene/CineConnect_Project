@@ -1,7 +1,10 @@
-import type { FormEvent } from 'react';
-import { Button, ErrorAlert } from '@/components/atoms';
-import { FormField, AuthNavLink } from '@/components/molecules';
-import type { FormFieldProps } from '@/components/molecules';
+import type { FormEvent } from "react";
+import { Button, ErrorAlert } from "@/components/atoms";
+import {
+  FormField,
+  AuthNavLink,
+  type FormFieldProps,
+} from "@/components/molecules";
 
 export interface AuthFormProps {
   fields: FormFieldProps[];
@@ -32,7 +35,11 @@ export function AuthForm({
         </Button>
       </form>
       <div className="mt-6">
-        <AuthNavLink prompt={navLink.prompt} to={navLink.to} label={navLink.label} />
+        <AuthNavLink
+          prompt={navLink.prompt}
+          to={navLink.to}
+          label={navLink.label}
+        />
       </div>
     </>
   );
