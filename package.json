@@ -9,8 +9,21 @@
     "build:back": "pnpm --filter backend build",
     "test:front": "pnpm --filter frontend test",
     "test:back": "pnpm --filter backend test",
+    "lint:front": "pnpm --filter frontend lint",
+    "lint:back": "pnpm --filter backend lint",
+    "typecheck:front": "pnpm --filter frontend typecheck",
+    "typecheck:back": "pnpm --filter backend typecheck",
+    "knip": "knip",
+    "knip:front": "knip --workspace frontend",
+    "knip:back": "knip --workspace backend",
+    "check:front": "pnpm lint:front && pnpm typecheck:front && pnpm knip:front",
+    "check:back": "pnpm lint:back && pnpm typecheck:back && pnpm knip:back",
+    "check:all": "pnpm check:front && pnpm check:back && pnpm knip",
     "db:generate": "pnpm --filter backend drizzle-kit generate",
     "db:migrate": "pnpm --filter backend drizzle-kit migrate"
+  },
+  "devDependencies": {
+    "knip": "^5.63.1"
   },
   "keywords": [],
   "author": "",
