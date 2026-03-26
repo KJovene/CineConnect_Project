@@ -9,7 +9,5 @@ export const userSchema = z.object({
   updatedAt: z.coerce.date(),
 });
 
-export const userResponseSchema = userSchema;
-
 export type User = z.infer<typeof userSchema>;
-export type UserResponse = z.infer<typeof userResponseSchema>;
+export type UserResponse = z.infer<typeof userSchema>;
