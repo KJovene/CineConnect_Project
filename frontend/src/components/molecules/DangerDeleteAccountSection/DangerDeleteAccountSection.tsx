@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export interface DangerDeleteAccountSectionProps {
+interface DangerDeleteAccountSectionProps {
   onDeleteAccount: () => Promise<void>;
 }
 

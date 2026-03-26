@@ -1,8 +1,8 @@
-import { HiChatBubbleLeftRight } from 'react-icons/hi2';
-import { Avatar } from '@/components/atoms';
-import type { FriendRelation, FriendUser } from '@/hooks/useFriends';
+import { HiChatBubbleLeftRight } from "react-icons/hi2";
+import { Avatar } from "@/components/atoms";
+import type { FriendRelation, FriendUser } from "@/hooks/useFriends";
 
-export interface ConversationListProps {
+interface ConversationListProps {
   friends: FriendRelation[];
   isLoading?: boolean;
   selectedId?: number | null;
@@ -55,9 +55,13 @@ export function ConversationList({
             key={rel.friend_id}
             onClick={() => onSelect(friend)}
             className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-r-2 cursor-pointer ${
-              isSelected ? 'border-indigo-500' : 'border-transparent hover:bg-white/[0.03]'
+              isSelected
+                ? "border-indigo-500"
+                : "border-transparent hover:bg-white/[0.03]"
             }`}
-            style={isSelected ? { background: "var(--color-surface)" } : undefined}
+            style={
+              isSelected ? { background: "var(--color-surface)" } : undefined
+            }
           >
             <Avatar image={friend.image} name={friend.name} size="md" />
             <div className="overflow-hidden flex-1 min-w-0">
@@ -65,7 +69,7 @@ export function ConversationList({
                 className="text-sm font-medium truncate"
                 style={{ color: "var(--color-text)" }}
               >
-                {friend.name ?? 'Utilisateur'}
+                {friend.name ?? "Utilisateur"}
               </div>
               <div
                 className="text-[11px] truncate"

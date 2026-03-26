@@ -1,7 +1,7 @@
 import { RatingStars } from "@/components/atoms";
 import { getHighQualityPosterUrl } from "@/utils/poster";
 
-export interface FilmDetailMovie {
+interface FilmDetailMovie {
   title: string;
   year: number | null;
   runtime: string | null;

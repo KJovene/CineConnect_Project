@@ -1,6 +1,6 @@
 import { HiStar } from "react-icons/hi2";
 
-export interface RatingStarsProps {
+interface RatingStarsProps {
   rating: number;
   max?: number;
   size?: number;

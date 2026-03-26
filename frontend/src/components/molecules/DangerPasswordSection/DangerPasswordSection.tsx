@@ -4,7 +4,9 @@ import { z } from "zod";
 const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Veuillez remplir tous les champs."),
-    newPassword: z.string().min(8, "Le nouveau mot de passe doit contenir au moins 8 caractères."),
+    newPassword: z
+      .string()
+      .min(8, "Le nouveau mot de passe doit contenir au moins 8 caractères."),
     confirmNewPassword: z.string().min(1, "Veuillez remplir tous les champs."),
   })
   .refine((d) => d.newPassword === d.confirmNewPassword, {
@@ -16,12 +18,12 @@ const changePasswordSchema = z
     path: ["newPassword"],
   });
 
-export interface DangerPasswordSectionSubmitPayload {
+interface DangerPasswordSectionSubmitPayload {
   currentPassword: string;
   newPassword: string;
 }
 
-export interface DangerPasswordSectionProps {
+interface DangerPasswordSectionProps {
   onChangePassword: (
     payload: DangerPasswordSectionSubmitPayload,
   ) => Promise<void>;
@@ -59,7 +61,11 @@ export function DangerPasswordSection({
     e.preventDefault();
     resetFeedback();
 
-    const result = changePasswordSchema.safeParse({ currentPassword, newPassword, confirmNewPassword });
+    const result = changePasswordSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
     if (!result.success) {
       setError(result.error.issues[0]?.message ?? "Données invalides.");
       return;

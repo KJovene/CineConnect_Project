@@ -12,7 +12,7 @@ import type {
   FriendUser,
 } from "@/hooks/useFriends";
 
-export interface FriendListProps {
+interface FriendListProps {
   friends: FriendRelation[];
   pendingRequests: PendingRequest[];
   isLoading?: boolean;

@@ -1,4 +1,4 @@
-export interface AvatarProps {
+interface AvatarProps {
   image: string | null;
   name: string | null;
   size?: "sm" | "md" | "lg" | "xl";

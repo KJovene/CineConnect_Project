@@ -6,7 +6,7 @@ import {
   type FormFieldProps,
 } from "@/components/molecules";
 
-export interface AuthFormProps {
+interface AuthFormProps {
   fields: FormFieldProps[];
   submitLabel: string;
   loading: boolean;

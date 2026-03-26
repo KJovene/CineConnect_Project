@@ -1,7 +1,7 @@
 import { Badge } from "@/components/atoms";
 import { MovieCard, type MovieCardProps } from "@/components/molecules";
 
-export interface MediaGridProps {
+interface MediaGridProps {
   title: string;
   badge?: string;
   movies: MovieCardProps[];

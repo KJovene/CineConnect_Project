@@ -5,7 +5,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useNotificationsFeed } from "@/hooks/useNotifications";
 import { ThemeToggle } from "@/components/atoms";
 
-export interface AppHeaderProps {
+interface AppHeaderProps {
   isAuthenticated: boolean;
   isLoading: boolean;
   onLogout: () => void;
@@ -109,7 +109,6 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-5 ml-auto">
-
         <div className="relative" ref={notificationsRef}>
           <button
             type="button"
@@ -122,7 +121,7 @@ export function AppHeader({
             {unreadCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-semibold text-white flex items-center justify-center"
-                style={{ border: "1px solid var(--color-bg)" }} 
+                style={{ border: "1px solid var(--color-bg)" }}
               >
                 {formattedCount}
               </span>
@@ -169,7 +168,11 @@ export function AppHeader({
                     <button
                       key={notification.id}
                       type="button"
-                      onClick={() => handleNotificationClick(notification.id).catch(console.error)}
+                      onClick={() =>
+                        handleNotificationClick(notification.id).catch(
+                          console.error,
+                        )
+                      }
                       className={`w-full text-left px-4 py-3 transition-colors ${
                         notification.isRead
                           ? "bg-transparent hover:bg-white/5"
@@ -201,7 +204,10 @@ export function AppHeader({
           style={{ background: "var(--color-border)" }}
         />
         <ThemeToggle />
-        <div className="h-6 w-px mx-1" style={{ background: 'var(--color-border)' }} />
+        <div
+          className="h-6 w-px mx-1"
+          style={{ background: "var(--color-border)" }}
+        />
         <AuthNavButton
           isAuthenticated={isAuthenticated}
           isLoading={isLoading}

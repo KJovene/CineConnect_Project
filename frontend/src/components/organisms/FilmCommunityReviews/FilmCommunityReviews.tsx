@@ -22,7 +22,7 @@ import { useSession } from "@/lib/auth-client";
 
 type ReviewItem = FilmReviewComment | ReviewReply;
 
-export interface FilmCommunityReviewsProps {
+interface FilmCommunityReviewsProps {
   omdbId: string;
 }
 
@@ -181,7 +181,9 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => handleSaveEdit(item.reviewId).catch(console.error)}
+                    onClick={() =>
+                      handleSaveEdit(item.reviewId).catch(console.error)
+                    }
                     disabled={updateComment.isPending || !editingText.trim()}
                     className="rounded-lg bg-white text-black px-3 py-1.5 text-xs font-semibold disabled:opacity-50 cursor-pointer"
                   >
@@ -267,7 +269,9 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleDelete(item.reviewId).catch(console.error)}
+                    onClick={() =>
+                      handleDelete(item.reviewId).catch(console.error)
+                    }
                     className="w-full inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-red-400 hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <HiTrash size={14} />
@@ -479,7 +483,11 @@ export function FilmCommunityReviews({ omdbId }: FilmCommunityReviewsProps) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleCreateReply(review.reviewId).catch(console.error)}
+                        onClick={() =>
+                          handleCreateReply(review.reviewId).catch(
+                            console.error,
+                          )
+                        }
                         disabled={createReply.isPending || !replyText.trim()}
                         className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black disabled:opacity-50"
                       >

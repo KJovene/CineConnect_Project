@@ -8,7 +8,7 @@ const nameSchema = z
   .min(2, "Le pseudo doit contenir au moins 2 caractères.")
   .max(50, "Le pseudo ne peut pas dépasser 50 caractères.");
 
-export interface ProfileNameEditorProps {
+interface ProfileNameEditorProps {
   currentName: string;
   isSaving?: boolean;
   onSave: (nextName: string) => Promise<void>;

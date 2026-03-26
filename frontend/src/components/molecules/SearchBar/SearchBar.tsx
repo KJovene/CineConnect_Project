@@ -1,6 +1,6 @@
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
-export interface SearchBarProps {
+interface SearchBarProps {
   placeholder?: string;
   value?: string;
   onChange?: (value: string) => void;
