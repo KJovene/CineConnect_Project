@@ -1,6 +1,7 @@
-import { db } from "../db/index.js";
-import { films, categories, filmsCategories } from "../db/schema.js";
-import { eq, desc } from "drizzle-orm";
+import {
+  findAllCategories,
+  findFilmsByCategoryId,
+} from "../repositories/categoriesRepository.js";
 import type {
   Film,
   Category,
@@ -13,10 +14,7 @@ import { withCommunityRatings } from "./filmsService.js";
  * Retourne toutes les catégories disponibles.
  */
 export async function getAllCategories(): Promise<Category[]> {
-  const result = await db
-    .select()
-    .from(categories)
-    .orderBy(categories.name);
+  const result = await findAllCategories();
 
   return result as Category[];
 }
@@ -30,28 +28,7 @@ export async function getFilmsByCategory(
   categoryId: number,
   limit = 24,
 ): Promise<Film[]> {
-  const result = await db
-    .select({
-      film_id: films.film_id,
-      omdb_id: films.omdb_id,
-      title: films.title,
-      year: films.year,
-      type: films.type,
-      director: films.director,
-      poster_url: films.poster_url,
-      genre: films.genre,
-      plot: films.plot,
-      runtime: films.runtime,
-      imdb_rating: films.imdb_rating,
-      awards: films.awards,
-      created_at: films.created_at,
-      updated_at: films.updated_at,
-    })
-    .from(films)
-    .innerJoin(filmsCategories, eq(filmsCategories.film_id, films.film_id))
-    .where(eq(filmsCategories.category_id, categoryId))
-    .orderBy(desc(films.imdb_rating))
-    .limit(limit);
+  const result = await findFilmsByCategoryId(categoryId, limit);
 
   return withCommunityRatings(result as unknown as Film[]);
 }
@@ -64,10 +41,7 @@ export async function getFilmsByCategory(
 export async function getFilmsByAllCategories(
   limitPerCategory = 24,
 ): Promise<FilmsByCategoryResponse> {
-  const allCategories = await db
-    .select()
-    .from(categories)
-    .orderBy(categories.name);
+  const allCategories = await findAllCategories();
 
   const sections: CategorySection[] = [];
 

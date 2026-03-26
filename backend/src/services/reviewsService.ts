@@ -1,19 +1,22 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { db } from "../db/index.js";
-import { films, reviews, user } from "../db/schema.js";
+import {
+  deleteReviewByIdAndFilmId,
+  findFilmIdByOmdbId,
+  findFilmRatingAggregate,
+  findLatestCommunityReviewsRows,
+  findParentReviewByUserAndFilm,
+  findParentReviewIdsByUserId,
+  findRepliesWithAuthorByParentIds,
+  findReplyNotificationRows,
+  findReviewById,
+  findReviewsWithAuthorByFilmId,
+  findReviewWithAuthorById,
+  insertReviewReturningId,
+  updateReviewComment as updateReviewCommentRecord,
+  updateReviewRating,
+  type ReviewRow,
+} from "../repositories/reviewsRepository.js";
 
-interface DbReviewRow {
-  review_id: number;
-  user_id: number;
-  film_id: number;
-  parent_review_id: number | null;
-  rating: number;
-  comment: string | null;
-  created_at: Date | null;
-  updated_at: Date | null;
-  user_name: string | null;
-  user_image: string | null;
-}
+type DbReviewRow = ReviewRow;
 
 export interface ReviewAuthorDto {
   id: number;
@@ -102,13 +105,7 @@ function normalizeOptionalRating(value: number | undefined): number | null {
 }
 
 async function getFilmIdByOmdbId(omdbId: string): Promise<number | null> {
-  const [film] = await db
-    .select({ film_id: films.film_id })
-    .from(films)
-    .where(eq(films.omdb_id, omdbId))
-    .limit(1);
-
-  return film?.film_id ?? null;
+  return findFilmIdByOmdbId(omdbId);
 }
 
 function mapReviewRow(row: DbReviewRow): ReviewBaseDto {
@@ -129,68 +126,18 @@ function mapReviewRow(row: DbReviewRow): ReviewBaseDto {
 }
 
 async function getReviewById(reviewId: number) {
-  const [existing] = await db
-    .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-    })
-    .from(reviews)
-    .where(eq(reviews.review_id, reviewId))
-    .limit(1);
-
-  return existing ?? null;
+  return findReviewById(reviewId);
 }
 
 async function getParentReviewByUserAndFilm(params: {
   userId: number;
   filmId: number;
 }) {
-  const [existing] = await db
-    .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-    })
-    .from(reviews)
-    .where(
-      and(
-        eq(reviews.user_id, params.userId),
-        eq(reviews.film_id, params.filmId),
-        isNull(reviews.parent_review_id),
-      ),
-    )
-    .limit(1);
-
-  return existing ?? null;
+  return findParentReviewByUserAndFilm(params);
 }
 
 async function getReviewWithAuthorById(reviewId: number) {
-  const [row] = await db
-    .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      updated_at: reviews.updated_at,
-      user_name: user.name,
-      user_image: user.image,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .where(eq(reviews.review_id, reviewId))
-    .limit(1);
-
-  return row as DbReviewRow | undefined;
+  return findReviewWithAuthorById(reviewId);
 }
 
 async function ensureFilmExists(omdbId: string): Promise<number> {
@@ -204,23 +151,7 @@ export async function getFilmComments(
 ): Promise<ReviewCommentDto[]> {
   const filmId = await ensureFilmExists(omdbId);
 
-  const rows = await db
-    .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      updated_at: reviews.updated_at,
-      user_name: user.name,
-      user_image: user.image,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .where(eq(reviews.film_id, filmId))
-    .orderBy(desc(reviews.created_at));
+  const rows = await findReviewsWithAuthorByFilmId(filmId);
 
   const parents = rows.filter(
     (row) =>
@@ -228,26 +159,7 @@ export async function getFilmComments(
   );
   const parentIds = parents.map((row) => row.review_id);
 
-  const repliesRows =
-    parentIds.length === 0
-      ? []
-      : await db
-          .select({
-            review_id: reviews.review_id,
-            user_id: reviews.user_id,
-            film_id: reviews.film_id,
-            parent_review_id: reviews.parent_review_id,
-            rating: reviews.rating,
-            comment: reviews.comment,
-            created_at: reviews.created_at,
-            updated_at: reviews.updated_at,
-            user_name: user.name,
-            user_image: user.image,
-          })
-          .from(reviews)
-          .innerJoin(user, eq(reviews.user_id, user.id))
-          .where(inArray(reviews.parent_review_id, parentIds))
-          .orderBy(asc(reviews.created_at));
+  const repliesRows = await findRepliesWithAuthorByParentIds(parentIds);
 
   const repliesByParent = new Map<number, ReviewReplyDto[]>();
 
@@ -283,18 +195,13 @@ export async function createFilmComment(params: {
   if (!comment) throw new Error("Le commentaire ne peut pas être vide");
 
   const optionalRating = normalizeOptionalRating(params.rating);
-  const [inserted] = await db
-    .insert(reviews)
-    .values({
-      user_id: params.userId,
-      film_id: filmId,
-      parent_review_id: null,
-      rating: optionalRating ?? 0,
-      comment,
-    })
-    .returning({ review_id: reviews.review_id });
-
-  const reviewId = inserted.review_id;
+  const reviewId = await insertReviewReturningId({
+    userId: params.userId,
+    filmId,
+    parentReviewId: null,
+    rating: optionalRating ?? 0,
+    comment,
+  });
 
   const created = await getReviewWithAuthorById(reviewId);
   if (!created) {
@@ -319,20 +226,14 @@ export async function upsertFilmRating(params: {
   });
 
   if (existingParent) {
-    await db
-      .update(reviews)
-      .set({
-        rating,
-        updated_at: new Date(),
-      })
-      .where(eq(reviews.review_id, existingParent.review_id));
+    await updateReviewRating(existingParent.review_id, rating);
     return;
   }
 
-  await db.insert(reviews).values({
-    user_id: params.userId,
-    film_id: filmId,
-    parent_review_id: null,
+  await insertReviewReturningId({
+    userId: params.userId,
+    filmId,
+    parentReviewId: null,
     rating,
     comment: null,
   });
@@ -344,19 +245,7 @@ export async function getFilmRatingSummary(params: {
 }): Promise<FilmRatingSummaryDto> {
   const filmId = await ensureFilmExists(params.omdbId);
 
-  const [aggregate] = await db
-    .select({
-      averageRating: sql<number | null>`avg(${reviews.rating})::numeric(10,2)`,
-      totalRatings: sql<number>`count(*)`,
-    })
-    .from(reviews)
-    .where(
-      and(
-        eq(reviews.film_id, filmId),
-        isNull(reviews.parent_review_id),
-        sql`${reviews.rating} > 0`,
-      ),
-    );
+  const aggregate = await findFilmRatingAggregate(filmId);
 
   let userRating: number | null = null;
   if (typeof params.userId === "number") {
@@ -383,47 +272,7 @@ export async function getLatestCommunityReviews(
 ): Promise<CommunityReviewDto[]> {
   const normalizedLimit = Math.min(Math.max(Math.trunc(limit), 1), 12);
 
-  const rows = await db
-    .select({
-      review_id: reviews.review_id,
-      rating: reviews.rating,
-      effective_rating: sql<number | null>`(
-        select r2.rating
-        from "reviews" r2
-        where r2.user_id = ${reviews.user_id}
-          and r2.film_id = ${reviews.film_id}
-          and r2.parent_review_id is null
-          and r2.rating > 0
-        order by coalesce(r2.updated_at, r2.created_at) desc
-        limit 1
-      )`,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      user_id: user.id,
-      user_name: user.name,
-      user_image: user.image,
-      film_omdb_id: films.omdb_id,
-      film_title: films.title,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .innerJoin(films, eq(reviews.film_id, films.film_id))
-    .where(
-      and(
-        isNull(reviews.parent_review_id),
-        sql`coalesce(length(trim(${reviews.comment})), 0) > 0`,
-        sql`exists (
-          select 1
-          from "reviews" r2
-          where r2.user_id = ${reviews.user_id}
-            and r2.film_id = ${reviews.film_id}
-            and r2.parent_review_id is null
-            and r2.rating > 0
-        )`,
-      ),
-    )
-    .orderBy(desc(reviews.created_at))
-    .limit(normalizedLimit);
+  const rows = await findLatestCommunityReviewsRows(normalizedLimit);
 
   return rows.map((row) => ({
     reviewId: row.review_id,
@@ -451,40 +300,14 @@ export async function getUserCommentReplyNotifications(params: {
     100,
   );
 
-  const parentRows = await db
-    .select({ review_id: reviews.review_id })
-    .from(reviews)
-    .where(
-      and(eq(reviews.user_id, params.userId), isNull(reviews.parent_review_id)),
-    );
-
-  const parentIds = parentRows.map((row) => row.review_id);
+  const parentIds = await findParentReviewIdsByUserId(params.userId);
   if (parentIds.length === 0) return [];
 
-  const rows = await db
-    .select({
-      reply_review_id: reviews.review_id,
-      parent_review_id: reviews.parent_review_id,
-      film_omdb_id: films.omdb_id,
-      film_title: films.title,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      replier_id: user.id,
-      replier_name: user.name,
-      replier_image: user.image,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .innerJoin(films, eq(reviews.film_id, films.film_id))
-    .where(
-      and(
-        inArray(reviews.parent_review_id, parentIds),
-        sql`${reviews.user_id} <> ${params.userId}`,
-        sql`coalesce(length(trim(${reviews.comment})), 0) > 0`,
-      ),
-    )
-    .orderBy(desc(reviews.created_at))
-    .limit(normalizedLimit);
+  const rows = await findReplyNotificationRows(
+    params.userId,
+    parentIds,
+    normalizedLimit,
+  );
 
   return rows
     .filter((row) => row.parent_review_id !== null)
@@ -523,34 +346,18 @@ export async function createReviewReply(params: {
   const comment = params.comment.trim();
   if (!comment) throw new Error("La réponse ne peut pas être vide");
 
-  const [inserted] = await db
-    .insert(reviews)
-    .values({
-      user_id: params.userId,
-      film_id: filmId,
-      parent_review_id: params.parentReviewId,
-      rating: 0,
-      comment,
-    })
-    .returning({ review_id: reviews.review_id });
+  const insertedId = await insertReviewReturningId({
+    userId: params.userId,
+    filmId,
+    parentReviewId: params.parentReviewId,
+    rating: 0,
+    comment,
+  });
 
-  const [created] = await db
-    .select({
-      review_id: reviews.review_id,
-      user_id: reviews.user_id,
-      film_id: reviews.film_id,
-      parent_review_id: reviews.parent_review_id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      created_at: reviews.created_at,
-      updated_at: reviews.updated_at,
-      user_name: user.name,
-      user_image: user.image,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(reviews.user_id, user.id))
-    .where(eq(reviews.review_id, inserted.review_id))
-    .limit(1);
+  const created = await findReviewWithAuthorById(insertedId);
+  if (!created) {
+    throw new ReviewNotFoundError("Réponse introuvable");
+  }
 
   const mapped = mapReviewRow(created as DbReviewRow);
   return {
@@ -579,15 +386,7 @@ export async function updateReviewComment(params: {
   const comment = params.comment.trim();
   if (!comment) throw new Error("Le commentaire ne peut pas être vide");
 
-  await db
-    .update(reviews)
-    .set({
-      comment,
-      updated_at: new Date(),
-    })
-    .where(
-      and(eq(reviews.review_id, params.reviewId), eq(reviews.film_id, filmId)),
-    );
+  await updateReviewCommentRecord(params.reviewId, filmId, comment);
 }
 
 export async function deleteReviewComment(params: {
@@ -606,9 +405,5 @@ export async function deleteReviewComment(params: {
     throw new ForbiddenReviewActionError("Action non autorisée");
   }
 
-  await db
-    .delete(reviews)
-    .where(
-      and(eq(reviews.review_id, params.reviewId), eq(reviews.film_id, filmId)),
-    );
+  await deleteReviewByIdAndFilmId(params.reviewId, filmId);
 }

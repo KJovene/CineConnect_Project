@@ -1,15 +1,16 @@
-import { db } from "../db/index.js";
-import { films, reviews, categories, filmsCategories } from "../db/schema.js";
 import {
-  and,
-  eq,
-  desc,
-  isNotNull,
-  isNull,
-  sql,
-  inArray,
-  like,
-} from "drizzle-orm";
+  createCategory,
+  createFilmCategoryLink,
+  findCategoryByName,
+  findFilmByOmdbId,
+  findFilmsByGenreLike,
+  findFilmsByIds,
+  findFilmsByOmdbIdsWithPoster,
+  findReviewAggregatesByFilmIds,
+  findTopRatedFilmIds,
+  findUnratedFilmIds,
+  upsertFilmByOmdb,
+} from "../repositories/filmsRepository.js";
 import type {
   Film,
   FilmSearchResult,
@@ -191,25 +192,13 @@ async function linkFilmCategories(
     .filter(Boolean);
 
   for (const genre of genres) {
-    // Trouver ou créer la catégorie
-    let [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.name, genre))
-      .limit(1);
+    let category = await findCategoryByName(genre);
 
     if (!category) {
-      [category] = await db
-        .insert(categories)
-        .values({ name: genre })
-        .returning();
+      category = await createCategory(genre);
     }
 
-    // Lier le film à la catégorie (ignore si le lien existe déjà)
-    await db
-      .insert(filmsCategories)
-      .values({ film_id: filmId, category_id: category.category_id })
-      .onConflictDoNothing();
+    await createFilmCategoryLink(filmId, category.category_id);
   }
 }
 
@@ -236,14 +225,7 @@ async function upsertFilmFromOmdbDetail(
     awards: omdbDetail.Awards !== "N/A" ? omdbDetail.Awards : null,
   };
 
-  const [film] = await db
-    .insert(films)
-    .values(values)
-    .onConflictDoUpdate({
-      target: films.omdb_id,
-      set: { ...values, updated_at: new Date() },
-    })
-    .returning();
+  const film = await upsertFilmByOmdb(values);
 
   if (values.genre) {
     await linkFilmCategories(film.film_id, values.genre);
@@ -257,21 +239,7 @@ export async function withCommunityRatings(items: Film[]): Promise<Film[]> {
 
   const filmIds = items.map((film) => film.film_id);
 
-  const aggregates = await db
-    .select({
-      film_id: reviews.film_id,
-      average_rating: sql<number | null>`avg(${reviews.rating})::numeric(10,2)`,
-      ratings_count: sql<number>`count(*)`,
-    })
-    .from(reviews)
-    .where(
-      and(
-        inArray(reviews.film_id, filmIds),
-        isNull(reviews.parent_review_id),
-        sql`${reviews.rating} > 0`,
-      ),
-    )
-    .groupBy(reviews.film_id);
+  const aggregates = await findReviewAggregatesByFilmIds(filmIds);
 
   const aggregateMap = new Map(aggregates.map((item) => [item.film_id, item]));
 
@@ -311,10 +279,7 @@ export async function searchFilms(
   const omdbIds = omdbSearch.Search.map((item) => item.imdbID);
 
   // Récupérer les films existants en BDD
-  const existingFilms = await db
-    .select()
-    .from(films)
-    .where(and(inArray(films.omdb_id, omdbIds), isNotNull(films.poster_url)));
+  const existingFilms = await findFilmsByOmdbIdsWithPoster(omdbIds);
 
   const validExistingFilms = await Promise.all(
     (existingFilms as unknown as Film[]).map(async (film) => {
@@ -363,11 +328,7 @@ export async function searchFilms(
 }
 
 export async function getFilmDetail(omdbId: string): Promise<Film | null> {
-  const [existing] = await db
-    .select()
-    .from(films)
-    .where(eq(films.omdb_id, omdbId))
-    .limit(1);
+  const existing = await findFilmByOmdbId(omdbId);
 
   if (existing) {
     if (existing.type !== "movie") return null;
@@ -389,34 +350,13 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
   const safeLimit =
     Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 10;
 
-  const ratedRows = await db
-    .select({ film_id: films.film_id })
-    .from(films)
-    .innerJoin(
-      reviews,
-      and(
-        eq(reviews.film_id, films.film_id),
-        isNull(reviews.parent_review_id),
-        sql`${reviews.rating} > 0`,
-      ),
-    )
-    .where(and(eq(films.type, "movie"), isNotNull(films.poster_url)))
-    .groupBy(films.film_id)
-    .orderBy(
-      desc(sql`avg(${reviews.rating})`),
-      desc(sql`count(*)`),
-      desc(films.imdb_rating),
-    )
-    .limit(safeLimit);
+  const ratedRows = await findTopRatedFilmIds(safeLimit);
 
   const ratedIds = ratedRows.map((row) => row.film_id);
 
   let orderedFilms: Film[] = [];
   if (ratedIds.length > 0) {
-    const ratedFilms = await db
-      .select()
-      .from(films)
-      .where(inArray(films.film_id, ratedIds));
+    const ratedFilms = await findFilmsByIds(ratedIds);
 
     const ratedById = new Map(
       (ratedFilms as unknown as Film[]).map((film) => [film.film_id, film]),
@@ -429,30 +369,12 @@ export async function getTopRatedFilms(limit = 10): Promise<Film[]> {
 
   const remaining = safeLimit - orderedFilms.length;
   if (remaining > 0) {
-    const unratedRows = await db
-      .select({ film_id: films.film_id })
-      .from(films)
-      .leftJoin(
-        reviews,
-        and(
-          eq(reviews.film_id, films.film_id),
-          isNull(reviews.parent_review_id),
-          sql`${reviews.rating} > 0`,
-        ),
-      )
-      .where(and(eq(films.type, "movie"), isNotNull(films.poster_url)))
-      .groupBy(films.film_id)
-      .having(sql`count(${reviews.review_id}) = 0`)
-      .orderBy(desc(films.imdb_rating), desc(films.updated_at))
-      .limit(remaining);
+    const unratedRows = await findUnratedFilmIds(remaining);
 
     const unratedIds = unratedRows.map((row) => row.film_id);
 
     if (unratedIds.length > 0) {
-      const unratedFilms = await db
-        .select()
-        .from(films)
-        .where(inArray(films.film_id, unratedIds));
+      const unratedFilms = await findFilmsByIds(unratedIds);
 
       const unratedById = new Map(
         (unratedFilms as unknown as Film[]).map((film) => [film.film_id, film]),
@@ -499,18 +421,7 @@ export async function getFilmsByGenre(
   const sections: GenreSection[] = [];
 
   for (const genre of GENRE_LIST) {
-    const result = await db
-      .select()
-      .from(films)
-      .where(
-        and(
-          eq(films.type, "movie"),
-          isNotNull(films.poster_url),
-          like(films.genre, `%${genre}%`),
-        ),
-      )
-      .orderBy(desc(films.imdb_rating))
-      .limit(limitPerGenre);
+    const result = await findFilmsByGenreLike(genre, limitPerGenre);
 
     const usableFilms = await filterFilmsWithUsablePoster(
       result as unknown as Film[],
