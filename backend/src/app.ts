@@ -9,6 +9,7 @@ import usersRouter from "./routes/users.js";
 import filmsRouter from "./routes/films.js";
 import categoriesRouter from "./routes/categories.js";
 import { initSocket } from "./socket.js";
+import { setupSwagger } from "./config/swagger.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -46,6 +47,8 @@ export function createApp(): express.Express {
   app.get("/", (_req, res) => {
     res.json({ message: "CineConnect API is running!" });
   });
+
+  setupSwagger(app);
 
   app.use("/api/friends", friendsRouter);
   app.use("/api/messages", messagesRouter);
