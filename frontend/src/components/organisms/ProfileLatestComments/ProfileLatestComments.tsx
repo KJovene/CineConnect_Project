@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import type { LatestUserComment } from "@/features/reviews/hooks";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import type { LatestUserComment } from "@/hooks/useReviews";
+import { getPosterUrl } from "@/media/utils/poster";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
 export interface ProfileLatestCommentsProps {

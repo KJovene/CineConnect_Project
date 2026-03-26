@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/lib/apiClient";
-import { usePendingRequests } from "@/features/friends/hooks";
+import { usePendingRequests } from "@/hooks/useFriends";
 
 export type AppNotificationType =
   | "friend-request"

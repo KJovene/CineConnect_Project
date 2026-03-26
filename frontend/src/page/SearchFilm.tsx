@@ -7,7 +7,7 @@ import {
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi2";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/media/utils/poster";
 import type { FilmSearchResult } from "@cineconnect/shared";
 
 const SearchPage: React.FC = () => {

@@ -10,7 +10,7 @@ import type {
   FriendRelation,
   PendingRequest,
   FriendUser,
-} from "@/features/friends/hooks";
+} from "@/hooks/useFriends";
 
 export interface FriendListProps {
   friends: FriendRelation[];

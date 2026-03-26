@@ -1,6 +1,6 @@
 import { HiStar } from "react-icons/hi2";
 import { Link } from "@tanstack/react-router";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/media/utils/poster";
 
 export interface MovieCardProps {
   image: string;

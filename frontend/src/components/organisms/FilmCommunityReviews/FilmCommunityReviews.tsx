@@ -16,7 +16,7 @@ import {
   useFilmReviews,
   useUpsertFilmRating,
   useUpdateFilmComment,
-} from "@/features/reviews/hooks";
+} from "@/hooks/useReviews";
 import { Avatar } from "@/components/atoms";
 import { useSession } from "@/lib/auth-client";
 

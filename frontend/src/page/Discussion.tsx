@@ -4,12 +4,12 @@ import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
 import { useSession } from "@/lib/auth-client";
-import { useFriends, type FriendUser } from "@/features/friends/hooks";
+import { useFriends, type FriendUser } from "@/hooks/useFriends";
 import {
   useMessages,
   useIncomingMessages,
   useSocketSend,
-} from "@/features/messages/hooks";
+} from "@/hooks/useMessages";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 
 const Discussion: React.FC = () => {

@@ -31,11 +31,11 @@ import {
   useRemoveFriend,
   type FriendUser,
   type UserSearchResult,
-} from "@/features/friends/hooks";
+} from "@/hooks/useFriends";
 import {
   useMyLatestComments,
   useMyLatestRatings,
-} from "@/features/reviews/hooks";
+} from "@/hooks/useReviews";
 
 const Profil: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { HiChatBubbleLeftRight } from 'react-icons/hi2';
 import { Avatar } from '@/components/atoms';
-import type { FriendRelation, FriendUser } from '@/features/friends/hooks';
+import type { FriendRelation, FriendUser } from '@/hooks/useFriends';
 
 export interface ConversationListProps {
   friends: FriendRelation[];

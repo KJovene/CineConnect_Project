@@ -1,5 +1,5 @@
 import { HiUserPlus } from "react-icons/hi2";
-import type { UserSearchResult } from "@/features/friends/hooks";
+import type { UserSearchResult } from "@/hooks/useFriends";
 
 const RELATION_LABEL: Record<string, string> = {
   accepted: "Déjà ami",

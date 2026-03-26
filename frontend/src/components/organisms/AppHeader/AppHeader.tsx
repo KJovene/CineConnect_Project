@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { HiBell, HiMagnifyingGlass } from "react-icons/hi2";
 import { AuthNavButton } from "@/components/molecules";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useNotificationsFeed } from "@/features/notifications/hooks";
+import { useNotificationsFeed } from "@/hooks/useNotifications";
 import { ThemeToggle } from "@/components/atoms";
 
 export interface AppHeaderProps {

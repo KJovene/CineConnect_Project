@@ -2,7 +2,7 @@ import React from "react";
 import { HeroSection, MediaGrid, ReviewList } from "@/components/organisms";
 import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
 import { useLatestCommunityReviews } from "@/hooks/useLatestCommunityReviews";
-import { getPosterUrl } from "@/features/media/utils/poster";
+import { getPosterUrl } from "@/media/utils/poster";
 import type { Film } from "@cineconnect/shared";
 import type { MovieCardProps } from "@/components/molecules";
 

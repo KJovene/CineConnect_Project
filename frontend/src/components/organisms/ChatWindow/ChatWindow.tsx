@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HiPaperAirplane, HiArrowLeft } from 'react-icons/hi2';
 import { Avatar } from '@/components/atoms';
-import type { FriendUser } from '@/features/friends/hooks';
-import type { Message } from '@/features/messages/hooks';
+import type { FriendUser } from '@/hooks/useFriends';
+import type { Message } from '@/hooks/useMessages';
 
 export interface ChatWindowProps {
   friend: FriendUser;
