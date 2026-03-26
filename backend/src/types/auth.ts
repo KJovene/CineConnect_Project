@@ -1,17 +1,4 @@
 import type { Request } from "express";
-import type { User } from "@cineconnect/shared";
-
-interface JwtPayload {
-  userId: string;
-  email: string;
-  iat: number;
-  exp: number;
-}
-
-interface AuthenticatedRequest {
-  user?: User;
-  userId?: string;
-}
 
 export interface AuthSession {
   user: {
