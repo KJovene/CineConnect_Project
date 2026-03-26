@@ -1,12 +1,15 @@
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-  avatar?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { z } from "zod";
 
-export interface UserResponse extends Omit<User, "id"> {
-  id: string;
-}
+export const userSchema = z.object({
+  id: z.string(),
+  email: z.email(),
+  username: z.string(),
+  avatar: z.string().optional(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const userResponseSchema = userSchema;
+
+export type User = z.infer<typeof userSchema>;
+export type UserResponse = z.infer<typeof userResponseSchema>;

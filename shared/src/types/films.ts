@@ -1,118 +1,145 @@
-export interface Film {
-  film_id: number;
-  omdb_id: string;
-  title: string;
-  year: number | null;
-  type: "movie" | null;
-  director: string | null;
-  poster_url: string | null;
-  genre: string | null;
-  plot: string | null;
-  runtime: string | null;
-  imdb_rating: string | null;
-  average_rating?: number | null;
-  ratings_count?: number;
-  awards: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { z } from "zod";
 
-export interface FilmSearchResult {
-  omdb_id: string;
-  title: string;
-  year: number | null;
-  type: "movie" | null;
-  poster_url: string | null;
-}
+export const filmSchema = z.object({
+  film_id: z.number(),
+  omdb_id: z.string(),
+  title: z.string(),
+  year: z.number().nullable(),
+  type: z.literal("movie").nullable(),
+  director: z.string().nullable(),
+  poster_url: z.string().nullable(),
+  genre: z.string().nullable(),
+  plot: z.string().nullable(),
+  runtime: z.string().nullable(),
+  imdb_rating: z.string().nullable(),
+  average_rating: z.number().nullable().optional(),
+  ratings_count: z.number().optional(),
+  awards: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
 
-export interface SearchResponse {
-  results: FilmSearchResult[];
-  totalResults: number;
-  page: number;
-}
+export const filmSearchResultSchema = z.object({
+  omdb_id: z.string(),
+  title: z.string(),
+  year: z.number().nullable(),
+  type: z.literal("movie").nullable(),
+  poster_url: z.string().nullable(),
+});
 
-export interface FilmDetailResponse extends Film {
-  average_rating: number | null;
-  ratings_count: number;
-  user_rating: number | null;
-}
+export const searchResponseSchema = z.object({
+  results: z.array(filmSearchResultSchema),
+  totalResults: z.number(),
+  page: z.number(),
+});
 
-export interface ReviewAuthor {
-  id: number;
-  name: string;
-  image: string | null;
-}
+export const filmDetailResponseSchema = filmSchema.extend({
+  average_rating: z.number().nullable(),
+  ratings_count: z.number(),
+  user_rating: z.number().nullable(),
+});
 
-export interface ReviewReply {
-  reviewId: number;
-  filmId: number;
-  parentReviewId: number;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  author: ReviewAuthor;
-}
+export const reviewAuthorSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  image: z.string().nullable(),
+});
 
-export interface FilmReviewComment {
-  reviewId: number;
-  filmId: number;
-  parentReviewId: null;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  author: ReviewAuthor;
-  replies: ReviewReply[];
-}
+export const reviewReplySchema = z.object({
+  reviewId: z.number(),
+  filmId: z.number(),
+  parentReviewId: z.number(),
+  rating: z.number(),
+  comment: z.string(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+  author: reviewAuthorSchema,
+});
 
-export type FilmReviewsResponse = FilmReviewComment[];
+export const filmReviewCommentSchema = z.object({
+  reviewId: z.number(),
+  filmId: z.number(),
+  parentReviewId: z.null(),
+  rating: z.number(),
+  comment: z.string(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+  author: reviewAuthorSchema,
+  replies: z.array(reviewReplySchema),
+});
 
-export interface CreateFilmCommentRequest {
-  comment: string;
-  rating?: number;
-}
+export const filmReviewsResponseSchema = z.array(filmReviewCommentSchema);
 
-export interface UpdateFilmCommentRequest {
-  comment: string;
-}
+export const createFilmCommentRequestSchema = z.object({
+  comment: z.string().min(1),
+  rating: z.number().min(1).max(10).optional(),
+});
 
-export interface CreateFilmReplyRequest {
-  comment: string;
-}
+export const updateFilmCommentRequestSchema = z.object({
+  comment: z.string().min(1),
+});
 
-export interface CommunityReview {
-  reviewId: number;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  author: ReviewAuthor;
-  film: {
-    omdbId: string;
-    title: string;
-  };
-}
+export const createFilmReplyRequestSchema = z.object({
+  comment: z.string().min(1),
+});
 
-export type CommunityReviewsResponse = CommunityReview[];
+export const upsertRatingRequestSchema = z.object({
+  rating: z.number().min(1).max(10),
+});
 
-export type TopRatedResponse = Film[];
+export const communityReviewSchema = z.object({
+  reviewId: z.number(),
+  rating: z.number(),
+  comment: z.string(),
+  createdAt: z.string().nullable(),
+  author: reviewAuthorSchema,
+  film: z.object({
+    omdbId: z.string(),
+    title: z.string(),
+  }),
+});
 
-export interface GenreSection {
-  genre: string;
-  films: Film[];
-}
+export const communityReviewsResponseSchema = z.array(communityReviewSchema);
 
-export type FilmsByGenreResponse = GenreSection[];
+export const topRatedResponseSchema = z.array(filmSchema);
 
-export interface Category {
-  category_id: number;
-  name: string;
-  description: string | null;
-}
+export const genreSectionSchema = z.object({
+  genre: z.string(),
+  films: z.array(filmSchema),
+});
 
-export interface CategorySection {
-  category: Category;
-  films: Film[];
-}
+export const filmsByGenreResponseSchema = z.array(genreSectionSchema);
 
-export type FilmsByCategoryResponse = CategorySection[];
+export const categorySchema = z.object({
+  category_id: z.number(),
+  name: z.string(),
+  description: z.string().nullable(),
+});
+
+export const categorySectionSchema = z.object({
+  category: categorySchema,
+  films: z.array(filmSchema),
+});
+
+export const filmsByCategoryResponseSchema = z.array(categorySectionSchema);
+
+// Types inférés automatiquement
+export type Film = z.infer<typeof filmSchema>;
+export type FilmSearchResult = z.infer<typeof filmSearchResultSchema>;
+export type SearchResponse = z.infer<typeof searchResponseSchema>;
+export type FilmDetailResponse = z.infer<typeof filmDetailResponseSchema>;
+export type ReviewAuthor = z.infer<typeof reviewAuthorSchema>;
+export type ReviewReply = z.infer<typeof reviewReplySchema>;
+export type FilmReviewComment = z.infer<typeof filmReviewCommentSchema>;
+export type FilmReviewsResponse = z.infer<typeof filmReviewsResponseSchema>;
+export type CreateFilmCommentRequest = z.infer<typeof createFilmCommentRequestSchema>;
+export type UpdateFilmCommentRequest = z.infer<typeof updateFilmCommentRequestSchema>;
+export type CreateFilmReplyRequest = z.infer<typeof createFilmReplyRequestSchema>;
+export type CommunityReview = z.infer<typeof communityReviewSchema>;
+export type CommunityReviewsResponse = z.infer<typeof communityReviewsResponseSchema>;
+export type TopRatedResponse = z.infer<typeof topRatedResponseSchema>;
+export type GenreSection = z.infer<typeof genreSectionSchema>;
+export type FilmsByGenreResponse = z.infer<typeof filmsByGenreResponseSchema>;
+export type Category = z.infer<typeof categorySchema>;
+export type CategorySection = z.infer<typeof categorySectionSchema>;
+export type FilmsByCategoryResponse = z.infer<typeof filmsByCategoryResponseSchema>;

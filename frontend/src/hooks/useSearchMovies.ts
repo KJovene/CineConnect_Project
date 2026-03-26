@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { SearchResponse } from "@cineconnect/shared";
+import { searchResponseSchema, type SearchResponse } from "@cineconnect/shared";
 import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
 const API_BASE = getApiBaseUrl();
@@ -15,7 +15,13 @@ async function searchMovies(
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message ?? "Erreur de recherche");
   }
-  return await res.json();
+  const raw = await res.json();
+  const parsed = searchResponseSchema.safeParse(raw);
+  if (!parsed.success) {
+    console.error("[useSearchMovies] Réponse invalide:", parsed.error);
+    throw new Error("Réponse API invalide");
+  }
+  return parsed.data;
 }
 
 export function useSearchMovies(query: string, page = 1) {

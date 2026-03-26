@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import type { CommunityReviewsResponse } from "@cineconnect/shared";
+import {
+  communityReviewsResponseSchema,
+  type CommunityReviewsResponse,
+} from "@cineconnect/shared";
 import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
 const API_BASE = getApiBaseUrl();
@@ -13,8 +16,13 @@ async function fetchLatestCommunityReviews(
   if (!res.ok) {
     throw new Error("Erreur chargement des avis de la communauté");
   }
-
-  return res.json();
+  const raw = await res.json();
+  const parsed = communityReviewsResponseSchema.safeParse(raw);
+  if (!parsed.success) {
+    console.error("[useLatestCommunityReviews] Réponse invalide:", parsed.error);
+    throw new Error("Réponse API invalide");
+  }
+  return parsed.data;
 }
 
 export function useLatestCommunityReviews(limit = 4) {

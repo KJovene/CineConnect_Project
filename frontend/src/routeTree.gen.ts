@@ -18,7 +18,7 @@ import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedFilmRouteImport } from './routes/_authenticated/film'
 import { Route as AuthenticatedDiscussionRouteImport } from './routes/_authenticated/discussion'
 import { Route as AuthenticatedFilmIdRouteImport } from './routes/_authenticated/film.$id'
-import { Route as AuthenticatedFilmCategoryIdRouteImport } from './routes/_authenticated/film.category.$categoryId'
+import { Route as AuthenticatedFilmCategoryCategoryIdRouteImport } from './routes/_authenticated/film.category.$categoryId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -64,8 +64,8 @@ const AuthenticatedFilmIdRoute = AuthenticatedFilmIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedFilmRoute,
 } as any)
-const AuthenticatedFilmCategoryIdRoute =
-  AuthenticatedFilmCategoryIdRouteImport.update({
+const AuthenticatedFilmCategoryCategoryIdRoute =
+  AuthenticatedFilmCategoryCategoryIdRouteImport.update({
     id: '/category/$categoryId',
     path: '/category/$categoryId',
     getParentRoute: () => AuthenticatedFilmRoute,
@@ -80,7 +80,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
   '/film/$id': typeof AuthenticatedFilmIdRoute
-  '/film/category/$categoryId': typeof AuthenticatedFilmCategoryIdRoute
+  '/film/category/$categoryId': typeof AuthenticatedFilmCategoryCategoryIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -91,7 +91,7 @@ export interface FileRoutesByTo {
   '/search': typeof AuthenticatedSearchRoute
   '/': typeof AuthenticatedIndexRoute
   '/film/$id': typeof AuthenticatedFilmIdRoute
-  '/film/category/$categoryId': typeof AuthenticatedFilmCategoryIdRoute
+  '/film/category/$categoryId': typeof AuthenticatedFilmCategoryCategoryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,7 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/film/$id': typeof AuthenticatedFilmIdRoute
-  '/_authenticated/film/category/$categoryId': typeof AuthenticatedFilmCategoryIdRoute
+  '/_authenticated/film/category/$categoryId': typeof AuthenticatedFilmCategoryCategoryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -218,7 +218,7 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/film/category/$categoryId'
       path: '/category/$categoryId'
       fullPath: '/film/category/$categoryId'
-      preLoaderRoute: typeof AuthenticatedFilmCategoryIdRouteImport
+      preLoaderRoute: typeof AuthenticatedFilmCategoryCategoryIdRouteImport
       parentRoute: typeof AuthenticatedFilmRoute
     }
   }
@@ -226,12 +226,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedFilmRouteChildren {
   AuthenticatedFilmIdRoute: typeof AuthenticatedFilmIdRoute
-  AuthenticatedFilmCategoryIdRoute: typeof AuthenticatedFilmCategoryIdRoute
+  AuthenticatedFilmCategoryCategoryIdRoute: typeof AuthenticatedFilmCategoryCategoryIdRoute
 }
 
 const AuthenticatedFilmRouteChildren: AuthenticatedFilmRouteChildren = {
   AuthenticatedFilmIdRoute: AuthenticatedFilmIdRoute,
-  AuthenticatedFilmCategoryIdRoute: AuthenticatedFilmCategoryIdRoute,
+  AuthenticatedFilmCategoryCategoryIdRoute:
+    AuthenticatedFilmCategoryCategoryIdRoute,
 }
 
 const AuthenticatedFilmRouteWithChildren =

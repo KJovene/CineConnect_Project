@@ -1,6 +1,12 @@
 import type { Response } from "express";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
 import {
+  createFilmCommentRequestSchema,
+  createFilmReplyRequestSchema,
+  updateFilmCommentRequestSchema,
+  upsertRatingRequestSchema,
+} from "@cineconnect/shared";
+import {
   createFilmComment,
   createReviewReply,
   deleteReviewComment,
@@ -78,12 +84,12 @@ export async function setRating(req: RequestWithSession, res: Response) {
   }
 
   const userId = Number.parseInt(req.session!.user.id, 10);
-  const { rating } = req.body as { rating?: number };
-
-  if (typeof rating !== "number") {
-    res.status(400).json({ error: "Le champ rating est requis" });
+  const bodyResult = upsertRatingRequestSchema.safeParse(req.body);
+  if (!bodyResult.success) {
+    res.status(400).json({ error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide" });
     return;
   }
+  const { rating } = bodyResult.data;
 
   try {
     await upsertFilmRating({ omdbId, userId, rating });
@@ -110,15 +116,12 @@ export async function createComment(req: RequestWithSession, res: Response) {
   }
 
   const userId = parseInt(req.session!.user.id, 10);
-  const { comment, rating } = req.body as {
-    comment?: string;
-    rating?: number;
-  };
-
-  if (typeof comment !== "string") {
-    res.status(400).json({ error: "Le champ comment est requis" });
+  const bodyResult = createFilmCommentRequestSchema.safeParse(req.body);
+  if (!bodyResult.success) {
+    res.status(400).json({ error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide" });
     return;
   }
+  const { comment, rating } = bodyResult.data;
 
   try {
     const created = await createFilmComment({
@@ -151,12 +154,12 @@ export async function createReply(req: RequestWithSession, res: Response) {
   }
 
   const userId = parseInt(req.session!.user.id, 10);
-  const { comment } = req.body as { comment?: string };
-
-  if (typeof comment !== "string") {
-    res.status(400).json({ error: "Le champ comment est requis" });
+  const bodyResult = createFilmReplyRequestSchema.safeParse(req.body);
+  if (!bodyResult.success) {
+    res.status(400).json({ error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide" });
     return;
   }
+  const { comment } = bodyResult.data;
 
   try {
     const created = await createReviewReply({
@@ -196,12 +199,12 @@ export async function patchComment(req: RequestWithSession, res: Response) {
   }
 
   const userId = parseInt(req.session!.user.id, 10);
-  const { comment } = req.body as { comment?: string };
-
-  if (typeof comment !== "string") {
-    res.status(400).json({ error: "Le champ comment est requis" });
+  const bodyResult = updateFilmCommentRequestSchema.safeParse(req.body);
+  if (!bodyResult.success) {
+    res.status(400).json({ error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide" });
     return;
   }
+  const { comment } = bodyResult.data;
 
   try {
     await updateReviewComment({ omdbId, userId, reviewId, comment });

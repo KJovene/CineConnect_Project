@@ -18,6 +18,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ["@cineconnect/shared"],
+  },
   server: {
     host: "0.0.0.0", // Permet les connexions externes pour Docker
     port: 5173,

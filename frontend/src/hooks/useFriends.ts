@@ -1,56 +1,85 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import { apiClient } from "@/lib/apiClient";
 
-export interface FriendUser {
-  id: number;
-  name: string | null;
-  email: string;
-  image: string | null;
-}
+const friendUserSchema = z.object({
+  id: z.number(),
+  name: z.string().nullable(),
+  email: z.string(),
+  image: z.string().nullable(),
+});
 
-export interface UserSearchResult extends FriendUser {
-  relationStatus: "pending" | "accepted" | "rejected" | null;
-}
+const userSearchResultSchema = friendUserSchema.extend({
+  relationStatus: z.enum(["pending", "accepted", "rejected"]).nullable(),
+});
 
-export interface FriendRelation {
-  friend_id: number;
-  user_id: number;
-  friend_user_id: number;
-  status: string;
-  created_at: string | null;
-  friend: FriendUser | null;
-}
+const friendRelationSchema = z.object({
+  friend_id: z.number(),
+  user_id: z.number(),
+  friend_user_id: z.number(),
+  status: z.string(),
+  created_at: z.string().nullable(),
+  friend: friendUserSchema.nullable(),
+});
 
-export interface PendingRequest {
-  friend_id: number;
-  user_id: number;
-  friend_user_id: number;
-  status: string;
-  created_at: string | null;
-  requester: FriendUser | null;
-}
+const pendingRequestSchema = z.object({
+  friend_id: z.number(),
+  user_id: z.number(),
+  friend_user_id: z.number(),
+  status: z.string(),
+  created_at: z.string().nullable(),
+  requester: friendUserSchema.nullable(),
+});
+
+export type FriendUser = z.infer<typeof friendUserSchema>;
+export type UserSearchResult = z.infer<typeof userSearchResultSchema>;
+export type FriendRelation = z.infer<typeof friendRelationSchema>;
+export type PendingRequest = z.infer<typeof pendingRequestSchema>;
 
 export function useFriends() {
   return useQuery({
     queryKey: ["friends"],
-    queryFn: () => apiClient.get<FriendRelation[]>("/friends"),
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>("/friends");
+      const parsed = z.array(friendRelationSchema).safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useFriends] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
   });
 }
 
 export function usePendingRequests() {
   return useQuery({
     queryKey: ["friends", "pending"],
-    queryFn: () => apiClient.get<PendingRequest[]>("/friends/pending"),
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>("/friends/pending");
+      const parsed = z.array(pendingRequestSchema).safeParse(raw);
+      if (!parsed.success) {
+        console.error("[usePendingRequests] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
   });
 }
 
 export function useSearchUsers(search: string) {
   return useQuery({
     queryKey: ["users", "search", search],
-    queryFn: () =>
-      apiClient.get<UserSearchResult[]>(
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>(
         `/users?search=${encodeURIComponent(search)}`,
-      ),
+      );
+      const parsed = z.array(userSearchResultSchema).safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useSearchUsers] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
     enabled: search.length >= 2,
   });
 }

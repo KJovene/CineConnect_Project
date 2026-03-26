@@ -1,76 +1,47 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import {
+  filmReviewsResponseSchema,
+  type FilmReviewComment,
+  type ReviewReply,
+  type CreateFilmCommentRequest,
+  type UpdateFilmCommentRequest,
+  type CreateFilmReplyRequest,
+} from "@cineconnect/shared";
 import { apiClient } from "@/lib/apiClient";
 
-export interface ReviewAuthor {
-  id: number;
-  name: string;
-  image: string | null;
-}
 
-export interface ReviewReply {
-  reviewId: number;
-  filmId: number;
-  parentReviewId: number;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  author: ReviewAuthor;
-}
+const filmRatingSummarySchema = z.object({
+  averageRating: z.number().nullable(),
+  totalRatings: z.number(),
+  userRating: z.number().nullable(),
+});
 
-export interface FilmReviewComment {
-  reviewId: number;
-  filmId: number;
-  parentReviewId: null;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  author: ReviewAuthor;
-  replies: ReviewReply[];
-}
+const latestUserRatingSchema = z.object({
+  reviewId: z.number(),
+  filmId: z.number(),
+  omdbId: z.string(),
+  filmTitle: z.string(),
+  posterUrl: z.string().nullable(),
+  rating: z.number(),
+  createdAt: z.string().nullable(),
+});
 
-type FilmReviewsResponse = FilmReviewComment[];
+const latestUserCommentSchema = z.object({
+  reviewId: z.number(),
+  filmId: z.number(),
+  omdbId: z.string(),
+  filmTitle: z.string(),
+  posterUrl: z.string().nullable(),
+  comment: z.string(),
+  isReply: z.boolean(),
+  createdAt: z.string().nullable(),
+});
 
-export interface FilmRatingSummary {
-  averageRating: number | null;
-  totalRatings: number;
-  userRating: number | null;
-}
-
-export interface LatestUserRating {
-  reviewId: number;
-  filmId: number;
-  omdbId: string;
-  filmTitle: string;
-  posterUrl: string | null;
-  rating: number;
-  createdAt: string | null;
-}
-
-export interface LatestUserComment {
-  reviewId: number;
-  filmId: number;
-  omdbId: string;
-  filmTitle: string;
-  posterUrl: string | null;
-  comment: string;
-  isReply: boolean;
-  createdAt: string | null;
-}
-
-interface CreateFilmCommentRequest {
-  comment: string;
-  rating?: number;
-}
-
-interface UpdateFilmCommentRequest {
-  comment: string;
-}
-
-interface CreateFilmReplyRequest {
-  comment: string;
-}
+export type FilmRatingSummary = z.infer<typeof filmRatingSummarySchema>;
+export type LatestUserRating = z.infer<typeof latestUserRatingSchema>;
+export type LatestUserComment = z.infer<typeof latestUserCommentSchema>;
+export type { FilmReviewComment, ReviewReply };
 
 const PROFILE_HISTORY_LIMIT = 100;
 
@@ -97,28 +68,49 @@ function latestCommentsQueryKey() {
 export function useMyLatestRatings() {
   return useQuery({
     queryKey: latestRatingsQueryKey(),
-    queryFn: () =>
-      apiClient.get<LatestUserRating[]>(
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>(
         `/users/me/latest-ratings?limit=${PROFILE_HISTORY_LIMIT}`,
-      ),
+      );
+      const parsed = z.array(latestUserRatingSchema).safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useMyLatestRatings] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
   });
 }
 
 export function useMyLatestComments() {
   return useQuery({
     queryKey: latestCommentsQueryKey(),
-    queryFn: () =>
-      apiClient.get<LatestUserComment[]>(
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>(
         `/users/me/latest-comments?limit=${PROFILE_HISTORY_LIMIT}`,
-      ),
+      );
+      const parsed = z.array(latestUserCommentSchema).safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useMyLatestComments] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
   });
 }
 
 export function useFilmReviews(omdbId: string) {
   return useQuery({
     queryKey: reviewsQueryKey(omdbId),
-    queryFn: () =>
-      apiClient.get<FilmReviewsResponse>(`/films/${omdbId}/reviews`),
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>(`/films/${omdbId}/reviews`);
+      const parsed = filmReviewsResponseSchema.safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useFilmReviews] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
     enabled: !!omdbId,
   });
 }
@@ -126,10 +118,17 @@ export function useFilmReviews(omdbId: string) {
 export function useFilmRatingSummary(omdbId: string) {
   return useQuery({
     queryKey: ratingSummaryQueryKey(omdbId),
-    queryFn: () =>
-      apiClient.get<FilmRatingSummary>(
+    queryFn: async () => {
+      const raw = await apiClient.get<unknown>(
         `/films/${omdbId}/reviews/rating-summary`,
-      ),
+      );
+      const parsed = filmRatingSummarySchema.safeParse(raw);
+      if (!parsed.success) {
+        console.error("[useFilmRatingSummary] Réponse invalide:", parsed.error);
+        throw new Error("Réponse API invalide");
+      }
+      return parsed.data;
+    },
     enabled: !!omdbId,
   });
 }
@@ -144,9 +143,7 @@ export function useUpsertFilmRating(omdbId: string) {
         payload,
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ratingSummaryQueryKey(omdbId),
-      });
+      queryClient.invalidateQueries({ queryKey: ratingSummaryQueryKey(omdbId) });
       queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
     },
@@ -161,9 +158,7 @@ export function useCreateFilmComment(omdbId: string) {
       apiClient.post(`/films/${omdbId}/reviews`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
-      queryClient.invalidateQueries({
-        queryKey: ratingSummaryQueryKey(omdbId),
-      });
+      queryClient.invalidateQueries({ queryKey: ratingSummaryQueryKey(omdbId) });
       queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
@@ -182,9 +177,7 @@ export function useUpdateFilmComment(omdbId: string) {
     }) => apiClient.patch(`/films/${omdbId}/reviews/${reviewId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
-      queryClient.invalidateQueries({
-        queryKey: ratingSummaryQueryKey(omdbId),
-      });
+      queryClient.invalidateQueries({ queryKey: ratingSummaryQueryKey(omdbId) });
       queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
@@ -198,9 +191,7 @@ export function useDeleteFilmComment(omdbId: string) {
       apiClient.delete(`/films/${omdbId}/reviews/${reviewId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewsQueryKey(omdbId) });
-      queryClient.invalidateQueries({
-        queryKey: ratingSummaryQueryKey(omdbId),
-      });
+      queryClient.invalidateQueries({ queryKey: ratingSummaryQueryKey(omdbId) });
       queryClient.invalidateQueries({ queryKey: movieDetailQueryKey(omdbId) });
     },
   });
