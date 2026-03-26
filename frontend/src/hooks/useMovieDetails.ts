@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import type { FilmDetailResponse } from "@cineconnect/shared";
+import {
+  filmDetailResponseSchema,
+  type FilmDetailResponse,
+} from "@cineconnect/shared";
 import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
 const API_BASE = getApiBaseUrl();
@@ -12,7 +15,13 @@ async function fetchFilmDetail(omdbId: string): Promise<FilmDetailResponse> {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message ?? "Film introuvable");
   }
-  return res.json();
+  const raw = await res.json();
+  const parsed = filmDetailResponseSchema.safeParse(raw);
+  if (!parsed.success) {
+    console.error("[useMovieDetails] Réponse invalide:", parsed.error);
+    throw new Error("Réponse API invalide");
+  }
+  return parsed.data;
 }
 
 export function useMovieDetails(omdbId: string) {
