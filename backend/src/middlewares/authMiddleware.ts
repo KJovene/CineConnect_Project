@@ -1,14 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { auth } from "../auth.js";
+import type { AuthSession, RequestWithSession } from "../types/index.js";
 
-export interface AuthSession {
-  user: { id: string; name: string | null; email: string; image: string | null };
-  session: { id: string; userId: string; token: string; expiresAt: Date };
-}
-
-export interface RequestWithSession extends Request {
-  session?: AuthSession | null;
-}
+export type { RequestWithSession };
 
 /** Convertit IncomingHttpHeaders en Headers (Web API) pour Better Auth. */
 function toHeaders(

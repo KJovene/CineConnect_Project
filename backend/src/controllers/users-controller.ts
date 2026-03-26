@@ -4,14 +4,26 @@ import { user, friends, reviews, films } from "../db/schema.js";
 import { ilike, or, and, eq, inArray, desc, isNull, sql } from "drizzle-orm";
 import { getUserCommentReplyNotifications } from "../services/reviewsService.js";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
+import type { ErrorResponse, PaginationQuery } from "../types/index.js";
+
+function getClampedLimit(query: PaginationQuery, fallback: number): number {
+  const rawValue = query.limit ?? query.pageSize;
+  const parsed = Number.parseInt(String(rawValue ?? fallback), 10);
+  const normalized = Number.isNaN(parsed) ? fallback : Math.trunc(parsed);
+  return Math.min(Math.max(normalized, 1), 200);
+}
+
+function internalError(): ErrorResponse {
+  return { error: "Erreur serveur" };
+}
 
 export async function getLatestRatings(req: RequestWithSession, res: Response) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
-    const parsedLimit = parseInt((req.query.limit as string) ?? "100", 10);
-    const normalizedLimit = Number.isNaN(parsedLimit)
-      ? 100
-      : Math.min(Math.max(Math.trunc(parsedLimit), 1), 200);
+    const normalizedLimit = getClampedLimit(
+      req.query as PaginationQuery,
+      100,
+    );
 
     const rows = await db
       .select({
@@ -47,7 +59,7 @@ export async function getLatestRatings(req: RequestWithSession, res: Response) {
       })),
     );
   } catch (_err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json(internalError());
   }
 }
 
@@ -57,10 +69,10 @@ export async function getLatestComments(
 ) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
-    const parsedLimit = parseInt((req.query.limit as string) ?? "100", 10);
-    const normalizedLimit = Number.isNaN(parsedLimit)
-      ? 100
-      : Math.min(Math.max(Math.trunc(parsedLimit), 1), 200);
+    const normalizedLimit = getClampedLimit(
+      req.query as PaginationQuery,
+      100,
+    );
 
     const rows = await db
       .select({
@@ -97,7 +109,7 @@ export async function getLatestComments(
       })),
     );
   } catch (_err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json(internalError());
   }
 }
 
@@ -107,7 +119,7 @@ export async function getCommentReplies(
 ) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
-    const limit = parseInt((req.query.limit as string) ?? "20", 10);
+    const limit = getClampedLimit(req.query as PaginationQuery, 20);
 
     const rows = await getUserCommentReplyNotifications({
       userId: myId,
@@ -115,7 +127,7 @@ export async function getCommentReplies(
     });
     res.json(rows);
   } catch (_err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json(internalError());
   }
 }
 
@@ -179,6 +191,6 @@ export async function searchUsers(req: RequestWithSession, res: Response) {
       })),
     );
   } catch (_err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json(internalError());
   }
 }
