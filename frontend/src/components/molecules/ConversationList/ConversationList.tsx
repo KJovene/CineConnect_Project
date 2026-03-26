@@ -57,7 +57,7 @@ export function ConversationList({
             className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-r-2 cursor-pointer ${
               isSelected
                 ? "border-indigo-500"
-                : "border-transparent hover:bg-white/[0.03]"
+                : "border-transparent hover:bg-white/3"
             }`}
             style={
               isSelected ? { background: "var(--color-surface)" } : undefined
