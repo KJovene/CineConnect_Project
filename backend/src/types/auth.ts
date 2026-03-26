@@ -14,7 +14,12 @@ export interface AuthenticatedRequest {
 }
 
 export interface AuthSession {
-  user: { id: string; name: string | null; email: string; image: string | null };
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
   session: { id: string; userId: string; token: string; expiresAt: Date };
 }
 

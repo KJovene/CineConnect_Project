@@ -20,10 +20,7 @@ function internalError(): ErrorResponse {
 export async function getLatestRatings(req: RequestWithSession, res: Response) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
-    const normalizedLimit = getClampedLimit(
-      req.query as PaginationQuery,
-      100,
-    );
+    const normalizedLimit = getClampedLimit(req.query as PaginationQuery, 100);
 
     const rows = await db
       .select({
@@ -69,10 +66,7 @@ export async function getLatestComments(
 ) {
   try {
     const myId = parseInt(String(req.session!.user.id), 10);
-    const normalizedLimit = getClampedLimit(
-      req.query as PaginationQuery,
-      100,
-    );
+    const normalizedLimit = getClampedLimit(req.query as PaginationQuery, 100);
 
     const rows = await db
       .select({
