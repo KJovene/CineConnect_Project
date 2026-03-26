@@ -1,23 +1,15 @@
-import { db } from '../db/index.js';
-import { friends, user } from '../db/schema.js';
-import { eq, or, and, inArray } from 'drizzle-orm';
+import {
+  createPendingRelation,
+  deleteRelation,
+  findAcceptedRelationsByUserId,
+  findExistingRelation,
+  findPendingRelationsForReceiver,
+  findUsersByIds,
+  updatePendingRelationStatus,
+} from "../repositories/friendsRepository.js";
 
 export async function getFriends(userId: number) {
-  const rows = await db
-    .select({
-      friend_id: friends.friend_id,
-      user_id: friends.user_id,
-      friend_user_id: friends.friend_user_id,
-      status: friends.status,
-      created_at: friends.created_at,
-    })
-    .from(friends)
-    .where(
-      and(
-        or(eq(friends.user_id, userId), eq(friends.friend_user_id, userId)),
-        eq(friends.status, 'accepted')
-      )
-    );
+  const rows = await findAcceptedRelationsByUserId(userId);
 
   if (rows.length === 0) return [];
 
@@ -25,10 +17,7 @@ export async function getFriends(userId: number) {
     r.user_id === userId ? r.friend_user_id : r.user_id
   );
 
-  const users = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
-    .from(user)
-    .where(inArray(user.id, otherIds));
+  const users = await findUsersByIds(otherIds);
 
   const userMap = new Map(users.map((u) => [u.id, u]));
 
@@ -39,26 +28,12 @@ export async function getFriends(userId: number) {
 }
 
 export async function getPendingRequests(userId: number) {
-  const rows = await db
-    .select({
-      friend_id: friends.friend_id,
-      user_id: friends.user_id,
-      friend_user_id: friends.friend_user_id,
-      status: friends.status,
-      created_at: friends.created_at,
-    })
-    .from(friends)
-    .where(
-      and(eq(friends.friend_user_id, userId), eq(friends.status, 'pending'))
-    );
+  const rows = await findPendingRelationsForReceiver(userId);
 
   if (rows.length === 0) return [];
 
   const requesterIds = rows.map((r) => r.user_id);
-  const users = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
-    .from(user)
-    .where(inArray(user.id, requesterIds));
+  const users = await findUsersByIds(requesterIds);
 
   const userMap = new Map(users.map((u) => [u.id, u]));
 
@@ -68,65 +43,35 @@ export async function getPendingRequests(userId: number) {
 export async function sendFriendRequest(userId: number, friendUserId: number) {
   if (userId === friendUserId) throw new Error('Impossible de s\'ajouter soi-même');
 
-  const existing = await db
-    .select()
-    .from(friends)
-    .where(
-      or(
-        and(eq(friends.user_id, userId), eq(friends.friend_user_id, friendUserId)),
-        and(eq(friends.user_id, friendUserId), eq(friends.friend_user_id, userId))
-      )
-    );
+  const existing = await findExistingRelation(userId, friendUserId);
 
   if (existing.length > 0) throw new Error('Relation déjà existante');
 
-  const [result] = await db
-    .insert(friends)
-    .values({ user_id: userId, friend_user_id: friendUserId, status: 'pending' })
-    .returning();
-
-  return result;
+  return createPendingRelation(userId, friendUserId);
 }
 
 export async function acceptFriendRequest(userId: number, friendUserId: number) {
-  const [result] = await db
-    .update(friends)
-    .set({ status: 'accepted' })
-    .where(
-      and(
-        eq(friends.user_id, friendUserId),
-        eq(friends.friend_user_id, userId),
-        eq(friends.status, 'pending')
-      )
-    )
-    .returning();
+  const result = await updatePendingRelationStatus(
+    userId,
+    friendUserId,
+    "accepted",
+  );
 
   if (!result) throw new Error('Demande introuvable');
   return result;
 }
 
 export async function rejectFriendRequest(userId: number, friendUserId: number) {
-  const [result] = await db
-    .update(friends)
-    .set({ status: 'rejected' })
-    .where(
-      and(
-        eq(friends.user_id, friendUserId),
-        eq(friends.friend_user_id, userId),
-        eq(friends.status, 'pending')
-      )
-    )
-    .returning();
+  const result = await updatePendingRelationStatus(
+    userId,
+    friendUserId,
+    "rejected",
+  );
 
   if (!result) throw new Error('Demande introuvable');
   return result;
 }
 
 export async function removeFriend(userId: number, friendUserId: number) {
-  await db.delete(friends).where(
-    or(
-      and(eq(friends.user_id, userId), eq(friends.friend_user_id, friendUserId)),
-      and(eq(friends.user_id, friendUserId), eq(friends.friend_user_id, userId))
-    )
-  );
+  await deleteRelation(userId, friendUserId);
 }
