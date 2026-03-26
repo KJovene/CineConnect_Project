@@ -1,23 +1,16 @@
 import type { Request, Response, NextFunction } from "express";
 import { auth } from "../auth.js";
+import type { RequestWithSession } from "../types/index.js";
 
-export interface AuthSession {
-  user: { id: string; name: string | null; email: string; image: string | null };
-  session: { id: string; userId: string; token: string; expiresAt: Date };
-}
-
-export interface RequestWithSession extends Request {
-  session?: AuthSession | null;
-}
+export type { RequestWithSession };
 
 /** Convertit IncomingHttpHeaders en Headers (Web API) pour Better Auth. */
 function toHeaders(
-  h: Request["headers"]
+  h: Request["headers"],
 ): InstanceType<typeof globalThis.Headers> {
   const headers = new Headers();
   for (const [k, v] of Object.entries(h)) {
-    if (v !== undefined)
-      headers.set(k, Array.isArray(v) ? v.join(", ") : v);
+    if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(", ") : v);
   }
   return headers;
 }
@@ -29,7 +22,7 @@ function toHeaders(
 export async function attachSession(
   req: RequestWithSession,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const raw = await auth.api.getSession({ headers: toHeaders(req.headers) });
@@ -53,7 +46,7 @@ export async function attachSession(
 export function requireAuth(
   req: RequestWithSession,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   if (!req.session?.user) {
     res.status(401).json({ error: "Non authentifié" });

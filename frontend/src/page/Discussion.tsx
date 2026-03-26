@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { HiChatBubbleLeftRight, HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  HiChatBubbleLeftRight,
+  HiChevronLeft,
+  HiChevronRight,
+} from "react-icons/hi2";
 import { useSearch } from "@tanstack/react-router";
 import { ChatWindow } from "@/components/organisms";
 import { ConversationList } from "@/components/molecules";
@@ -15,16 +19,34 @@ import { connectSocket, disconnectSocket } from "@/lib/socket";
 const Discussion: React.FC = () => {
   const search = useSearch({ from: "/_authenticated/discussion" });
   const { data: session } = useSession();
-  const currentUserId = session?.user ? Number.parseInt(session.user.id, 10) : null;
+  const currentUserId = session?.user
+    ? Number.parseInt(session.user.id, 10)
+    : null;
 
-  const [selectedFriend, setSelectedFriend] = useState<FriendUser | null>(null);
+  const parsedSearchFriendId = useMemo(() => {
+    const rawFriendId = search.friendId;
+    if (!rawFriendId) return null;
+    const parsedFriendId = Number.parseInt(rawFriendId, 10);
+    return Number.isNaN(parsedFriendId) ? null : parsedFriendId;
+  }, [search.friendId]);
+
+  const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   // "list" | "chat" — contrôle la vue active sur mobile
-  const [mobileView, setMobileView] = useState<"list" | "chat">("list");
+  const [mobileView, setMobileView] = useState<"list" | "chat">(
+    parsedSearchFriendId ? "chat" : "list",
+  );
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const { data: friends = [], isLoading: friendsLoading } = useFriends();
+  const activeFriendId = selectedFriendId ?? parsedSearchFriendId;
+  const activeFriend = useMemo(() => {
+    if (!activeFriendId) return null;
+    const relation = friends.find((item) => item.friend?.id === activeFriendId);
+    return relation?.friend ?? null;
+  }, [friends, activeFriendId]);
+
   const { data: messages = [], isLoading: messagesLoading } = useMessages(
-    selectedFriend?.id ?? null,
+    activeFriend?.id ?? null,
   );
   const socketSend = useSocketSend();
 
@@ -33,37 +55,24 @@ const Discussion: React.FC = () => {
     return () => disconnectSocket();
   }, []);
 
-  useEffect(() => {
-    const rawFriendId = search.friendId;
-    if (!rawFriendId) return;
-    const parsedFriendId = Number.parseInt(rawFriendId, 10);
-    if (Number.isNaN(parsedFriendId)) return;
-    const relation = friends.find((item) => item.friend?.id === parsedFriendId);
-    const targetFriend = relation?.friend;
-    if (!targetFriend) return;
-    setSelectedFriend(targetFriend);
-    setMobileView("chat");
-  }, [friends, search.friendId]);
-
   useIncomingMessages(currentUserId);
 
   const handleSend = (content: string) => {
-    if (!selectedFriend || !currentUserId) return;
-    socketSend(selectedFriend.id, content);
+    if (!activeFriend || !currentUserId) return;
+    socketSend(activeFriend.id, content);
   };
 
   const handleSelectFriend = (friend: FriendUser) => {
-    setSelectedFriend(friend);
-    setMobileView("chat"); 
+    setSelectedFriendId(friend.id);
+    setMobileView("chat");
   };
 
   const handleBack = () => {
-    setMobileView("list"); 
+    setMobileView("list");
   };
 
   return (
     <div className="flex h-full pt-20">
-
       {/* liste des conversations */}
       <aside
         className={`
@@ -98,19 +107,26 @@ const Discussion: React.FC = () => {
             style={{ color: "var(--color-text-muted)" }}
             title={sidebarCollapsed ? "Ouvrir la liste" : "Réduire la liste"}
           >
-            {sidebarCollapsed ? <HiChevronRight size={18} /> : <HiChevronLeft size={18} />}
+            {sidebarCollapsed ? (
+              <HiChevronRight size={18} />
+            ) : (
+              <HiChevronLeft size={18} />
+            )}
           </button>
         </div>
 
         {/* Liste */}
         <div
           className="flex-1 overflow-y-auto no-scrollbar transition-opacity duration-200"
-          style={{ opacity: sidebarCollapsed ? 0 : 1, pointerEvents: sidebarCollapsed ? "none" : "auto" }}
+          style={{
+            opacity: sidebarCollapsed ? 0 : 1,
+            pointerEvents: sidebarCollapsed ? "none" : "auto",
+          }}
         >
           <ConversationList
             friends={friends}
             isLoading={friendsLoading}
-            selectedId={selectedFriend?.id ?? null}
+            selectedId={activeFriend?.id ?? null}
             onSelect={handleSelectFriend}
           />
         </div>
@@ -123,9 +139,9 @@ const Discussion: React.FC = () => {
           ${mobileView === "list" ? "hidden lg:flex" : "flex"}
         `}
       >
-        {selectedFriend && currentUserId ? (
+        {activeFriend && currentUserId ? (
           <ChatWindow
-            friend={selectedFriend}
+            friend={activeFriend}
             messages={messages}
             currentUserId={currentUserId}
             isLoading={messagesLoading}
@@ -138,7 +154,9 @@ const Discussion: React.FC = () => {
             style={{ color: "var(--color-text-muted)" }}
           >
             <HiChatBubbleLeftRight size={48} className="mb-4 opacity-20" />
-            <p className="text-sm">Sélectionnez un ami pour commencer à discuter</p>
+            <p className="text-sm">
+              Sélectionnez un ami pour commencer à discuter
+            </p>
           </div>
         )}
       </main>

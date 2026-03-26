@@ -1,14 +1,17 @@
 import type { ReactNode } from "react";
-import { Logo } from "@/components/atoms";
-import { ThemeToggle } from "@/components/atoms";
+import { Logo, ThemeToggle } from "@/components/atoms";
 
-export interface AuthPageLayoutProps {
+interface AuthPageLayoutProps {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
 }
 
-export function AuthPageLayout({ title, children, footer }: AuthPageLayoutProps) {
+export function AuthPageLayout({
+  title,
+  children,
+  footer,
+}: AuthPageLayoutProps) {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"

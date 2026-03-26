@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { HiPaperAirplane, HiArrowLeft } from 'react-icons/hi2';
-import { Avatar } from '@/components/atoms';
-import type { FriendUser } from '@/hooks/useFriends';
-import type { Message } from '@/hooks/useMessages';
+import React, { useEffect, useRef, useState } from "react";
+import { HiPaperAirplane, HiArrowLeft } from "react-icons/hi2";
+import { Avatar } from "@/components/atoms";
+import type { FriendUser } from "@/hooks/useFriends";
+import type { Message } from "@/hooks/useMessages";
 
-export interface ChatWindowProps {
+interface ChatWindowProps {
   friend: FriendUser;
   messages: Message[];
   currentUserId: number;
@@ -14,19 +14,22 @@ export interface ChatWindowProps {
 }
 
 function formatTime(sentAt: string | null): string {
-  if (!sentAt) return '';
-  return new Date(sentAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  if (!sentAt) return "";
+  return new Date(sentAt).toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatDate(sentAt: string | null): string {
-  if (!sentAt) return '';
+  if (!sentAt) return "";
   const date = new Date(sentAt);
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   if (date.toDateString() === today.toDateString()) return "Aujourd'hui";
-  if (date.toDateString() === yesterday.toDateString()) return 'Hier';
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  if (date.toDateString() === yesterday.toDateString()) return "Hier";
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
 function isSameDay(a: string | null, b: string | null): boolean {
@@ -37,14 +40,20 @@ function isSameDay(a: string | null, b: string | null): boolean {
 function DateSeparator({ date }: { date: string | null }) {
   return (
     <div className="flex items-center gap-3 my-3">
-      <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
+      <div
+        className="flex-1 h-px"
+        style={{ background: "var(--color-border)" }}
+      />
       <span
         className="text-[10px] font-medium tracking-widest uppercase"
         style={{ color: "var(--color-text-muted)" }}
       >
         {formatDate(date)}
       </span>
-      <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
+      <div
+        className="flex-1 h-px"
+        style={{ background: "var(--color-border)" }}
+      />
     </div>
   );
 }
@@ -63,10 +72,11 @@ function FriendBubble({
   return (
     <div className="flex items-end gap-2 w-full justify-start">
       <div className="w-8 shrink-0 self-end mb-1">
-        {isLast
-          ? <Avatar image={friend.image} name={friend.name} />
-          : <div className="w-8 h-8" />
-        }
+        {isLast ? (
+          <Avatar image={friend.image} name={friend.name} />
+        ) : (
+          <div className="w-8 h-8" />
+        )}
       </div>
 
       <div className="flex flex-col items-start gap-1 max-w-[65%]">
@@ -75,7 +85,7 @@ function FriendBubble({
             className="text-[11px] ml-1"
             style={{ color: "var(--color-text-muted)" }}
           >
-            {friend.name ?? 'Utilisateur'}
+            {friend.name ?? "Utilisateur"}
           </span>
         )}
 
@@ -133,11 +143,11 @@ export function ChatWindow({
   onSend,
   onBack,
 }: ChatWindowProps) {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -145,22 +155,24 @@ export function ChatWindow({
     const trimmed = input.trim();
     if (!trimmed) return;
     onSend(trimmed);
-    setInput('');
+    setInput("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       const trimmed = input.trim();
       if (!trimmed) return;
       onSend(trimmed);
-      setInput('');
+      setInput("");
     }
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "var(--color-bg)" }}>
-
+    <div
+      className="flex flex-col h-full"
+      style={{ background: "var(--color-bg)" }}
+    >
       {/* Header */}
       <div
         className="h-16 flex items-center gap-3 px-6 shrink-0"
@@ -175,7 +187,7 @@ export function ChatWindow({
             className="text-sm font-semibold truncate"
             style={{ color: "var(--color-text)" }}
           >
-            {friend.name ?? 'Utilisateur'}
+            {friend.name ?? "Utilisateur"}
           </p>
         </div>
 
@@ -187,8 +199,6 @@ export function ChatWindow({
           <HiArrowLeft size={20} />
         </button>
       </div>
-
-      
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-6">
@@ -230,11 +240,17 @@ export function ChatWindow({
                 style={{ color: "var(--color-text-muted)" }}
               />
             </div>
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
+            <p
+              className="text-sm font-medium"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               Commencez la conversation
             </p>
-            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-              Dites bonjour à {friend.name ?? 'votre ami'} !
+            <p
+              className="text-xs mt-1"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              Dites bonjour à {friend.name ?? "votre ami"} !
             </p>
           </div>
         ) : (
@@ -250,11 +266,17 @@ export function ChatWindow({
               return (
                 <React.Fragment key={msg.message_id}>
                   {showDate && <DateSeparator date={msg.sent_at} />}
-                  <div className={isFirst ? 'mt-3' : 'mt-0.5'}>
-                    {isMine
-                      ? <MyBubble msg={msg} isLast={isLast} />
-                      : <FriendBubble msg={msg} isFirst={isFirst} isLast={isLast} friend={friend} />
-                    }
+                  <div className={isFirst ? "mt-3" : "mt-0.5"}>
+                    {isMine ? (
+                      <MyBubble msg={msg} isLast={isLast} />
+                    ) : (
+                      <FriendBubble
+                        msg={msg}
+                        isFirst={isFirst}
+                        isLast={isLast}
+                        friend={friend}
+                      />
+                    )}
                   </div>
                 </React.Fragment>
               );
@@ -278,7 +300,7 @@ export function ChatWindow({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Message à ${friend.name ?? 'votre ami'}…`}
+            placeholder={`Message à ${friend.name ?? "votre ami"}…`}
             className="flex-1 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition-all"
             style={{
               background: "var(--color-bg)",

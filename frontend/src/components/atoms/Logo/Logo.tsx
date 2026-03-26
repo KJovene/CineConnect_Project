@@ -1,6 +1,6 @@
 import { HiOutlinePlayCircle } from "react-icons/hi2";
 
-export interface LogoProps {
+interface LogoProps {
   showText?: boolean;
 }
 

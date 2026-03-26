@@ -1,13 +1,15 @@
-import type { User } from "@cineconnect/shared";
+import type { Request } from "express";
 
-export interface JwtPayload {
-  userId: string;
-  email: string;
-  iat: number;
-  exp: number;
+export interface AuthSession {
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
+  session: { id: string; userId: string; token: string; expiresAt: Date };
 }
 
-export interface AuthenticatedRequest {
-  user?: User;
-  userId?: string;
+export interface RequestWithSession extends Request {
+  session?: AuthSession | null;
 }

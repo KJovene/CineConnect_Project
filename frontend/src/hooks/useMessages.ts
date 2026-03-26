@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { z } from 'zod';
-import { useEffect, useCallback } from 'react';
-import { apiClient } from '@/lib/apiClient';
-import { getSocket } from '@/lib/socket';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { useEffect, useCallback } from "react";
+import { apiClient } from "@/lib/apiClient";
+import { getSocket } from "@/lib/socket";
 
 const messageSchema = z.object({
   message_id: z.number(),
@@ -16,7 +16,7 @@ export type Message = z.infer<typeof messageSchema>;
 
 export function useMessages(withUserId: number | null) {
   return useQuery({
-    queryKey: ['messages', withUserId],
+    queryKey: ["messages", withUserId],
     queryFn: async () => {
       const raw = await apiClient.get<unknown>(`/messages/with/${withUserId}`);
       const parsed = z.array(messageSchema).safeParse(raw);
@@ -30,17 +30,10 @@ export function useMessages(withUserId: number | null) {
   });
 }
 
-export function useSendMessage() {
-  return useMutation({
-    mutationFn: ({ receiverId, content }: { receiverId: number; content: string }) =>
-      apiClient.post<Message>('/messages', { receiverId, content }),
-  });
-}
-
 /** Envoie un message via Socket.io (temps réel). */
 export function useSocketSend() {
   return useCallback((toUserId: number, content: string) => {
-    getSocket().emit('dm:send', { toUserId, content });
+    getSocket().emit("dm:send", { toUserId, content });
   }, []);
 }
 
@@ -59,22 +52,25 @@ export function useIncomingMessages(currentUserId: number | null) {
     const handleNewMessage = ({ message }: { message: unknown }) => {
       const parsed = messageSchema.safeParse(message);
       if (!parsed.success) {
-        console.error("[useIncomingMessages] Message socket invalide:", parsed.error);
+        console.error(
+          "[useIncomingMessages] Message socket invalide:",
+          parsed.error,
+        );
         return;
       }
       const msg = parsed.data;
       const otherId =
         msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
 
-      qc.setQueryData<Message[]>(['messages', otherId], (old) => [
+      qc.setQueryData<Message[]>(["messages", otherId], (old) => [
         ...(old ?? []),
         msg,
       ]);
     };
 
-    socket.on('dm:new', handleNewMessage);
+    socket.on("dm:new", handleNewMessage);
     return () => {
-      socket.off('dm:new', handleNewMessage);
+      socket.off("dm:new", handleNewMessage);
     };
   }, [currentUserId, qc]);
 }

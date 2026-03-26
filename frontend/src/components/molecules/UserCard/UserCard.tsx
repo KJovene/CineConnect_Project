@@ -1,7 +1,7 @@
 import { Avatar } from "@/components/atoms";
 import { Link } from "@tanstack/react-router";
 
-export interface UserCardProps {
+interface UserCardProps {
   userName: string;
   userBadge: string;
   userAvatar: string | null;

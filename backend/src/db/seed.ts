@@ -63,63 +63,59 @@ const testUsers = [
 async function createUserViaAPI(
   testUser: (typeof testUsers)[0],
 ): Promise<boolean> {
-  try {
-    // D'abord, vérifier si l'utilisateur existe déjà en DB
-    const existingUser = await db
-      .select()
-      .from(user)
-      .where(eq(user.email, testUser.email))
-      .limit(1);
+  // D'abord, vérifier si l'utilisateur existe déjà en DB
+  const existingUser = await db
+    .select()
+    .from(user)
+    .where(eq(user.email, testUser.email))
+    .limit(1);
 
-    if (existingUser.length > 0) {
-      return false; // Utilisateur existe déjà
-    }
+  if (existingUser.length > 0) {
+    return false; // Utilisateur existe déjà
+  }
 
-    // Créer via Better Auth API
-    const response = await fetch(`${API_BASE_URL}/api/auth/sign-up/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Origin: API_BASE_URL,
-      },
-      body: JSON.stringify({
-        email: testUser.email,
-        password: GENERIC_PASSWORD,
-        name: testUser.name,
-        image: testUser.image,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      // Ignorer les erreurs "user already exists"
-      if (response.status === 400 && error.includes("already exists")) {
-        // L'utilisateur existe dans Better Auth, le chercher et l'ajouter à notre DB
-        console.log(`  └─ En train d'ajouter ${testUser.email} à la DB...`);
-        await db.insert(user).values({
-          name: testUser.name,
-          email: testUser.email,
-          image: testUser.image,
-          emailVerified: true,
-        });
-        return true;
-      }
-      throw new Error(`HTTP ${response.status}: ${error}`);
-    }
-
-    // Succès: aussi ajouter à notre DB PostgreSQL
-    console.log(`  └─ En train d'ajouter ${testUser.email} à la DB...`);
-    await db.insert(user).values({
+  // Créer via Better Auth API
+  const response = await fetch(`${API_BASE_URL}/api/auth/sign-up/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: API_BASE_URL,
+    },
+    body: JSON.stringify({
       name: testUser.name,
       email: testUser.email,
+      password: GENERIC_PASSWORD,
       image: testUser.image,
-      emailVerified: true,
-    });
+    }),
+  });
 
-    return true; // Créé avec succès
-  } catch (error: any) {
-    throw error;
+  if (!response.ok) {
+    const error = await response.text();
+    // Ignorer les erreurs "user already exists"
+    if (response.status === 400 && error.includes("already exists")) {
+      // L'utilisateur existe dans Better Auth, le chercher et l'ajouter à notre DB
+      console.log(`  └─ En train d'ajouter ${testUser.email} à la DB...`);
+      await db.insert(user).values({
+        name: testUser.name,
+        email: testUser.email,
+        image: testUser.image,
+        emailVerified: true,
+      });
+      return true;
+    }
+    throw new Error(`HTTP ${response.status}: ${error}`);
   }
+
+  // Succès: aussi ajouter à notre DB PostgreSQL
+  console.log(`  └─ En train d'ajouter ${testUser.email} à la DB...`);
+  await db.insert(user).values({
+    name: testUser.name,
+    email: testUser.email,
+    image: testUser.image,
+    emailVerified: true,
+  });
+
+  return true; // Créé avec succès
 }
 
 /**

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-export interface AuthNavLinkProps {
+interface AuthNavLinkProps {
   prompt: string;
   to: string;
   label: string;

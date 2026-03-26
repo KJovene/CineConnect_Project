@@ -3,7 +3,7 @@
 # ========================================
 # Commandes pour gérer le projet via Docker
 
-.PHONY: help install build up down start stop restart ps logs logs-follow clean clean-volumes clean-all shell-backend shell-frontend shell-db db-migrate db-reset auth-pause auth-resume rebuild health
+.PHONY: help install build up down start stop restart ps logs logs-follow clean clean-volumes clean-all shell-backend shell-frontend shell-db db-migrate db-reset auth-pause auth-resume rebuild health check-front check-back check-all lint-front lint-back typecheck-front typecheck-back knip-front knip-back knip-all
 
 # Variables
 DOCKER_COMPOSE = docker compose
@@ -238,6 +238,46 @@ test: ## Lancer tous les tests
 	@echo "$(GREEN)Lancement des tests...$(NC)"
 	pnpm test:front
 	pnpm test:back
+
+lint-front: ## Lancer ESLint sur le frontend (local)
+	@echo "$(GREEN)Lint frontend...$(NC)"
+	pnpm lint:front
+
+lint-back: ## Lancer ESLint sur le backend (local)
+	@echo "$(GREEN)Lint backend...$(NC)"
+	pnpm lint:back
+
+typecheck-front: ## Lancer le typecheck TypeScript sur le frontend
+	@echo "$(GREEN)Typecheck frontend...$(NC)"
+	pnpm typecheck:front
+
+typecheck-back: ## Lancer le typecheck TypeScript sur le backend
+	@echo "$(GREEN)Typecheck backend...$(NC)"
+	pnpm typecheck:back
+
+knip-front: ## Détecter dead code/imports inutilisés frontend avec Knip
+	@echo "$(GREEN)Knip frontend...$(NC)"
+	pnpm knip:front
+
+knip-back: ## Détecter dead code/imports inutilisés backend avec Knip
+	@echo "$(GREEN)Knip backend...$(NC)"
+	pnpm knip:back
+
+knip-all: ## Détecter dead code/imports inutilisés sur tout le monorepo
+	@echo "$(GREEN)Knip global...$(NC)"
+	pnpm knip
+
+check-front: ## Check qualité frontend: lint + typecheck + knip
+	@echo "$(GREEN)Check frontend complet...$(NC)"
+	pnpm check:front
+
+check-back: ## Check qualité backend: lint + typecheck + knip
+	@echo "$(GREEN)Check backend complet...$(NC)"
+	pnpm check:back
+
+check-all: ## Check qualité global: front + back + knip global
+	@echo "$(GREEN)Check global complet...$(NC)"
+	pnpm check:all
 
 lint: ## Vérifier le code (linting)
 	@echo "$(GREEN)Vérification du code...$(NC)"

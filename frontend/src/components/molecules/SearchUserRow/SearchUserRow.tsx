@@ -7,7 +7,7 @@ const RELATION_LABEL: Record<string, string> = {
   rejected: "Refusé",
 };
 
-export interface SearchUserRowProps {
+interface SearchUserRowProps {
   user: UserSearchResult;
   onAdd: (id: number) => void;
   isPending?: boolean;

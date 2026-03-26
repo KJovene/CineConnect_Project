@@ -1,7 +1,7 @@
 import {
   findAllCategories,
   findFilmsByCategoryId,
-} from "../repositories/categoriesRepository.js";
+} from "../repository/categoriesRepository.js";
 import type {
   Film,
   Category,

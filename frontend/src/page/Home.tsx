@@ -2,7 +2,7 @@ import React from "react";
 import { HeroSection, MediaGrid, ReviewList } from "@/components/organisms";
 import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
 import { useLatestCommunityReviews } from "@/hooks/useLatestCommunityReviews";
-import { getPosterUrl } from "@/media/utils/poster";
+import { getPosterUrl } from "@/utils/poster";
 import type { Film } from "@cineconnect/shared";
 import type { MovieCardProps } from "@/components/molecules";
 
@@ -25,8 +25,18 @@ const Home: React.FC = () => {
       return undefined;
     }
 
-    const randomIndex = Math.floor(Math.random() * topFilms.length);
-    return topFilms[randomIndex];
+    // Build a deterministic index from current film data to keep render pure.
+    const seed = topFilms.reduce((accumulator, film, index) => {
+      const source = `${film.omdb_id ?? film.title ?? ""}-${index}`;
+      let value = accumulator;
+      for (let i = 0; i < source.length; i += 1) {
+        value = (value * 31 + source.charCodeAt(i)) >>> 0;
+      }
+      return value;
+    }, 0);
+
+    const featuredIndex = seed % topFilms.length;
+    return topFilms[featuredIndex];
   }, [topFilms]);
 
   const trendingFilms = topFilms?.map(convertToMovieCard) || [];

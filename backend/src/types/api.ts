@@ -1,7 +1,7 @@
 export interface ErrorResponse {
-  success: false;
+  success?: false;
   error: string;
-  statusCode: number;
+  statusCode?: number;
 }
 
 export interface PaginationQuery {

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { LatestUserRating } from "@/hooks/useReviews";
-import { getPosterUrl } from "@/media/utils/poster";
+import { getPosterUrl } from "@/utils/poster";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-export interface ProfileLatestRatingsProps {
+interface ProfileLatestRatingsProps {
   ratings: LatestUserRating[];
   isLoading: boolean;
   onOpenFilm: (omdbId: string) => void;
@@ -33,23 +33,15 @@ export function ProfileLatestRatings({
 
   const totalPages = Math.ceil(ratings.length / ITEMS_PER_PAGE);
   const safeTotalPages = Math.max(1, totalPages);
-  const hasPrevPage = currentPage > 1;
-  const hasNextPage = currentPage < safeTotalPages;
+  const currentPageInBounds = Math.min(currentPage, safeTotalPages);
+  const hasPrevPage = currentPageInBounds > 1;
+  const hasNextPage = currentPageInBounds < safeTotalPages;
 
   const paginatedRatings = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const start = (currentPageInBounds - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
     return ratings.slice(start, end);
-  }, [currentPage, ratings]);
-
-  useEffect(() => {
-    if (totalPages === 0) {
-      setCurrentPage(1);
-      return;
-    }
-
-    setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
-  }, [totalPages]);
+  }, [currentPageInBounds, ratings]);
 
   return (
     <div
@@ -115,7 +107,9 @@ export function ProfileLatestRatings({
           <div className="pt-2 flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              onClick={() =>
+                setCurrentPage(Math.max(1, currentPageInBounds - 1))
+              }
               disabled={!hasPrevPage}
               className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               style={{
@@ -131,14 +125,12 @@ export function ProfileLatestRatings({
               className="text-xs"
               style={{ color: "var(--color-text-muted)" }}
             >
-              {currentPage} / {safeTotalPages}
+              {currentPageInBounds} / {safeTotalPages}
             </span>
 
             <button
               type="button"
-              onClick={() =>
-                setCurrentPage((page) => Math.min(safeTotalPages, page + 1))
-              }
+              onClick={() => setCurrentPage(currentPageInBounds + 1)}
               disabled={!hasNextPage}
               className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               style={{

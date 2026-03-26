@@ -4,7 +4,7 @@ import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { MovieCard } from "@/components/molecules";
 import type { Film } from "@cineconnect/shared";
 
-export interface CategoryCarouselProps {
+interface CategoryCarouselProps {
   categoryId: number;
   genre: string;
   films: Film[];
@@ -14,7 +14,11 @@ export interface CategoryCarouselProps {
  * Carousel horizontal pour une catégorie de films.
  * Affiche ~8 films visibles et permet de naviguer par groupe.
  */
-export function CategoryCarousel({ categoryId, genre, films }: CategoryCarouselProps) {
+export function CategoryCarousel({
+  categoryId,
+  genre,
+  films,
+}: CategoryCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
