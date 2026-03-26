@@ -7,7 +7,6 @@ export * from "./SidebarBrand";
 export * from "./UserCard";
 export * from "./MobileMenuToggle";
 export * from "./SearchBar";
-export * from "./CategoryDropdown";
 export * from "./SearchUserRow";
 export * from "./ConversationList";
 export * from "./ProfileNameEditor";
