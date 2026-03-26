@@ -5,7 +5,7 @@ import {
   insertMessage,
 } from "../repository/messagesRepository.js";
 
-export interface IncomingMessageNotificationDto {
+interface IncomingMessageNotificationDto {
   message_id: number;
   sender_id: number;
   sender_name: string | null;

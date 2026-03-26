@@ -11,7 +11,7 @@ import {
 import { db } from "../db/index.js";
 import { categories, films, filmsCategories, reviews } from "../db/schema.js";
 
-export interface FilmUpsertValues {
+interface FilmUpsertValues {
   omdb_id: string;
   title: string;
   year: number | null;
@@ -30,7 +30,9 @@ export async function findCategoryByName(name: string) {
     .select()
     .from(categories)
     .where(eq(categories.name, name)) as unknown as {
-    limit?: (value: number) => Promise<Array<{ category_id: number; name: string }>>;
+    limit?: (
+      value: number,
+    ) => Promise<Array<{ category_id: number; name: string }>>;
   } & Promise<Array<{ category_id: number; name: string }>>;
 
   const rows =
@@ -56,7 +58,10 @@ export async function createCategory(name: string) {
   return { category_id: 0, name };
 }
 
-export async function createFilmCategoryLink(filmId: number, categoryId: number) {
+export async function createFilmCategoryLink(
+  filmId: number,
+  categoryId: number,
+) {
   if (!Number.isFinite(categoryId) || categoryId <= 0) {
     return;
   }
@@ -163,10 +168,7 @@ export async function findUnratedFilmIds(limit: number) {
 export async function findFilmsByIds(filmIds: number[]) {
   if (filmIds.length === 0) return [];
 
-  return db
-    .select()
-    .from(films)
-    .where(inArray(films.film_id, filmIds));
+  return db.select().from(films).where(inArray(films.film_id, filmIds));
 }
 
 export async function findFilmsByGenreLike(genre: string, limit: number) {
