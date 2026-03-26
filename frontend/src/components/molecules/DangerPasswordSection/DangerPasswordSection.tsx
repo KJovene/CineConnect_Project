@@ -1,4 +1,20 @@
 import { useState, type FormEvent } from "react";
+import { z } from "zod";
+
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Veuillez remplir tous les champs."),
+    newPassword: z.string().min(8, "Le nouveau mot de passe doit contenir au moins 8 caractères."),
+    confirmNewPassword: z.string().min(1, "Veuillez remplir tous les champs."),
+  })
+  .refine((d) => d.newPassword === d.confirmNewPassword, {
+    message: "La confirmation du mot de passe ne correspond pas.",
+    path: ["confirmNewPassword"],
+  })
+  .refine((d) => d.currentPassword !== d.newPassword, {
+    message: "Le nouveau mot de passe doit être différent de l'actuel.",
+    path: ["newPassword"],
+  });
 
 export interface DangerPasswordSectionSubmitPayload {
   currentPassword: string;
@@ -43,23 +59,9 @@ export function DangerPasswordSection({
     e.preventDefault();
     resetFeedback();
 
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-      setError("Veuillez remplir tous les champs.");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      setError("La confirmation du mot de passe ne correspond pas.");
-      return;
-    }
-
-    if (currentPassword === newPassword) {
-      setError("Le nouveau mot de passe doit être différent de l'actuel.");
+    const result = changePasswordSchema.safeParse({ currentPassword, newPassword, confirmNewPassword });
+    if (!result.success) {
+      setError(result.error.issues[0]?.message ?? "Données invalides.");
       return;
     }
 

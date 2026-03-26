@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from "react";
+import { z } from "zod";
 import { HiPencilSquare } from "react-icons/hi2";
+
+const nameSchema = z
+  .string()
+  .trim()
+  .min(2, "Le pseudo doit contenir au moins 2 caractères.")
+  .max(50, "Le pseudo ne peut pas dépasser 50 caractères.");
 
 export interface ProfileNameEditorProps {
   currentName: string;
@@ -34,20 +41,16 @@ export function ProfileNameEditor({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const trimmedName = draftName.trim();
     setLocalError(null);
     onResetFeedback?.();
 
-    if (trimmedName.length < 2) {
-      setLocalError("Le pseudo doit contenir au moins 2 caractères.");
+    const result = nameSchema.safeParse(draftName);
+    if (!result.success) {
+      setLocalError(result.error.issues[0]?.message ?? "Pseudo invalide.");
       return;
     }
 
-    if (trimmedName.length > 50) {
-      setLocalError("Le pseudo ne peut pas dépasser 50 caractères.");
-      return;
-    }
-
+    const trimmedName = result.data;
     if (trimmedName === currentName) {
       closeEditor();
       return;

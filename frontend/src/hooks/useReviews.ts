@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   filmReviewsResponseSchema,
   type FilmReviewComment,
+  type ReviewReply,
   type CreateFilmCommentRequest,
   type UpdateFilmCommentRequest,
   type CreateFilmReplyRequest,
@@ -40,7 +41,7 @@ const latestUserCommentSchema = z.object({
 export type FilmRatingSummary = z.infer<typeof filmRatingSummarySchema>;
 export type LatestUserRating = z.infer<typeof latestUserRatingSchema>;
 export type LatestUserComment = z.infer<typeof latestUserCommentSchema>;
-export type { FilmReviewComment };
+export type { FilmReviewComment, ReviewReply };
 
 const PROFILE_HISTORY_LIMIT = 100;
 
