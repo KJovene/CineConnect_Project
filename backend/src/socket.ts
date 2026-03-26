@@ -64,7 +64,7 @@ export function initSocket(httpServer: HttpServer): SocketServer {
 
           // Renvoyer à l'émetteur (confirmation + multi-onglet)
           socket.emit("dm:new", { message });
-        } catch (err) {
+        } catch (_err) {
           socket.emit("dm:error", { error: "Impossible d'envoyer le message" });
         }
       },

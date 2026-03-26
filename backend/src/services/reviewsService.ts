@@ -35,18 +35,6 @@ interface ReviewReplyDto {
   author: ReviewAuthorDto;
 }
 
-interface ReviewCommentDto {
-  reviewId: number;
-  filmId: number;
-  parentReviewId: null;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  author: ReviewAuthorDto;
-  replies: ReviewReplyDto[];
-}
-
 interface ReviewBaseDto {
   reviewId: number;
   filmId: number;
@@ -62,34 +50,6 @@ export class FilmNotFoundError extends Error {}
 export class ReviewNotFoundError extends Error {}
 export class ForbiddenReviewActionError extends Error {}
 export class ReplyDepthExceededError extends Error {}
-
-interface FilmRatingSummaryDto {
-  averageRating: number | null;
-  totalRatings: number;
-  userRating: number | null;
-}
-
-interface CommunityReviewDto {
-  reviewId: number;
-  rating: number;
-  comment: string;
-  createdAt: string | null;
-  author: ReviewAuthorDto;
-  film: {
-    omdbId: string;
-    title: string;
-  };
-}
-
-interface UserCommentReplyNotificationDto {
-  replyReviewId: number;
-  parentReviewId: number;
-  omdbId: string;
-  filmTitle: string;
-  replier: ReviewAuthorDto;
-  comment: string;
-  createdAt: string | null;
-}
 
 function normalizeRating(value: number): number {
   const rating = Number.parseInt(String(value), 10);
@@ -146,9 +106,7 @@ async function ensureFilmExists(omdbId: string): Promise<number> {
   return filmId;
 }
 
-export async function getFilmComments(
-  omdbId: string,
-) {
+export async function getFilmComments(omdbId: string) {
   const filmId = await ensureFilmExists(omdbId);
 
   const rows = await findReviewsWithAuthorByFilmId(filmId);
@@ -267,9 +225,7 @@ export async function getFilmRatingSummary(params: {
   };
 }
 
-export async function getLatestCommunityReviews(
-  limit = 4,
-) {
+export async function getLatestCommunityReviews(limit = 4) {
   const normalizedLimit = Math.min(Math.max(Math.trunc(limit), 1), 12);
 
   const rows = await findLatestCommunityReviewsRows(normalizedLimit);
