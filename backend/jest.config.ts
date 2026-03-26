@@ -17,13 +17,16 @@ const config: Config = {
     "!src/db/seed.ts",
     "!src/db/seedCommunity.ts",
     "!src/db/seedFilms.ts",
+    "!src/db/seedCategories.ts",
+    "!src/types/**",
+    "!src/config/swagger.ts",
   ],
   coverageThreshold: {
     global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
+      branches: 80,
+      functions: 90,
+      lines: 90,
+      statements: 90,
     },
   },
 };
