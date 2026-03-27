@@ -57,7 +57,6 @@ export async function getRatingSummary(req: RequestWithSession, res: Response) {
   const userId = Number.parseInt(String(req.session?.user?.id), 10);
 
   try {
-    /* istanbul ignore next: garde conservee pour la robustesse a l'execution */
     const summary = await getFilmRatingSummary({
       omdbId,
       userId: Number.isNaN(userId) ? undefined : userId,
@@ -86,12 +85,9 @@ export async function setRating(req: RequestWithSession, res: Response) {
   const userId = Number.parseInt(req.session!.user.id, 10);
   const bodyResult = upsertRatingRequestSchema.safeParse(req.body);
   if (!bodyResult.success) {
-    res
-      .status(400)
-      .json({
-        error:
-          bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
-      });
+    res.status(400).json({
+      error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
+    });
     return;
   }
   const { rating } = bodyResult.data;
@@ -123,12 +119,9 @@ export async function createComment(req: RequestWithSession, res: Response) {
   const userId = parseInt(req.session!.user.id, 10);
   const bodyResult = createFilmCommentRequestSchema.safeParse(req.body);
   if (!bodyResult.success) {
-    res
-      .status(400)
-      .json({
-        error:
-          bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
-      });
+    res.status(400).json({
+      error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
+    });
     return;
   }
   const { comment, rating } = bodyResult.data;
@@ -166,12 +159,9 @@ export async function createReply(req: RequestWithSession, res: Response) {
   const userId = parseInt(req.session!.user.id, 10);
   const bodyResult = createFilmReplyRequestSchema.safeParse(req.body);
   if (!bodyResult.success) {
-    res
-      .status(400)
-      .json({
-        error:
-          bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
-      });
+    res.status(400).json({
+      error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
+    });
     return;
   }
   const { comment } = bodyResult.data;
@@ -216,12 +206,9 @@ export async function patchComment(req: RequestWithSession, res: Response) {
   const userId = parseInt(req.session!.user.id, 10);
   const bodyResult = updateFilmCommentRequestSchema.safeParse(req.body);
   if (!bodyResult.success) {
-    res
-      .status(400)
-      .json({
-        error:
-          bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
-      });
+    res.status(400).json({
+      error: bodyResult.error.issues[0]?.message ?? "Corps de requête invalide",
+    });
     return;
   }
   const { comment } = bodyResult.data;

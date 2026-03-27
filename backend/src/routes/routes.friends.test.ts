@@ -22,7 +22,7 @@ jest.mock("../middlewares/authMiddleware.js", () => ({
   requireAuth: (_req: any, _res: any, next: any) => next(),
 }));
 
-import friendsRouter from "../routes/friends.js";
+import friendsRouter from "./friends.js";
 
 describe("friends routes", () => {
   const app = express();

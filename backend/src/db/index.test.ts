@@ -9,11 +9,11 @@ describe("db/index", () => {
 
     jest.doMock("pg", () => ({ Pool: poolCtor }));
     jest.doMock("drizzle-orm/node-postgres", () => ({ drizzle: drizzleMock }));
-    jest.doMock("../db/schema", () => ({ schema: true }));
+    jest.doMock("./schema", () => ({ schema: true }));
 
     process.env.DATABASE_URL = "postgres://test";
 
-    const mod = require("../db/index.js");
+    const mod = require("./index.js");
 
     expect(mod.db).toBeDefined();
     expect(poolCtor).toHaveBeenCalledWith({

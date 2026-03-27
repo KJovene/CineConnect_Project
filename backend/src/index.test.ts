@@ -6,7 +6,7 @@ const listenMock = jest.fn((_port, cb) => {
 const fakeServer = { listen: listenMock };
 const createHttpServerMock = jest.fn((_app: unknown) => fakeServer);
 
-jest.mock("../app.js", () => ({
+jest.mock("./app.js", () => ({
   createApp: () => createAppMock(),
   createHttpServer: (arg: unknown) => createHttpServerMock(arg),
 }));
@@ -26,7 +26,7 @@ describe("index bootstrap", () => {
       .spyOn(console, "log")
       .mockImplementation(() => undefined);
 
-    const mod = require("../index.js");
+    const mod = require("./index.js");
     const result = mod.startServer();
 
     expect(createAppMock).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe("index bootstrap", () => {
   });
 
   it("ne demarre pas automatiquement quand NODE_ENV=test", () => {
-    require("../index.js");
+    require("./index.js");
 
     expect(listenMock).not.toHaveBeenCalled();
   });
@@ -46,7 +46,7 @@ describe("index bootstrap", () => {
   it("demarre automatiquement quand NODE_ENV!=test", () => {
     process.env.NODE_ENV = "development";
 
-    require("../index.js");
+    require("./index.js");
 
     expect(listenMock).toHaveBeenCalledTimes(1);
   });
@@ -54,7 +54,7 @@ describe("index bootstrap", () => {
   it("utilise le port 3000 par defaut", () => {
     delete process.env.PORT;
 
-    const mod = require("../index.js");
+    const mod = require("./index.js");
     mod.startServer();
 
     expect(listenMock).toHaveBeenCalledWith(3000, expect.any(Function));

@@ -18,7 +18,7 @@ jest.mock("../middlewares/authMiddleware.js", () => ({
   requireAuth: (_req: any, _res: any, next: any) => next(),
 }));
 
-import messagesRouter from "../routes/messages.js";
+import messagesRouter from "./messages.js";
 
 describe("messages routes", () => {
   const app = express();

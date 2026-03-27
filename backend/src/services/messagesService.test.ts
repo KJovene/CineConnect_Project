@@ -10,7 +10,7 @@ import {
   createMessage,
   getRecentConversations,
   getIncomingMessages,
-} from "../services/messagesService.js";
+} from "./messagesService.js";
 
 describe("messagesService", () => {
   beforeEach(() => {

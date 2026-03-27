@@ -3,7 +3,7 @@ import { useLatestCommunityReviews } from "@/hooks/useLatestCommunityReviews";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
-} from "@/__tests__/test-utils";
+} from "@/utils/test-utils";
 
 describe("useLatestCommunityReviews", () => {
   beforeEach(() => {

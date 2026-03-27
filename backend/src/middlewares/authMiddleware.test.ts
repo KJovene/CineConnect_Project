@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
-jest.mock("../auth.js", () => ({
+jest.mock("../config/auth.js", () => ({
   auth: {
     api: {
       getSession: jest.fn(),
@@ -8,12 +8,12 @@ jest.mock("../auth.js", () => ({
   },
 }));
 
-import { auth } from "../auth.js";
+import { auth } from "../config/auth.js";
 import {
   attachSession,
   requireAuth,
   type RequestWithSession,
-} from "../middlewares/authMiddleware.js";
+} from "./authMiddleware.js";
 
 describe("authMiddleware", () => {
   const getSessionMock = auth.api.getSession as unknown as jest.Mock;

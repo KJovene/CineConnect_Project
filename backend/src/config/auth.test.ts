@@ -26,7 +26,7 @@ describe("auth module", () => {
 
     process.env.BETTER_AUTH_SECRET = "short";
 
-    const mod = require("../auth.js");
+    const mod = require("./auth.js");
 
     expect(mod.auth).toBeDefined();
     expect(betterAuthMock).toHaveBeenCalledTimes(1);
@@ -54,7 +54,7 @@ describe("auth module", () => {
 
     delete process.env.BETTER_AUTH_SECRET;
 
-    require("../auth.js");
+    require("./auth.js");
 
     expect(betterAuthMock).toHaveBeenCalledTimes(1);
     const configArg = betterAuthMock.mock.calls[0][0] as { secret: string };
@@ -82,7 +82,7 @@ describe("auth module", () => {
 
     process.env.BETTER_AUTH_SECRET = "12345678901234567890123456789012";
 
-    require("../auth.js");
+    require("./auth.js");
 
     expect(betterAuthMock).toHaveBeenCalledTimes(1);
     expect(warnSpy).not.toHaveBeenCalled();
@@ -109,7 +109,7 @@ describe("auth module", () => {
     delete process.env.BETTER_AUTH_URL;
     process.env.BETTER_AUTH_SECRET = "12345678901234567890123456789012";
 
-    require("../auth.js");
+    require("./auth.js");
 
     expect(betterAuthMock).toHaveBeenCalledTimes(1);
     const configArg = betterAuthMock.mock.calls[0][0] as { baseURL: string };

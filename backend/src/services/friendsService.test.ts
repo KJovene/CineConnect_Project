@@ -14,7 +14,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
   removeFriend,
-} from "../services/friendsService.js";
+} from "./friendsService.js";
 
 describe("friendsService", () => {
   beforeEach(() => {
@@ -33,17 +33,15 @@ describe("friendsService", () => {
   });
 
   it("getFriends enrichit avec friend mappe", async () => {
-    const firstWhere = jest
-      .fn()
-      .mockResolvedValue([
-        {
-          friend_id: 1,
-          user_id: 1,
-          friend_user_id: 2,
-          status: "accepted",
-          created_at: new Date(),
-        },
-      ]);
+    const firstWhere = jest.fn().mockResolvedValue([
+      {
+        friend_id: 1,
+        user_id: 1,
+        friend_user_id: 2,
+        status: "accepted",
+        created_at: new Date(),
+      },
+    ]);
     const secondWhere = jest
       .fn()
       .mockResolvedValue([
@@ -68,17 +66,15 @@ describe("friendsService", () => {
   });
 
   it("getFriends met friend a null si utilisateur introuvable", async () => {
-    const firstWhere = jest
-      .fn()
-      .mockResolvedValue([
-        {
-          friend_id: 1,
-          user_id: 2,
-          friend_user_id: 1,
-          status: "accepted",
-          created_at: new Date(),
-        },
-      ]);
+    const firstWhere = jest.fn().mockResolvedValue([
+      {
+        friend_id: 1,
+        user_id: 2,
+        friend_user_id: 1,
+        status: "accepted",
+        created_at: new Date(),
+      },
+    ]);
     const secondWhere = jest.fn().mockResolvedValue([]);
 
     mockDb.select
@@ -106,17 +102,15 @@ describe("friendsService", () => {
   });
 
   it("getPendingRequests enrichit avec requester", async () => {
-    const firstWhere = jest
-      .fn()
-      .mockResolvedValue([
-        {
-          friend_id: 10,
-          user_id: 2,
-          friend_user_id: 1,
-          status: "pending",
-          created_at: new Date(),
-        },
-      ]);
+    const firstWhere = jest.fn().mockResolvedValue([
+      {
+        friend_id: 10,
+        user_id: 2,
+        friend_user_id: 1,
+        status: "pending",
+        created_at: new Date(),
+      },
+    ]);
     const secondWhere = jest
       .fn()
       .mockResolvedValue([
@@ -137,17 +131,15 @@ describe("friendsService", () => {
   });
 
   it("getPendingRequests met requester a null si utilisateur absent", async () => {
-    const firstWhere = jest
-      .fn()
-      .mockResolvedValue([
-        {
-          friend_id: 10,
-          user_id: 2,
-          friend_user_id: 1,
-          status: "pending",
-          created_at: new Date(),
-        },
-      ]);
+    const firstWhere = jest.fn().mockResolvedValue([
+      {
+        friend_id: 10,
+        user_id: 2,
+        friend_user_id: 1,
+        status: "pending",
+        created_at: new Date(),
+      },
+    ]);
     const secondWhere = jest.fn().mockResolvedValue([]);
 
     mockDb.select
@@ -218,11 +210,9 @@ describe("friendsService", () => {
   it("acceptFriendRequest retourne resultat", async () => {
     mockDb.update.mockReturnValue({
       set: jest.fn().mockReturnValue({
-        where: jest
-          .fn()
-          .mockReturnValue({
-            returning: jest.fn().mockResolvedValue([{ status: "accepted" }]),
-          }),
+        where: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([{ status: "accepted" }]),
+        }),
       }),
     });
 
@@ -247,11 +237,9 @@ describe("friendsService", () => {
   it("rejectFriendRequest retourne resultat", async () => {
     mockDb.update.mockReturnValue({
       set: jest.fn().mockReturnValue({
-        where: jest
-          .fn()
-          .mockReturnValue({
-            returning: jest.fn().mockResolvedValue([{ status: "rejected" }]),
-          }),
+        where: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([{ status: "rejected" }]),
+        }),
       }),
     });
 

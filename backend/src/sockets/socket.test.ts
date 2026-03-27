@@ -32,7 +32,7 @@ jest.mock("socket.io", () => ({
   Server: jest.fn(() => new FakeSocketServer()),
 }));
 
-jest.mock("../auth.js", () => ({
+jest.mock("../config/auth.js", () => ({
   auth: {
     api: {
       getSession: (...args: unknown[]) => getSessionMock(...args),
@@ -44,7 +44,7 @@ jest.mock("../services/messagesService.js", () => ({
   createMessage: (...args: unknown[]) => createMessageMock(...args),
 }));
 
-import { initSocket } from "../socket.js";
+import { initSocket } from "./socket.js";
 
 describe("socket init", () => {
   beforeEach(() => {

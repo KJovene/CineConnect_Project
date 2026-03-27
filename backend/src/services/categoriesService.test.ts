@@ -4,7 +4,7 @@ const mockDb = {
 
 jest.mock("../db/index.js", () => ({ db: mockDb }));
 
-jest.mock("../services/filmsService.js", () => ({
+jest.mock("./filmsService.js", () => ({
   withCommunityRatings: jest.fn((items: unknown[]) => Promise.resolve(items)),
 }));
 
@@ -12,7 +12,7 @@ import {
   getAllCategories,
   getFilmsByCategory,
   getFilmsByAllCategories,
-} from "../services/categoriesService.js";
+} from "./categoriesService.js";
 
 describe("categoriesService", () => {
   beforeEach(() => {

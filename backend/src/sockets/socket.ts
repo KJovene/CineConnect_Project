@@ -1,7 +1,7 @@
 import { Server as HttpServer } from "http";
 import { Server as SocketServer } from "socket.io";
-import { auth } from "./auth.js";
-import * as messagesService from "./services/messagesService.js";
+import { auth } from "../config/auth.js";
+import * as messagesService from "../services/messagesService.js";
 
 interface SocketData {
   userId: number;

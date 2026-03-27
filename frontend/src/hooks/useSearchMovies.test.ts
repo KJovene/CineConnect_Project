@@ -3,7 +3,7 @@ import { useSearchMovies } from "@/hooks/useSearchMovies";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
-} from "@/__tests__/test-utils";
+} from "@/utils/test-utils";
 
 describe("useSearchMovies", () => {
   beforeEach(() => {

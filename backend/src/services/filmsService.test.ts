@@ -10,7 +10,7 @@ import {
   getFilmDetail,
   getTopRatedFilms,
   getFilmsByGenre,
-} from "../services/filmsService.js";
+} from "./filmsService.js";
 
 describe("filmsService", () => {
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe("filmsService", () => {
     jest.resetModules();
     delete process.env.OMDB_API_KEY;
 
-    let mod: typeof import("../services/filmsService.js");
+    let mod: typeof import("./filmsService.js");
     jest.isolateModules(() => {
       jest.doMock("../db/index.js", () => ({
         db: {
@@ -53,7 +53,7 @@ describe("filmsService", () => {
         },
       }));
 
-      mod = require("../services/filmsService.js");
+      mod = require("./filmsService.js");
     });
 
     await expect(mod!.searchFilms("abc")).rejects.toThrow(
@@ -484,7 +484,7 @@ describe("filmsService", () => {
     jest.resetModules();
     delete process.env.OMDB_API_KEY;
 
-    let mod: typeof import("../services/filmsService.js");
+    let mod: typeof import("./filmsService.js");
     jest.isolateModules(() => {
       jest.doMock("../db/index.js", () => ({
         db: {
@@ -499,7 +499,7 @@ describe("filmsService", () => {
         },
       }));
 
-      mod = require("../services/filmsService.js");
+      mod = require("./filmsService.js");
     });
 
     await expect(mod!.getFilmDetail("tt2")).rejects.toThrow(

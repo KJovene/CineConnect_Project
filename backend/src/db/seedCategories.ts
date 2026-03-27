@@ -3,13 +3,6 @@ import { films, categories, filmsCategories } from "./schema.js";
 import { eq } from "drizzle-orm";
 
 /**
- * Script de seed pour peupler les tables `categories` et `films_categories`
- * à partir des genres OMDB déjà présents dans la table `films`.
- *
- * Usage: pnpm db:seed-categories
- */
-
-/**
  * Parse la string de genres OMDB (ex: "Action, Crime, Drama")
  * et retourne un tableau de genres normalisés.
  */
@@ -89,7 +82,9 @@ async function seedCategories(): Promise<void> {
     for (const genre of genres) {
       const categoryId = categoryMap.get(genre);
       if (!categoryId) {
-        console.warn(`Catégorie introuvable pour le genre "${genre}" (film: ${film.title})`);
+        console.warn(
+          `Catégorie introuvable pour le genre "${genre}" (film: ${film.title})`,
+        );
         continue;
       }
 

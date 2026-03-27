@@ -8,40 +8,40 @@ jest.mock("better-auth/node", () => ({
   toNodeHandler: jest.fn(() => handlerMock),
 }));
 
-jest.mock("../auth.js", () => ({ auth: {} }));
-jest.mock("../socket.js", () => ({
+jest.mock("./config/auth.js", () => ({ auth: {} }));
+jest.mock("./sockets/socket.js", () => ({
   initSocket: (...args: unknown[]) => initSocketMock(...args),
 }));
 
-jest.mock("../routes/friends.js", () => {
+jest.mock("./routes/friends.js", () => {
   const express = require("express");
   const router = express.Router();
   router.get("/", (_req: Request, res: Response) => res.json([{ ok: true }]));
   return { __esModule: true, default: router };
 });
 
-jest.mock("../routes/messages.js", () => {
+jest.mock("./routes/messages.js", () => {
   const express = require("express");
   const router = express.Router();
   router.get("/", (_req: Request, res: Response) => res.json([{ ok: true }]));
   return { __esModule: true, default: router };
 });
 
-jest.mock("../routes/users.js", () => {
+jest.mock("./routes/users.js", () => {
   const express = require("express");
   const router = express.Router();
   router.get("/", (_req: Request, res: Response) => res.json([{ ok: true }]));
   return { __esModule: true, default: router };
 });
 
-jest.mock("../routes/films.js", () => {
+jest.mock("./routes/films.js", () => {
   const express = require("express");
   const router = express.Router();
   router.get("/", (_req: Request, res: Response) => res.json([{ ok: true }]));
   return { __esModule: true, default: router };
 });
 
-import { createApp, createHttpServer } from "../app.js";
+import { createApp, createHttpServer } from "./app.js";
 
 describe("app factory", () => {
   beforeEach(() => {

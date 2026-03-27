@@ -3,7 +3,7 @@ import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
-} from "@/__tests__/test-utils";
+} from "@/utils/test-utils";
 
 describe("useTopRatedMovies", () => {
   beforeEach(() => {

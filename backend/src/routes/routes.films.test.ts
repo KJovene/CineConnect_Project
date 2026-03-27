@@ -17,7 +17,7 @@ const mockReviewsService = {
 
 jest.mock("../services/filmsService.js", () => mockFilmsService);
 jest.mock("../services/reviewsService.js", () => mockReviewsService);
-jest.mock("../routes/reviews.js", () => {
+jest.mock("./reviews.js", () => {
   const router = express.Router({ mergeParams: true });
   router.get("/", (_req, res) => res.json([{ reviewId: 1 }]));
   return { __esModule: true, default: router };
@@ -30,7 +30,7 @@ jest.mock("../middlewares/authMiddleware.js", () => ({
   },
 }));
 
-import filmsRouter from "../routes/films.js";
+import filmsRouter from "./films.js";
 
 describe("films routes", () => {
   const app = express();

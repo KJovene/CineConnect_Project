@@ -21,7 +21,7 @@ import {
   createReviewReply,
   updateReviewComment,
   deleteReviewComment,
-} from "../services/reviewsService.js";
+} from "./reviewsService.js";
 
 function selectWhereLimitResult(result: unknown) {
   return {

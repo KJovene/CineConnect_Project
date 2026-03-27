@@ -9,7 +9,7 @@ const mockCategoriesService = {
 
 jest.mock("../services/categoriesService.js", () => mockCategoriesService);
 
-import categoriesRouter from "../routes/categories.js";
+import categoriesRouter from "./categories.js";
 
 describe("categories routes", () => {
   const app = express();
@@ -20,7 +20,7 @@ describe("categories routes", () => {
     jest.clearAllMocks();
   });
 
-  //  GET /api/categories 
+  //  GET /api/categories
 
   it("GET / retourne la liste des catégories", async () => {
     mockCategoriesService.getAllCategories.mockResolvedValue([
@@ -38,7 +38,7 @@ describe("categories routes", () => {
     expect(res.status).toBe(500);
   });
 
-  // GET /api/categories/films 
+  // GET /api/categories/films
 
   it("GET /films retourne les films groupés par catégorie", async () => {
     mockCategoriesService.getFilmsByAllCategories.mockResolvedValue([

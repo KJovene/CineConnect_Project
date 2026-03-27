@@ -3,7 +3,7 @@ import { useMovieDetails } from "@/hooks/useMovieDetails";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
-} from "@/__tests__/test-utils";
+} from "@/utils/test-utils";
 
 describe("useMovieDetails", () => {
   beforeEach(() => {
