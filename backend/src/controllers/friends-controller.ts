@@ -1,6 +1,14 @@
 import type { Response } from "express";
+import { eq } from "drizzle-orm";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
 import * as friendsService from "../services/friends/friendsService.js";
+import { db } from "../db/index.js";
+import { user as userTable } from "../db/schema.js";
+import { sendMail } from "../services/mailerService.js";
+import {
+  friendRequestTemplate,
+  friendRequestAcceptedTemplate,
+} from "../utils/emailTemplates.js";
 
 export async function getFriends(req: RequestWithSession, res: Response) {
   try {
@@ -51,6 +59,21 @@ export async function sendFriendRequest(
   try {
     const result = await friendsService.sendFriendRequest(userId, friendId);
     res.status(201).json(result);
+
+    const [recipient] = await db
+      .select({ name: userTable.name, email: userTable.email })
+      .from(userTable)
+      .where(eq(userTable.id, friendId));
+    if (recipient) {
+      const frontendUrl = process.env.FRONTEND_ORIGIN ?? "http://localhost:5173";
+      const senderName = req.session!.user.name || req.session!.user.email;
+      const { subject, html } = friendRequestTemplate(
+        recipient.name || recipient.email,
+        senderName,
+        frontendUrl,
+      );
+      await sendMail({ to: recipient.email, subject, html });
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";
     res.status(400).json({ error: message });
@@ -75,6 +98,21 @@ export async function acceptFriendRequest(
       friendUserId,
     );
     res.json(result);
+
+    const [requester] = await db
+      .select({ name: userTable.name, email: userTable.email })
+      .from(userTable)
+      .where(eq(userTable.id, friendUserId));
+    if (requester) {
+      const frontendUrl = process.env.FRONTEND_ORIGIN ?? "http://localhost:5173";
+      const acceptorName = req.session!.user.name || req.session!.user.email;
+      const { subject, html } = friendRequestAcceptedTemplate(
+        requester.name || requester.email,
+        acceptorName,
+        frontendUrl,
+      );
+      await sendMail({ to: requester.email, subject, html });
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";
     res.status(400).json({ error: message });
