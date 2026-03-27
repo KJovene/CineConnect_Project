@@ -1,4 +1,4 @@
-import { getFilmDetail } from "../services/filmsService.js";
+import { getFilmDetail } from "../services/films/filmsService.js";
 
 const IMDB_IDS: { id: string; label: string }[] = [
   // --- Action & Superhéros ---

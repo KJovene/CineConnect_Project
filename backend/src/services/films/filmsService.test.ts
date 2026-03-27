@@ -3,7 +3,7 @@ const mockDb = {
   insert: jest.fn(),
 };
 
-jest.mock("../db/index.js", () => ({ db: mockDb }));
+jest.mock("../../db/index.js", () => ({ db: mockDb }));
 
 import {
   searchFilms,
@@ -46,7 +46,7 @@ describe("filmsService", () => {
 
     let mod: typeof import("./filmsService.js");
     jest.isolateModules(() => {
-      jest.doMock("../db/index.js", () => ({
+      jest.doMock("../../db/index.js", () => ({
         db: {
           select: jest.fn(),
           insert: jest.fn(),
@@ -486,7 +486,7 @@ describe("filmsService", () => {
 
     let mod: typeof import("./filmsService.js");
     jest.isolateModules(() => {
-      jest.doMock("../db/index.js", () => ({
+      jest.doMock("../../db/index.js", () => ({
         db: {
           select: jest.fn().mockReturnValue({
             from: jest.fn().mockReturnValue({

@@ -8,9 +8,9 @@ const mockUsersService = {
   searchUsers: jest.fn(),
 };
 
-jest.mock("../services/usersService.js", () => mockUsersService);
+jest.mock("../../services/users/usersService.js", () => mockUsersService);
 
-jest.mock("../middlewares/authMiddleware.js", () => ({
+jest.mock("../../middlewares/authMiddleware.js", () => ({
   attachSession: (req: any, _res: any, next: any) => {
     req.session = { user: { id: "1" } };
     next();
@@ -72,7 +72,9 @@ describe("users routes", () => {
   });
 
   it("GET /me/comment-replies retourne les notifications", async () => {
-    mockUsersService.getCommentReplies.mockResolvedValue([{ replyReviewId: 1 }]);
+    mockUsersService.getCommentReplies.mockResolvedValue([
+      { replyReviewId: 1 },
+    ]);
 
     const res = await request(app).get("/api/users/me/comment-replies?limit=3");
 

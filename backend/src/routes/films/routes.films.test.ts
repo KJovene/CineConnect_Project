@@ -15,15 +15,15 @@ const mockReviewsService = {
   getLatestCommunityReviews: jest.fn(),
 };
 
-jest.mock("../services/filmsService.js", () => mockFilmsService);
-jest.mock("../services/reviewsService.js", () => mockReviewsService);
-jest.mock("./reviews.js", () => {
+jest.mock("../../services/films/filmsService.js", () => mockFilmsService);
+jest.mock("../../services/reviews/reviewsService.js", () => mockReviewsService);
+jest.mock("../reviews/reviews.js", () => {
   const router = express.Router({ mergeParams: true });
   router.get("/", (_req, res) => res.json([{ reviewId: 1 }]));
   return { __esModule: true, default: router };
 });
 
-jest.mock("../middlewares/authMiddleware.js", () => ({
+jest.mock("../../middlewares/authMiddleware.js", () => ({
   attachSession: (req: any, _res: any, next: any) => {
     req.session = { user: { id: sessionUserId } };
     next();

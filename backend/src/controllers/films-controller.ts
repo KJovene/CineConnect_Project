@@ -5,11 +5,11 @@ import {
   getFilmDetail,
   getTopRatedFilms,
   getFilmsByGenre,
-} from "../services/filmsService.js";
+} from "../services/films/filmsService.js";
 import {
   getFilmRatingSummary,
   getLatestCommunityReviews,
-} from "../services/reviewsService.js";
+} from "../services/reviews/reviewsService.js";
 
 export async function search(req: Request, res: Response) {
   const query = req.query.q as string;

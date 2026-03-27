@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { attachSession, requireAuth } from "../middlewares/authMiddleware.js";
+import { attachSession, requireAuth } from "../../middlewares/authMiddleware.js";
 import {
   acceptFriendRequest,
   getFriends,
@@ -7,7 +7,7 @@ import {
   rejectFriendRequest,
   removeFriend,
   sendFriendRequest,
-} from "../controllers/friends-controller.js";
+} from "../../controllers/friends-controller.js";
 
 const router = Router();
 

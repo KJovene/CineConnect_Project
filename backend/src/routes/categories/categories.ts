@@ -3,7 +3,7 @@ import {
   listCategories,
   getFilms,
   getAllFilms,
-} from "../controllers/categories-controller.js";
+} from "../../controllers/categories-controller.js";
 
 const router = Router();
 

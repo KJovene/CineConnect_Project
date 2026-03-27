@@ -40,7 +40,7 @@ jest.mock("../config/auth.js", () => ({
   },
 }));
 
-jest.mock("../services/messagesService.js", () => ({
+jest.mock("../services/messages/messagesService.js", () => ({
   createMessage: (...args: unknown[]) => createMessageMock(...args),
 }));
 

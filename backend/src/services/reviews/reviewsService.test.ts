@@ -5,7 +5,7 @@ const mockDb = {
   delete: jest.fn(),
 };
 
-jest.mock("../db/index.js", () => ({ db: mockDb }));
+jest.mock("../../db/index.js", () => ({ db: mockDb }));
 
 import {
   FilmNotFoundError,

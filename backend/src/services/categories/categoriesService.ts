@@ -1,14 +1,14 @@
 import {
   findAllCategories,
   findFilmsByCategoryId,
-} from "../repository/categoriesRepository.js";
+} from "../../repository/categoriesRepository.js";
 import type {
   Film,
   Category,
   CategorySection,
   FilmsByCategoryResponse,
 } from "@cineconnect/shared";
-import { withCommunityRatings } from "./filmsService.js";
+import { withCommunityRatings } from "../films/filmsService.js";
 
 /**
  * Retourne toutes les catégories disponibles.

@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
-import * as messagesService from "../services/messagesService.js";
+import * as messagesService from "../services/messages/messagesService.js";
 
 export async function getConversation(req: RequestWithSession, res: Response) {
   try {

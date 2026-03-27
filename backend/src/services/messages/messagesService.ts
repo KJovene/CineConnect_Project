@@ -3,7 +3,7 @@ import {
   findIncomingMessagesWithSender,
   findRecentConversationMessages,
   insertMessage,
-} from "../repository/messagesRepository.js";
+} from "../../repository/messagesRepository.js";
 
 interface IncomingMessageNotificationDto {
   message_id: number;

@@ -3,11 +3,11 @@ import cors from "cors";
 import express from "express";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./config/auth.js";
-import friendsRouter from "./routes/friends.js";
-import messagesRouter from "./routes/messages.js";
-import usersRouter from "./routes/users.js";
-import filmsRouter from "./routes/films.js";
-import categoriesRouter from "./routes/categories.js";
+import friendsRouter from "./routes/friends/friends.js";
+import messagesRouter from "./routes/messages/messages.js";
+import usersRouter from "./routes/users/users.js";
+import filmsRouter from "./routes/films/films.js";
+import categoriesRouter from "./routes/categories/categories.js";
 import { initSocket } from "./sockets/socket.js";
 import { setupSwagger } from "./config/swagger.js";
 

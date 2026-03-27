@@ -12,9 +12,9 @@ const mockFriendsService = {
   removeFriend: jest.fn(),
 };
 
-jest.mock("../services/friendsService.js", () => mockFriendsService);
+jest.mock("../../services/friends/friendsService.js", () => mockFriendsService);
 
-jest.mock("../middlewares/authMiddleware.js", () => ({
+jest.mock("../../middlewares/authMiddleware.js", () => ({
   attachSession: (req: any, _res: any, next: any) => {
     req.session = { user: { id: mockSessionUserId } };
     next();

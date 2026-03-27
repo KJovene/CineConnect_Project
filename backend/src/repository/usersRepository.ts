@@ -36,10 +36,7 @@ export interface UserRelationRow {
   status: string | null;
 }
 
-export async function findLatestRatingsByUserId(
-  userId: number,
-  limit: number,
-) {
+export async function findLatestRatingsByUserId(userId: number, limit: number) {
   return db
     .select({
       reviewId: reviews.review_id,
@@ -99,7 +96,9 @@ export async function findUsersBySearch(search: string, limit: number) {
       image: user.image,
     })
     .from(user)
-    .where(or(ilike(user.name, `%${search}%`), ilike(user.email, `%${search}%`)))
+    .where(
+      or(ilike(user.name, `%${search}%`), ilike(user.email, `%${search}%`)),
+    )
     .limit(limit);
 }
 

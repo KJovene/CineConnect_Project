@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
-import * as usersService from "../services/usersService.js";
+import * as usersService from "../services/users/usersService.js";
 import type { ErrorResponse, PaginationQuery } from "../types/index.js";
 
 function internalError(): ErrorResponse {

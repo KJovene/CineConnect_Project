@@ -9,8 +9,8 @@ const mockReviewsService = {
   getUserCommentReplyNotifications: jest.fn(),
 };
 
-jest.mock("../repository/usersRepository.js", () => mockUsersRepository);
-jest.mock("./reviewsService.js", () => mockReviewsService);
+jest.mock("../../repository/usersRepository.js", () => mockUsersRepository);
+jest.mock("../reviews/reviewsService.js", () => mockReviewsService);
 
 import {
   getCommentReplies,
@@ -112,7 +112,9 @@ describe("usersService", () => {
     const result = await searchUsers(1, "me");
 
     expect(result).toEqual([]);
-    expect(mockUsersRepository.findUserRelationsWithOthers).not.toHaveBeenCalled();
+    expect(
+      mockUsersRepository.findUserRelationsWithOthers,
+    ).not.toHaveBeenCalled();
   });
 
   it("searchUsers mappe relationStatus accepted", async () => {

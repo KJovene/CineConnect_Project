@@ -3,9 +3,9 @@ import {
   findLatestRatingsByUserId,
   findUserRelationsWithOthers,
   findUsersBySearch,
-} from "../repository/usersRepository.js";
-import { getUserCommentReplyNotifications } from "./reviewsService.js";
-import type { PaginationQuery } from "../types/index.js";
+} from "../../repository/usersRepository.js";
+import { getUserCommentReplyNotifications } from "../reviews/reviewsService.js";
+import type { PaginationQuery } from "../../types/index.js";
 
 function getClampedLimit(query: PaginationQuery, fallback: number): number {
   const rawValue = query.limit ?? query.pageSize;
@@ -14,10 +14,7 @@ function getClampedLimit(query: PaginationQuery, fallback: number): number {
   return Math.min(Math.max(normalized, 1), 200);
 }
 
-export async function getLatestRatings(
-  userId: number,
-  query: PaginationQuery,
-) {
+export async function getLatestRatings(userId: number, query: PaginationQuery) {
   const normalizedLimit = getClampedLimit(query, 100);
   const rows = await findLatestRatingsByUserId(userId, normalizedLimit);
 
@@ -51,7 +48,10 @@ export async function getLatestComments(
   }));
 }
 
-export async function getCommentReplies(userId: number, query: PaginationQuery) {
+export async function getCommentReplies(
+  userId: number,
+  query: PaginationQuery,
+) {
   const limit = getClampedLimit(query, 20);
 
   return getUserCommentReplyNotifications({

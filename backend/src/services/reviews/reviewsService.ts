@@ -14,7 +14,7 @@ import {
   updateReviewComment as updateReviewCommentRecord,
   updateReviewRating,
   type ReviewRow,
-} from "../repository/reviewsRepository.js";
+} from "../../repository/reviewsRepository.js";
 
 type DbReviewRow = ReviewRow;
 

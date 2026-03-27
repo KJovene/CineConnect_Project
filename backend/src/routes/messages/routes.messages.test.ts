@@ -8,9 +8,9 @@ const mockMessagesService = {
   createMessage: jest.fn(),
 };
 
-jest.mock("../services/messagesService.js", () => mockMessagesService);
+jest.mock("../../services/messages/messagesService.js", () => mockMessagesService);
 
-jest.mock("../middlewares/authMiddleware.js", () => ({
+jest.mock("../../middlewares/authMiddleware.js", () => ({
   attachSession: (req: any, _res: any, next: any) => {
     req.session = { user: { id: "1" } };
     next();

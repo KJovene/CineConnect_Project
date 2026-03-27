@@ -10,7 +10,7 @@ import {
   findTopRatedFilmIds,
   findUnratedFilmIds,
   upsertFilmByOmdb,
-} from "../repository/filmsRepository.js";
+} from "../../repository/filmsRepository.js";
 import type {
   Film,
   FilmSearchResult,

@@ -7,7 +7,7 @@ const mockCategoriesService = {
   getFilmsByAllCategories: jest.fn(),
 };
 
-jest.mock("../services/categoriesService.js", () => mockCategoriesService);
+jest.mock("../../services/categories/categoriesService.js", () => mockCategoriesService);
 
 import categoriesRouter from "./categories.js";
 

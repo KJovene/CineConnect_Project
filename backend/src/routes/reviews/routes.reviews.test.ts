@@ -20,9 +20,9 @@ const mockReviewsService = {
   deleteReviewComment: jest.fn(),
 };
 
-jest.mock("../services/reviewsService.js", () => mockReviewsService);
+jest.mock("../../services/reviews/reviewsService.js", () => mockReviewsService);
 
-jest.mock("../middlewares/authMiddleware.js", () => ({
+jest.mock("../../middlewares/authMiddleware.js", () => ({
   attachSession: (req: any, _res: any, next: any) => {
     req.session = { user: { id: "1" } };
     next();

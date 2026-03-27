@@ -18,7 +18,7 @@ import {
   ReviewNotFoundError,
   upsertFilmRating,
   updateReviewComment,
-} from "../services/reviewsService.js";
+} from "../services/reviews/reviewsService.js";
 
 function getOmdbId(req: RequestWithSession): string {
   return String(req.params.omdbId).trim();

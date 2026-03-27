@@ -6,7 +6,7 @@ import {
   findPendingRelationsForReceiver,
   findUsersByIds,
   updatePendingRelationStatus,
-} from "../repository/friendsRepository.js";
+} from "../../repository/friendsRepository.js";
 
 export async function getFriends(userId: number) {
   const rows = await findAcceptedRelationsByUserId(userId);
