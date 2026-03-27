@@ -22,8 +22,23 @@ describe("useMovieDetails", () => {
 
   it("fetches details with credentials include", async () => {
     const payload = {
-      film: { omdbId: "tt0133093", title: "Matrix" },
-      reviews: [],
+      film_id: 1,
+      omdb_id: "tt0133093",
+      title: "Matrix",
+      year: 1999,
+      type: "movie",
+      director: "Lana Wachowski, Lilly Wachowski",
+      poster_url: "https://images.example.com/matrix.jpg",
+      genre: "Action, Sci-Fi",
+      plot: "A hacker discovers reality is a simulation.",
+      runtime: "136 min",
+      imdb_rating: "8.7",
+      average_rating: 4.5,
+      ratings_count: 12,
+      awards: "Won 4 Oscars. 42 wins & 51 nominations total",
+      created_at: "2026-03-27T10:00:00.000Z",
+      updated_at: "2026-03-27T10:00:00.000Z",
+      user_rating: null,
     };
 
     (globalThis.fetch as jest.Mock).mockResolvedValue({

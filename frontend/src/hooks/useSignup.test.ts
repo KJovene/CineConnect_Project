@@ -29,7 +29,7 @@ describe("useSignup", () => {
     act(() => {
       result.current.setName("  Kevin  ");
       result.current.setEmail("kevin@example.com");
-      result.current.setPassword("secret");
+      result.current.setPassword("secret123");
     });
 
     await act(async () => {
@@ -42,7 +42,7 @@ describe("useSignup", () => {
       expect.objectContaining({
         name: "Kevin",
         email: "kevin@example.com",
-        password: "secret",
+        password: "secret123",
         callbackURL: "/",
       }),
     );
@@ -62,6 +62,12 @@ describe("useSignup", () => {
     });
 
     const { result } = renderHook(() => useSignup());
+
+    act(() => {
+      result.current.setName("Kevin");
+      result.current.setEmail("kevin@example.com");
+      result.current.setPassword("secret123");
+    });
 
     await act(async () => {
       await result.current.handleSubmit({

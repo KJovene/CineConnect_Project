@@ -31,9 +31,17 @@ describe("useSearchMovies", () => {
 
   it("fetches movies when query is valid", async () => {
     const payload = {
-      films: [{ id: 1, title: "Matrix" }],
+      results: [
+        {
+          omdb_id: "tt0133093",
+          title: "Matrix",
+          year: 1999,
+          type: "movie",
+          poster_url: "https://images.example.com/matrix.jpg",
+        },
+      ],
       page: 1,
-      totalPages: 1,
+      totalResults: 1,
     };
 
     (globalThis.fetch as jest.Mock).mockResolvedValue({
@@ -60,9 +68,17 @@ describe("useSearchMovies", () => {
 
   it("uses default page when not provided", async () => {
     const payload = {
-      films: [{ id: 2, title: "Inception" }],
+      results: [
+        {
+          omdb_id: "tt1375666",
+          title: "Inception",
+          year: 2010,
+          type: "movie",
+          poster_url: "https://images.example.com/inception.jpg",
+        },
+      ],
       page: 1,
-      totalPages: 1,
+      totalResults: 1,
     };
 
     (globalThis.fetch as jest.Mock).mockResolvedValue({

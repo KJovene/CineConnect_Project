@@ -28,7 +28,7 @@ describe("useLogin", () => {
 
     act(() => {
       result.current.setEmail("test@example.com");
-      result.current.setPassword("secret");
+      result.current.setPassword("secret123");
     });
 
     const preventDefault = jest.fn();
@@ -43,7 +43,7 @@ describe("useLogin", () => {
     expect(authClient.signIn.email).toHaveBeenCalledWith(
       expect.objectContaining({
         email: "test@example.com",
-        password: "secret",
+        password: "secret123",
         callbackURL: "/",
       }),
     );
@@ -64,6 +64,11 @@ describe("useLogin", () => {
 
     const { result } = renderHook(() => useLogin());
 
+    act(() => {
+      result.current.setEmail("test@example.com");
+      result.current.setPassword("secret123");
+    });
+
     await act(async () => {
       await result.current.handleSubmit({
         preventDefault: jest.fn(),
@@ -82,6 +87,11 @@ describe("useLogin", () => {
 
     const { result } = renderHook(() => useLogin());
 
+    act(() => {
+      result.current.setEmail("test@example.com");
+      result.current.setPassword("secret123");
+    });
+
     await act(async () => {
       await result.current.handleSubmit({
         preventDefault: jest.fn(),
@@ -99,6 +109,11 @@ describe("useLogin", () => {
     );
 
     const { result } = renderHook(() => useLogin());
+
+    act(() => {
+      result.current.setEmail("test@example.com");
+      result.current.setPassword("secret123");
+    });
 
     await act(async () => {
       await result.current.handleSubmit({

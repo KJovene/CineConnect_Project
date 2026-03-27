@@ -12,7 +12,23 @@ describe("useLatestCommunityReviews", () => {
   });
 
   it("fetches latest community reviews", async () => {
-    const payload = { reviews: [{ id: 1, title: "Great" }] };
+    const payload = [
+      {
+        reviewId: 1,
+        rating: 5,
+        comment: "Great",
+        createdAt: "2026-03-27T10:00:00.000Z",
+        author: {
+          id: 10,
+          name: "Alice",
+          image: null,
+        },
+        film: {
+          omdbId: "tt0133093",
+          title: "Matrix",
+        },
+      },
+    ];
 
     (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: true,
