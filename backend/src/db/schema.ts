@@ -79,7 +79,7 @@ export const films = pgTable("films", {
   genre: varchar("genre", { length: 255 }),
   plot: text("plot"),
   runtime: varchar("runtime", { length: 20 }),
-  imdb_rating: varchar("imdb_rating", { length: 10 }),
+  omdb_rating: varchar("omdb_rating", { length: 10 }),
   awards: text("awards"),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at")

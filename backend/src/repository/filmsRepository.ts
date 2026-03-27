@@ -21,7 +21,7 @@ interface FilmUpsertValues {
   genre: string | null;
   plot: string | null;
   runtime: string | null;
-  imdb_rating: string | null;
+  omdb_rating: string | null;
   awards: string | null;
 }
 
@@ -141,7 +141,7 @@ export async function findTopRatedFilmIds(limit: number) {
     .orderBy(
       desc(sql`avg(${reviews.rating})`),
       desc(sql`count(*)`),
-      desc(films.imdb_rating),
+      desc(films.omdb_rating),
     )
     .limit(limit);
 }
@@ -161,7 +161,7 @@ export async function findUnratedFilmIds(limit: number) {
     .where(and(eq(films.type, "movie"), isNotNull(films.poster_url)))
     .groupBy(films.film_id)
     .having(sql`count(${reviews.review_id}) = 0`)
-    .orderBy(desc(films.imdb_rating), desc(films.updated_at))
+    .orderBy(desc(films.omdb_rating), desc(films.updated_at))
     .limit(limit);
 }
 
@@ -182,6 +182,6 @@ export async function findFilmsByGenreLike(genre: string, limit: number) {
         like(films.genre, `%${genre}%`),
       ),
     )
-    .orderBy(desc(films.imdb_rating))
+    .orderBy(desc(films.omdb_rating))
     .limit(limit);
 }

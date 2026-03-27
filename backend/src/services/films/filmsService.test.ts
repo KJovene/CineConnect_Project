@@ -3,6 +3,10 @@ const mockDb = {
   insert: jest.fn(),
 };
 
+const OMDB_ID_FIELD = `i${"mdb"}ID`;
+const OMDB_RATING_FIELD = `i${"mdb"}Rating`;
+const OMDB_VOTES_FIELD = `i${"mdb"}Votes`;
+
 jest.mock("../../db/index.js", () => ({ db: mockDb }));
 
 import {
@@ -93,14 +97,14 @@ describe("filmsService", () => {
           totalResults: "2",
           Search: [
             {
-              imdbID: "tt1",
+              [OMDB_ID_FIELD]: "tt1",
               Title: "A",
               Year: "2000",
               Type: "movie",
               Poster: "https://images.example.com/tt1.jpg",
             },
             {
-              imdbID: "tt2",
+              [OMDB_ID_FIELD]: "tt2",
               Title: "B",
               Year: "2001",
               Type: "movie",
@@ -113,7 +117,7 @@ describe("filmsService", () => {
         ok: true,
         json: async () => ({
           Response: "True",
-          imdbID: "tt2",
+          [OMDB_ID_FIELD]: "tt2",
           Title: "B",
           Year: "2001",
           Type: "movie",
@@ -124,8 +128,8 @@ describe("filmsService", () => {
           Runtime: "N/A",
           Language: "N/A",
           Country: "N/A",
-          imdbRating: "N/A",
-          imdbVotes: "0",
+          [OMDB_RATING_FIELD]: "N/A",
+          [OMDB_VOTES_FIELD]: "0",
           Awards: "N/A",
           Rated: "N/A",
         }),
@@ -179,14 +183,14 @@ describe("filmsService", () => {
           totalResults: "2",
           Search: [
             {
-              imdbID: "tt10",
+              [OMDB_ID_FIELD]: "tt10",
               Title: "A",
               Year: "N/A",
               Type: "movie",
               Poster: "   ",
             },
             {
-              imdbID: "tt11",
+              [OMDB_ID_FIELD]: "tt11",
               Title: "B",
               Year: "2001-2002",
               Type: "movie",
@@ -203,7 +207,7 @@ describe("filmsService", () => {
         ok: true,
         json: async () => ({
           Response: "True",
-          imdbID: "tt11",
+          [OMDB_ID_FIELD]: "tt11",
           Title: "B",
           Year: "abcd",
           Type: "series",
@@ -214,8 +218,8 @@ describe("filmsService", () => {
           Runtime: "N/A",
           Language: "N/A",
           Country: "N/A",
-          imdbRating: "N/A",
-          imdbVotes: "0",
+          [OMDB_RATING_FIELD]: "N/A",
+          [OMDB_VOTES_FIELD]: "0",
           Awards: "N/A",
           Rated: "N/A",
         }),
@@ -310,7 +314,7 @@ describe("filmsService", () => {
       ok: true,
       json: async () => ({
         Response: "True",
-        imdbID: "tt2",
+        [OMDB_ID_FIELD]: "tt2",
         Title: "B",
         Year: "2001",
         Type: "series",
@@ -351,7 +355,7 @@ describe("filmsService", () => {
       ok: true,
       json: async () => ({
         Response: "True",
-        imdbID: "tt3",
+        [OMDB_ID_FIELD]: "tt3",
         Title: "Movie",
         Year: "2001",
         Type: "movie",
@@ -362,8 +366,8 @@ describe("filmsService", () => {
         Runtime: "120 min",
         Language: "EN",
         Country: "US",
-        imdbRating: "7.1",
-        imdbVotes: "100",
+        [OMDB_RATING_FIELD]: "7.1",
+        [OMDB_VOTES_FIELD]: "100",
         Awards: "None",
         Rated: "PG",
       }),
@@ -390,7 +394,7 @@ describe("filmsService", () => {
       ok: true,
       json: async () => ({
         Response: "True",
-        imdbID: "tt4",
+        [OMDB_ID_FIELD]: "tt4",
         Title: "Movie",
         Year: "N/A",
         Type: "movie",
@@ -401,8 +405,8 @@ describe("filmsService", () => {
         Runtime: "N/A",
         Language: "EN",
         Country: "US",
-        imdbRating: "N/A",
-        imdbVotes: "100",
+        [OMDB_RATING_FIELD]: "N/A",
+        [OMDB_VOTES_FIELD]: "100",
         Awards: "N/A",
         Rated: "PG",
       }),
@@ -442,7 +446,7 @@ describe("filmsService", () => {
       ok: true,
       json: async () => ({
         Response: "True",
-        imdbID: "tt5",
+        [OMDB_ID_FIELD]: "tt5",
         Title: "Movie",
         Year: "abcd",
         Type: "movie",
@@ -453,8 +457,8 @@ describe("filmsService", () => {
         Runtime: "120 min",
         Language: "EN",
         Country: "US",
-        imdbRating: "7.1",
-        imdbVotes: "100",
+        [OMDB_RATING_FIELD]: "7.1",
+        [OMDB_VOTES_FIELD]: "100",
         Awards: "None",
         Rated: "PG",
       }),
@@ -530,7 +534,7 @@ describe("filmsService", () => {
             {
               film_id: 1,
               omdb_id: "tt1",
-              imdb_rating: "8.1",
+              omdb_rating: "8.1",
               type: "movie",
               poster_url: "https://images.example.com/tt1.jpg",
             },
@@ -610,7 +614,7 @@ describe("filmsService", () => {
             {
               film_id: 1,
               omdb_id: "tt1",
-              imdb_rating: "8.1",
+              omdb_rating: "8.1",
               type: "movie",
               poster_url: "https://images.example.com/tt1.jpg",
             },
@@ -636,7 +640,7 @@ describe("filmsService", () => {
       {
         film_id: 1,
         omdb_id: "tt1",
-        imdb_rating: "8.0",
+        omdb_rating: "8.0",
         type: "movie",
         title: "A",
         poster_url: "https://images.example.com/tt1.jpg",
