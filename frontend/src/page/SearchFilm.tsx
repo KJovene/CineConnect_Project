@@ -36,7 +36,6 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center relative">
-      {/* Glow de fond — indigo, pas besoin de changer */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-4xl mx-auto pt-24 px-6 pb-20 z-10">

@@ -32,10 +32,7 @@ import {
   type FriendUser,
   type UserSearchResult,
 } from "@/hooks/useFriends";
-import {
-  useMyLatestComments,
-  useMyLatestRatings,
-} from "@/hooks/useReviews";
+import { useMyLatestComments, useMyLatestRatings } from "@/hooks/useReviews";
 
 const Profil: React.FC = () => {
   const navigate = useNavigate();

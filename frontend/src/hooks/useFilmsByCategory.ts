@@ -25,6 +25,6 @@ export function useFilmsByCategory(limit = 24) {
   return useQuery({
     queryKey: ["movies", "by-category", limit],
     queryFn: () => fetchFilmsByCategory(limit),
-    staleTime: 1000 * 60 * 15, // 15 min — données stables
+    staleTime: 1000 * 60 * 15,
   });
 }

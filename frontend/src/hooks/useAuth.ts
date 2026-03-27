@@ -12,7 +12,6 @@ export function useAuth() {
     await signOut({
       fetchOptions: {
         onSuccess: () => {
-          // Redirection vers la page de connexion après logout
           window.location.assign("/login");
         },
       },

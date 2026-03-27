@@ -34,7 +34,6 @@ export async function createMessage(
 }
 
 export async function getRecentConversations(userId: number) {
-  // Récupère le dernier message de chaque conversation
   const rows = await findRecentConversationMessages(userId);
 
   // Déduplique par interlocuteur, garde uniquement le dernier message

@@ -3,10 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { loginRequestSchema } from "@cineconnect/shared";
 import { authClient } from "@/lib/auth-client";
 
-/**
- * Hook encapsulant la logique de connexion (état + signIn).
- * À utiliser dans la page Login (conteneur).
- */
 export function useLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -21,7 +17,9 @@ export function useLogin() {
     const validation = loginRequestSchema.safeParse({ email, password });
     if (!validation.success) {
       const field = validation.error.issues[0]?.path[0];
-      setError(field === "email" ? "Adresse email invalide." : "Mot de passe requis.");
+      setError(
+        field === "email" ? "Adresse email invalide." : "Mot de passe requis.",
+      );
       return;
     }
 

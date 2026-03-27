@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { topRatedResponseSchema, type TopRatedResponse } from "@cineconnect/shared";
+import {
+  topRatedResponseSchema,
+  type TopRatedResponse,
+} from "@cineconnect/shared";
 import { getApiBaseUrl } from "@/lib/runtimeConfig";
 
 const API_BASE = getApiBaseUrl();
@@ -20,6 +23,6 @@ export function useTopRatedMovies(limit = 10) {
   return useQuery({
     queryKey: ["movies", "top-rated", limit],
     queryFn: () => fetchTopRated(limit),
-    staleTime: 1000 * 60 * 15, // 15 min — données stables
+    staleTime: 1000 * 60 * 15,
   });
 }

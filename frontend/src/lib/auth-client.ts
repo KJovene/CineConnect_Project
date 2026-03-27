@@ -28,7 +28,7 @@ interface DeleteCurrentUserInput {
 }
 
 /**
- * Met a jour le profil de l'utilisateur connecte via Better Auth.
+ * Met a jour le profil de l'utilisateur connecté via Better Auth.
  */
 export async function updateCurrentUser(payload: UpdateCurrentUserInput) {
   const response = await fetch(`${API_URL}/api/auth/update-user`, {

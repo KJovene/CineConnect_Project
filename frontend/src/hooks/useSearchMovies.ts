@@ -29,6 +29,6 @@ export function useSearchMovies(query: string, page = 1) {
     queryKey: ["movies", "search", query, page],
     queryFn: () => searchMovies(query, page),
     enabled: !!query && query.length >= 3,
-    staleTime: 1000 * 60 * 5, // 5 min — pas besoin de recharger souvent, c'est en BDD
+    staleTime: 1000 * 60 * 5,
   });
 }

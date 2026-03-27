@@ -30,17 +30,12 @@ export function useMessages(withUserId: number | null) {
   });
 }
 
-/** Envoie un message via Socket.io (temps réel). */
 export function useSocketSend() {
   return useCallback((toUserId: number, content: string) => {
     getSocket().emit("dm:send", { toUserId, content });
   }, []);
 }
 
-/**
- * S'abonne aux nouveaux messages entrants via Socket.io.
- * Met à jour le cache TanStack Query pour la conversation concernée.
- */
 export function useIncomingMessages(currentUserId: number | null) {
   const qc = useQueryClient();
 
