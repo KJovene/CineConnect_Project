@@ -1,18 +1,6 @@
-import { getFilmDetail } from "../services/filmsService.js";
+import { getFilmDetail } from "../services/films/filmsService.js";
 
-/**
- * Script de seed pour peupler la base de données avec ~100 films connus.
- * Les films sont récupérés depuis l'API OMDB et insérés/mis à jour en BDD.
- * Utilise l'OMDB_API_KEY définie dans les variables d'environnement.
- *
- * Usage: pnpm db:seed-films
- */
-
-/**
- * Liste de ~100 films iconiques sur différentes catégories
- * Identifiants IMDb (imdbID) utilisés pour l'API OMDB
- */
-const IMDB_IDS: { id: string; label: string }[] = [
+const OMDB_IDS: { id: string; label: string }[] = [
   // --- Action & Superhéros ---
   { id: "tt0468569", label: "The Dark Knight (2008)" },
   { id: "tt1375666", label: "Inception (2010)" },
@@ -67,8 +55,14 @@ const IMDB_IDS: { id: string; label: string }[] = [
   { id: "tt0401792", label: "Sin City (2005)" },
 
   // --- Fantastique & Aventure ---
-  { id: "tt0167260", label: "The Lord of the Rings: The Return of the King (2003)" },
-  { id: "tt0120737", label: "The Lord of the Rings: The Fellowship of the Ring (2001)" },
+  {
+    id: "tt0167260",
+    label: "The Lord of the Rings: The Return of the King (2003)",
+  },
+  {
+    id: "tt0120737",
+    label: "The Lord of the Rings: The Fellowship of the Ring (2001)",
+  },
   { id: "tt0167261", label: "The Lord of the Rings: The Two Towers (2002)" },
   { id: "tt0266697", label: "Kill Bill: Vol. 1 (2003)" },
   { id: "tt0361748", label: "Inglourious Basterds (2009)" },
@@ -138,9 +132,11 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Déduplique la liste d'IDs IMDb (au cas où)
+ * Déduplique la liste d'IDs OMDB (au cas où)
  */
-function deduplicateIds(list: { id: string; label: string }[]): { id: string; label: string }[] {
+function deduplicateIds(
+  list: { id: string; label: string }[],
+): { id: string; label: string }[] {
   const seen = new Set<string>();
   return list.filter(({ id }) => {
     if (seen.has(id)) return false;
@@ -150,7 +146,7 @@ function deduplicateIds(list: { id: string; label: string }[]): { id: string; la
 }
 
 async function seedFilms(): Promise<void> {
-  const uniqueList = deduplicateIds(IMDB_IDS);
+  const uniqueList = deduplicateIds(OMDB_IDS);
   const total = uniqueList.length;
 
   console.log(`\n🎬 Seed films — ${total} films à traiter\n`);
@@ -171,7 +167,9 @@ async function seedFilms(): Promise<void> {
         console.log(`✅ ${progress} ${label}`);
         inserted++;
       } else {
-        console.log(`⚠️  ${progress} ${label} — réponse vide (film introuvable)`);
+        console.log(
+          `⚠️  ${progress} ${label} — réponse vide (film introuvable)`,
+        );
         skipped++;
       }
     } catch (err) {

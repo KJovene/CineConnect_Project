@@ -7,7 +7,7 @@ const config: Config = {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   roots: ["<rootDir>/src"],
-  testMatch: ["**/__tests__/**/*.test.ts"],
+  testMatch: ["**/*.test.ts"],
   setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
   collectCoverageFrom: [
     "src/**/*.ts",

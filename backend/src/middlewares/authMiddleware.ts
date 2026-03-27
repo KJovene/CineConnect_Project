@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { auth } from "../auth.js";
+import { auth } from "../config/auth.js";
 import type { RequestWithSession } from "../types/index.js";
 
 export type { RequestWithSession };

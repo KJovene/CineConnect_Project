@@ -7,7 +7,7 @@
     "build:shared": "pnpm --filter shared build",
     "build:front": "pnpm --filter frontend build",
     "build:back": "pnpm --filter backend build",
-    "test:front": "pnpm --filter frontend test",
+    "test:front": "pnpm build:shared && pnpm --filter frontend test",
     "test:back": "pnpm --filter backend test",
     "lint:front": "pnpm --filter frontend lint",
     "lint:back": "pnpm --filter backend lint",

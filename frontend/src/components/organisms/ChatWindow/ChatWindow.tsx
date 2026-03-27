@@ -173,7 +173,7 @@ export function ChatWindow({
       className="flex flex-col h-full"
       style={{ background: "var(--color-bg)" }}
     >
-      {/* Header */}
+      {/* En-tete */}
       <div
         className="h-16 flex items-center gap-3 px-6 shrink-0"
         style={{
@@ -286,7 +286,7 @@ export function ChatWindow({
         )}
       </div>
 
-      {/* Input */}
+      {/* Champ de saisie */}
       <div
         className="shrink-0 px-4 py-4"
         style={{

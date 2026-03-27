@@ -2,18 +2,9 @@ import { db } from "./index.js";
 import { user } from "./schema.js";
 import { eq } from "drizzle-orm";
 
-/**
- * Script de fixtures pour initialiser la base de données avec des utilisateurs de test.
- * Crée les utilisateurs via l'API Better Auth pour assurer la compatibilité.
- * Mot de passe générique pour tous les utilisateurs : "Password123!"
- */
-
 const GENERIC_PASSWORD = "Password123!";
 const API_BASE_URL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
 
-/**
- * Utilisateurs de test avec nom, email et pseudo convaincants
- */
 const testUsers = [
   {
     name: "Sophie Dubois",
@@ -71,7 +62,7 @@ async function createUserViaAPI(
     .limit(1);
 
   if (existingUser.length > 0) {
-    return false; // Utilisateur existe déjà
+    return false;
   }
 
   // Créer via Better Auth API
@@ -115,17 +106,13 @@ async function createUserViaAPI(
     emailVerified: true,
   });
 
-  return true; // Créé avec succès
+  return true;
 }
 
-/**
- * Fonction principale de seed
- */
 async function seed() {
   try {
     console.log("🌱 Démarrage du seed de la base de données...\n");
 
-    // Vérification si des utilisateurs existent déjà
     const existingUsers = await db.select().from(user);
     if (existingUsers.length > 0) {
       console.log(
@@ -133,7 +120,6 @@ async function seed() {
       );
       console.log("💡 Si vous voulez réinitialiser, utilisez: make db-reset\n");
 
-      // Demander confirmation
       console.log(
         "Voulez-vous ajouter les fixtures quand même ? (Les doublons d'email seront ignorés)",
       );
@@ -183,5 +169,4 @@ async function seed() {
   }
 }
 
-// Exécution du seed
 seed();

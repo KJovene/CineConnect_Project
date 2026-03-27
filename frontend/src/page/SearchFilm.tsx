@@ -36,7 +36,6 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center relative">
-      {/* Glow de fond — indigo, pas besoin de changer */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-4xl mx-auto pt-24 px-6 pb-20 z-10">
@@ -51,14 +50,14 @@ const SearchPage: React.FC = () => {
 
         {searchQuery.length >= 3 && (
           <div className="mb-16">
-            {/* Error */}
+            {/* Erreur */}
             {error && (
               <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl mb-6">
                 ❌ {error instanceof Error ? error.message : "Erreur"}
               </div>
             )}
 
-            {/* Loading */}
+            {/* Chargement */}
             {isLoading && (
               <div className="text-center py-12">
                 <div className="inline-block w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4" />
@@ -71,7 +70,7 @@ const SearchPage: React.FC = () => {
               </div>
             )}
 
-            {/* No results */}
+            {/* Aucun resultat */}
             {!isLoading && results.length === 0 && !error && (
               <div className="text-center py-12">
                 <div
@@ -101,7 +100,7 @@ const SearchPage: React.FC = () => {
               </div>
             )}
 
-            {/* Results grid */}
+            {/* Grille de resultats */}
             {!isLoading && results.length > 0 && (
               <>
                 <div className="mb-4 px-2">
@@ -121,7 +120,7 @@ const SearchPage: React.FC = () => {
                       key={movie.omdb_id}
                       to="/film/$id"
                       params={{ id: movie.omdb_id }}
-                      className="group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer transition-all"
+                      className="group relative aspect-2/3 rounded-xl overflow-hidden cursor-pointer transition-all"
                       style={{
                         background: "var(--color-surface)",
                         border: "1px solid var(--color-border)",
@@ -132,8 +131,8 @@ const SearchPage: React.FC = () => {
                         alt={movie.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-                      {/* Gradient overlay — reste sombre quel que soit le thème, c'est sur une image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+                      {/* Degrade de superposition — reste sombre quel que soit le theme, c'est sur une image */}
+                      <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
                       <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white font-semibold tracking-tight mb-1 truncate text-xs">
                           {movie.title}

@@ -29,6 +29,13 @@
       "when": 1773500000000,
       "tag": "0003_comment_replies",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774609000000,
+      "tag": "0004_omdb_rating_rename",
+      "breakpoints": true
     }
   ]
 }

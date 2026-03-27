@@ -10,7 +10,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-// --- Better Auth (user, session, account, verification) ---
 export const user = pgTable("user", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }),
@@ -69,8 +68,6 @@ export const verification = pgTable("verification", {
     .$onUpdateFn(() => new Date()),
 });
 
-// --- App (films, categories, reviews, friends, messages) ---
-// Table films
 export const films = pgTable("films", {
   film_id: serial("film_id").primaryKey(),
   omdb_id: varchar("omdb_id", { length: 50 }).unique(),
@@ -82,7 +79,7 @@ export const films = pgTable("films", {
   genre: varchar("genre", { length: 255 }),
   plot: text("plot"),
   runtime: varchar("runtime", { length: 20 }),
-  imdb_rating: varchar("imdb_rating", { length: 10 }),
+  omdb_rating: varchar("omdb_rating", { length: 10 }),
   awards: text("awards"),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at")
@@ -90,14 +87,12 @@ export const films = pgTable("films", {
     .$onUpdateFn(() => new Date()),
 });
 
-// Table categories
 export const categories = pgTable("categories", {
   category_id: serial("category_id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description"),
 });
 
-// Table de liaison films_categories
 export const filmsCategories = pgTable(
   "films_categories",
   {
@@ -111,7 +106,6 @@ export const filmsCategories = pgTable(
   (table) => [primaryKey({ columns: [table.film_id, table.category_id] })],
 );
 
-// Table reviews
 export const reviews = pgTable("reviews", {
   review_id: serial("review_id").primaryKey(),
   user_id: integer("user_id")
@@ -132,7 +126,6 @@ export const reviews = pgTable("reviews", {
     .$onUpdateFn(() => new Date()),
 });
 
-// Table friends
 export const friends = pgTable("friends", {
   friend_id: serial("friend_id").primaryKey(),
   user_id: integer("user_id")
@@ -145,7 +138,6 @@ export const friends = pgTable("friends", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
-// Table messages
 export const messages = pgTable("messages", {
   message_id: serial("message_id").primaryKey(),
   sender_id: integer("sender_id")
@@ -158,7 +150,6 @@ export const messages = pgTable("messages", {
   sent_at: timestamp("sent_at").defaultNow(),
 });
 
-// Relations Better Auth
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),

@@ -3,9 +3,8 @@
   "compilerOptions": {
     "types": ["jest", "node", "vite/client"],
     "esModuleInterop": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
     "verbatimModuleSyntax": false
   },
-  "include": ["src"]
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": []
 }

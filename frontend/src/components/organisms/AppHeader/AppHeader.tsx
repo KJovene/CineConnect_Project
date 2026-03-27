@@ -149,7 +149,7 @@ export function AppHeader({
                 <button
                   type="button"
                   onClick={markAllAsRead}
-                  className="text-[11px] text-indigo-400 hover:text-indigo-300"
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 cursor-pointer"
                 >
                   Tout marquer comme lu
                 </button>
@@ -173,7 +173,7 @@ export function AppHeader({
                           console.error,
                         )
                       }
-                      className={`w-full text-left px-4 py-3 transition-colors ${
+                      className={`cursor-pointer w-full text-left px-4 py-3 transition-colors ${
                         notification.isRead
                           ? "bg-transparent hover:bg-white/5"
                           : "bg-indigo-500/10 hover:bg-indigo-500/15"

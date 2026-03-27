@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { RequestWithSession } from "../middlewares/authMiddleware.js";
-import * as friendsService from "../services/friendsService.js";
+import * as friendsService from "../services/friends/friendsService.js";
 
 export async function getFriends(req: RequestWithSession, res: Response) {
   try {

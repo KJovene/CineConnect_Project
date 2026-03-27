@@ -3,7 +3,7 @@ import {
   getAllCategories,
   getFilmsByCategory,
   getFilmsByAllCategories,
-} from "../services/categoriesService.js";
+} from "../services/categories/categoriesService.js";
 
 export async function listCategories(_req: Request, res: Response) {
   try {

@@ -31,7 +31,7 @@ const Discussion: React.FC = () => {
   }, [search.friendId]);
 
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
-  // "list" | "chat" — contrôle la vue active sur mobile
+  // Controle la vue active sur mobile
   const [mobileView, setMobileView] = useState<"list" | "chat">(
     parsedSearchFriendId ? "chat" : "list",
   );
@@ -86,7 +86,7 @@ const Discussion: React.FC = () => {
           borderRight: "1px solid var(--color-border)",
         }}
       >
-        {/* Header sidebar */}
+        {/* En-tete de la barre laterale */}
         <div
           className="h-16 flex items-center justify-between shrink-0 px-3 gap-2"
           style={{ borderBottom: "1px solid var(--color-border)" }}
@@ -132,7 +132,7 @@ const Discussion: React.FC = () => {
         </div>
       </aside>
 
-      {/* fenêtre de chat */}
+      {/* Fenêtre de chat */}
       <main
         className={`
           flex-1 overflow-hidden flex flex-col
