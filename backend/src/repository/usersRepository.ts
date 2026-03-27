@@ -2,40 +2,6 @@ import { and, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { films, friends, reviews, user } from "../db/schema.js";
 
-export interface LatestRatingRow {
-  reviewId: number;
-  filmId: number;
-  omdbId: string;
-  filmTitle: string;
-  posterUrl: string | null;
-  rating: number;
-  createdAt: Date | null;
-}
-
-export interface LatestCommentRow {
-  reviewId: number;
-  filmId: number;
-  omdbId: string;
-  filmTitle: string;
-  posterUrl: string | null;
-  comment: string | null;
-  parentReviewId: number | null;
-  createdAt: Date | null;
-}
-
-export interface UserSearchRow {
-  id: number;
-  name: string;
-  email: string;
-  image: string | null;
-}
-
-export interface UserRelationRow {
-  user_id: number;
-  friend_user_id: number;
-  status: string | null;
-}
-
 export async function findLatestRatingsByUserId(userId: number, limit: number) {
   return db
     .select({

@@ -120,7 +120,7 @@ const SearchPage: React.FC = () => {
                       key={movie.omdb_id}
                       to="/film/$id"
                       params={{ id: movie.omdb_id }}
-                      className="group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer transition-all"
+                      className="group relative aspect-2/3 rounded-xl overflow-hidden cursor-pointer transition-all"
                       style={{
                         background: "var(--color-surface)",
                         border: "1px solid var(--color-border)",
@@ -132,7 +132,7 @@ const SearchPage: React.FC = () => {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       {/* Degrade de superposition — reste sombre quel que soit le theme, c'est sur une image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
                       <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white font-semibold tracking-tight mb-1 truncate text-xs">
                           {movie.title}
