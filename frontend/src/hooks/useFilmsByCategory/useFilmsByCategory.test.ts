@@ -31,7 +31,7 @@ describe("useFilmsByCategory", () => {
             genre: "Action, Sci-Fi",
             plot: "A hacker discovers reality is a simulation.",
             runtime: "136 min",
-            imdb_rating: "8.7",
+            omdb_rating: "8.7",
             average_rating: 4.5,
             ratings_count: 12,
             awards: "Won 4 Oscars. 42 wins & 51 nominations total",

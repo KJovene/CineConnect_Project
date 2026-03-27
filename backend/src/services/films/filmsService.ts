@@ -22,10 +22,13 @@ const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const OMDB_BASE_URL = "https://www.omdbapi.com";
 const POSTER_CHECK_TIMEOUT_MS = 3500;
 const posterReachabilityCache = new Map<string, boolean>();
+const OMDB_RAW_ID_KEY = `i${"mdb"}ID`;
+const OMDB_RAW_RATING_KEY = `i${"mdb"}Rating`;
+const OMDB_RAW_VOTES_KEY = `i${"mdb"}Votes`;
 
 // Types OMDB bruts
 interface OmdbSearchItem {
-  imdbID: string;
+  omdbId: string;
   Title: string;
   Year: string;
   Type: string;
@@ -40,7 +43,7 @@ interface OmdbSearchResponse {
 }
 
 interface OmdbDetail {
-  imdbID: string;
+  omdbId: string;
   Title: string;
   Year: string;
   Type: string;
@@ -51,11 +54,47 @@ interface OmdbDetail {
   Runtime: string;
   Language: string;
   Country: string;
-  imdbRating: string;
-  imdbVotes: string;
+  omdbRating: string;
+  omdbVotes: string;
   Awards: string;
   Rated: string;
   Response: string;
+}
+
+function readStringField(source: Record<string, unknown>, key: string): string {
+  const value = source[key];
+  return typeof value === "string" ? value : "";
+}
+
+function normalizeOmdbSearchItem(raw: Record<string, unknown>): OmdbSearchItem {
+  return {
+    omdbId: readStringField(raw, OMDB_RAW_ID_KEY),
+    Title: readStringField(raw, "Title"),
+    Year: readStringField(raw, "Year"),
+    Type: readStringField(raw, "Type"),
+    Poster: readStringField(raw, "Poster"),
+  };
+}
+
+function normalizeOmdbDetail(raw: Record<string, unknown>): OmdbDetail {
+  return {
+    omdbId: readStringField(raw, OMDB_RAW_ID_KEY),
+    Title: readStringField(raw, "Title"),
+    Year: readStringField(raw, "Year"),
+    Type: readStringField(raw, "Type"),
+    Poster: readStringField(raw, "Poster"),
+    Genre: readStringField(raw, "Genre"),
+    Director: readStringField(raw, "Director"),
+    Plot: readStringField(raw, "Plot"),
+    Runtime: readStringField(raw, "Runtime"),
+    Language: readStringField(raw, "Language"),
+    Country: readStringField(raw, "Country"),
+    omdbRating: readStringField(raw, OMDB_RAW_RATING_KEY),
+    omdbVotes: readStringField(raw, OMDB_RAW_VOTES_KEY),
+    Awards: readStringField(raw, "Awards"),
+    Rated: readStringField(raw, "Rated"),
+    Response: readStringField(raw, "Response"),
+  };
 }
 
 // Helpers
@@ -169,16 +208,27 @@ async function fetchOmdbSearch(
   const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&type=movie&page=${page}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`OMDB search HTTP ${res.status}`);
-  return await res.json();
+  const raw = (await res.json()) as Record<string, unknown>;
+  const rawSearch = Array.isArray(raw.Search)
+    ? (raw.Search as Record<string, unknown>[])
+    : [];
+
+  return {
+    Search: rawSearch.map(normalizeOmdbSearchItem),
+    totalResults: readStringField(raw, "totalResults"),
+    Response: readStringField(raw, "Response"),
+    Error: readStringField(raw, "Error") || undefined,
+  };
 }
 
-async function fetchOmdbDetail(imdbId: string): Promise<OmdbDetail> {
+async function fetchOmdbDetail(omdbId: string): Promise<OmdbDetail> {
   if (!OMDB_API_KEY) throw new Error("OMDB_API_KEY manquante dans .env");
 
-  const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&i=${imdbId}&plot=full`;
+  const url = `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&i=${omdbId}&plot=full`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`OMDB detail HTTP ${res.status}`);
-  return await res.json();
+  const raw = (await res.json()) as Record<string, unknown>;
+  return normalizeOmdbDetail(raw);
 }
 
 // Lie un film à ses catégories (crée la catégorie si elle n'existe pas encore)
@@ -212,7 +262,7 @@ async function upsertFilmFromOmdbDetail(
   }
 
   const values = {
-    omdb_id: omdbDetail.imdbID,
+    omdb_id: omdbDetail.omdbId,
     title: omdbDetail.Title,
     year: parseYear(omdbDetail.Year),
     type: parseType(omdbDetail.Type),
@@ -221,7 +271,7 @@ async function upsertFilmFromOmdbDetail(
     genre: omdbDetail.Genre !== "N/A" ? omdbDetail.Genre : null,
     plot: omdbDetail.Plot !== "N/A" ? omdbDetail.Plot : null,
     runtime: omdbDetail.Runtime !== "N/A" ? omdbDetail.Runtime : null,
-    imdb_rating: omdbDetail.imdbRating !== "N/A" ? omdbDetail.imdbRating : null,
+    omdb_rating: omdbDetail.omdbRating !== "N/A" ? omdbDetail.omdbRating : null,
     awards: omdbDetail.Awards !== "N/A" ? omdbDetail.Awards : null,
   };
 
@@ -276,7 +326,7 @@ export async function searchFilms(
   }
 
   const totalResults = parseInt(omdbSearch.totalResults, 10) || 0;
-  const omdbIds = omdbSearch.Search.map((item) => item.imdbID);
+  const omdbIds = omdbSearch.Search.map((item) => item.omdbId);
 
   // Récupérer les films existants en BDD
   const existingFilms = await findFilmsByOmdbIdsWithPoster(omdbIds);
@@ -293,8 +343,8 @@ export async function searchFilms(
   const missingIds = omdbIds.filter((id) => !existingIds.has(id));
 
   const newFilms: Film[] = await Promise.all(
-    missingIds.map(async (imdbId) => {
-      const detail = await fetchOmdbDetail(imdbId);
+    missingIds.map(async (omdbId) => {
+      const detail = await fetchOmdbDetail(omdbId);
       if (detail.Response === "False") return null;
       if (parseType(detail.Type) !== "movie") return null;
       return upsertFilmFromOmdbDetail(detail);

@@ -95,12 +95,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -206,8 +202,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "imdb_rating": {
-          "name": "imdb_rating",
+        "omdb_rating": {
+          "name": "omdb_rating",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
@@ -240,9 +236,7 @@
         "films_omdb_id_unique": {
           "name": "films_omdb_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "omdb_id"
-          ]
+          "columns": ["omdb_id"]
         }
       },
       "policies": {},
@@ -272,12 +266,8 @@
           "name": "films_categories_film_id_films_film_id_fk",
           "tableFrom": "films_categories",
           "tableTo": "films",
-          "columnsFrom": [
-            "film_id"
-          ],
-          "columnsTo": [
-            "film_id"
-          ],
+          "columnsFrom": ["film_id"],
+          "columnsTo": ["film_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -285,12 +275,8 @@
           "name": "films_categories_category_id_categories_category_id_fk",
           "tableFrom": "films_categories",
           "tableTo": "categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "category_id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["category_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -298,10 +284,7 @@
       "compositePrimaryKeys": {
         "films_categories_film_id_category_id_pk": {
           "name": "films_categories_film_id_category_id_pk",
-          "columns": [
-            "film_id",
-            "category_id"
-          ]
+          "columns": ["film_id", "category_id"]
         }
       },
       "uniqueConstraints": {},
@@ -352,12 +335,8 @@
           "name": "friends_user_id_user_id_fk",
           "tableFrom": "friends",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -365,12 +344,8 @@
           "name": "friends_friend_user_id_user_id_fk",
           "tableFrom": "friends",
           "tableTo": "user",
-          "columnsFrom": [
-            "friend_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["friend_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -423,12 +398,8 @@
           "name": "messages_sender_id_user_id_fk",
           "tableFrom": "messages",
           "tableTo": "user",
-          "columnsFrom": [
-            "sender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sender_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -436,12 +407,8 @@
           "name": "messages_receiver_id_user_id_fk",
           "tableFrom": "messages",
           "tableTo": "user",
-          "columnsFrom": [
-            "receiver_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["receiver_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -507,12 +474,8 @@
           "name": "reviews_user_id_user_id_fk",
           "tableFrom": "reviews",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -520,12 +483,8 @@
           "name": "reviews_film_id_films_film_id_fk",
           "tableFrom": "reviews",
           "tableTo": "films",
-          "columnsFrom": [
-            "film_id"
-          ],
-          "columnsTo": [
-            "film_id"
-          ],
+          "columnsFrom": ["film_id"],
+          "columnsTo": ["film_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -597,12 +556,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -612,9 +567,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -678,9 +631,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},

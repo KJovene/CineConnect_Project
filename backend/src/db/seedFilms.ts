@@ -1,6 +1,6 @@
 import { getFilmDetail } from "../services/films/filmsService.js";
 
-const IMDB_IDS: { id: string; label: string }[] = [
+const OMDB_IDS: { id: string; label: string }[] = [
   // --- Action & Superhéros ---
   { id: "tt0468569", label: "The Dark Knight (2008)" },
   { id: "tt1375666", label: "Inception (2010)" },
@@ -132,7 +132,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Déduplique la liste d'IDs IMDb (au cas où)
+ * Déduplique la liste d'IDs OMDB (au cas où)
  */
 function deduplicateIds(
   list: { id: string; label: string }[],
@@ -146,7 +146,7 @@ function deduplicateIds(
 }
 
 async function seedFilms(): Promise<void> {
-  const uniqueList = deduplicateIds(IMDB_IDS);
+  const uniqueList = deduplicateIds(OMDB_IDS);
   const total = uniqueList.length;
 
   console.log(`\n🎬 Seed films — ${total} films à traiter\n`);

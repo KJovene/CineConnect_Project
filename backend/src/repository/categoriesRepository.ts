@@ -19,7 +19,7 @@ export async function findFilmsByCategoryId(categoryId: number, limit: number) {
       genre: films.genre,
       plot: films.plot,
       runtime: films.runtime,
-      imdb_rating: films.imdb_rating,
+      omdb_rating: films.omdb_rating,
       awards: films.awards,
       created_at: films.created_at,
       updated_at: films.updated_at,
@@ -27,6 +27,6 @@ export async function findFilmsByCategoryId(categoryId: number, limit: number) {
     .from(films)
     .innerJoin(filmsCategories, eq(filmsCategories.film_id, films.film_id))
     .where(eq(filmsCategories.category_id, categoryId))
-    .orderBy(desc(films.imdb_rating))
+    .orderBy(desc(films.omdb_rating))
     .limit(limit);
 }

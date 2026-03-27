@@ -11,7 +11,7 @@ export const filmSchema = z.object({
   genre: z.string().nullable(),
   plot: z.string().nullable(),
   runtime: z.string().nullable(),
-  imdb_rating: z.string().nullable(),
+  omdb_rating: z.string().nullable(),
   average_rating: z.number().nullable().optional(),
   ratings_count: z.number().optional(),
   awards: z.string().nullable(),
@@ -132,14 +132,24 @@ export type ReviewAuthor = z.infer<typeof reviewAuthorSchema>;
 export type ReviewReply = z.infer<typeof reviewReplySchema>;
 export type FilmReviewComment = z.infer<typeof filmReviewCommentSchema>;
 export type FilmReviewsResponse = z.infer<typeof filmReviewsResponseSchema>;
-export type CreateFilmCommentRequest = z.infer<typeof createFilmCommentRequestSchema>;
-export type UpdateFilmCommentRequest = z.infer<typeof updateFilmCommentRequestSchema>;
-export type CreateFilmReplyRequest = z.infer<typeof createFilmReplyRequestSchema>;
+export type CreateFilmCommentRequest = z.infer<
+  typeof createFilmCommentRequestSchema
+>;
+export type UpdateFilmCommentRequest = z.infer<
+  typeof updateFilmCommentRequestSchema
+>;
+export type CreateFilmReplyRequest = z.infer<
+  typeof createFilmReplyRequestSchema
+>;
 export type CommunityReview = z.infer<typeof communityReviewSchema>;
-export type CommunityReviewsResponse = z.infer<typeof communityReviewsResponseSchema>;
+export type CommunityReviewsResponse = z.infer<
+  typeof communityReviewsResponseSchema
+>;
 export type TopRatedResponse = z.infer<typeof topRatedResponseSchema>;
 export type GenreSection = z.infer<typeof genreSectionSchema>;
 export type FilmsByGenreResponse = z.infer<typeof filmsByGenreResponseSchema>;
 export type Category = z.infer<typeof categorySchema>;
 export type CategorySection = z.infer<typeof categorySectionSchema>;
-export type FilmsByCategoryResponse = z.infer<typeof filmsByCategoryResponseSchema>;
+export type FilmsByCategoryResponse = z.infer<
+  typeof filmsByCategoryResponseSchema
+>;

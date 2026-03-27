@@ -22,7 +22,7 @@ router.get("/top-rated", getTopRated);
 router.get("/community-reviews", getCommunityReviews);
 router.use("/:omdbId/reviews", reviewsRouter);
 
-// Détail d'un film par son imdbID (ex: "tt1375666").
+// Détail d'un film par son omdbId (ex: "tt1375666").
 // ⚠️  Cette route doit être APRÈS /search et /top-rated pour ne pas les intercepter.
 router.get("/:omdbId", attachSession, getByOmdbId);
 

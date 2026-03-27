@@ -20,7 +20,7 @@ export async function getAllCategories(): Promise<Category[]> {
 }
 
 /**
- * Retourne les films d'une catégorie donnée, triés par note IMDB.
+ * Retourne les films d'une catégorie donnée, triés par note OMDB.
  * @param categoryId  ID de la catégorie
  * @param limit       Nombre max de films (défaut 24)
  */
