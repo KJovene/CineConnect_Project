@@ -13,10 +13,6 @@ export function SidebarBrand() {
           <div className="absolute inset-0 bg-linear-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white z-10">
             <HiOutlinePlayCircle size={18} />
           </div>
-          <div
-            className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 z-20"
-            style={{ borderColor: "var(--color-bg)" }}
-          />
         </div>
         <div className="hidden lg:flex flex-col">
           <span
