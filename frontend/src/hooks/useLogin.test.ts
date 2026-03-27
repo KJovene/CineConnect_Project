@@ -126,4 +126,40 @@ describe("useLogin", () => {
     );
     expect(result.current.loading).toBe(false);
   });
+
+  it("shows email validation error when email is invalid", async () => {
+    const { result } = renderHook(() => useLogin());
+
+    act(() => {
+      result.current.setEmail("invalid-email");
+      result.current.setPassword("secret123");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    expect(result.current.error).toBe("Adresse email invalide.");
+    expect(authClient.signIn.email).not.toHaveBeenCalled();
+  });
+
+  it("shows password validation error when password is missing", async () => {
+    const { result } = renderHook(() => useLogin());
+
+    act(() => {
+      result.current.setEmail("test@example.com");
+      result.current.setPassword("");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    expect(result.current.error).toBe("Mot de passe requis.");
+    expect(authClient.signIn.email).not.toHaveBeenCalled();
+  });
 });

@@ -117,4 +117,26 @@ describe("useMovieDetails", () => {
 
     expect((result.current.error as Error).message).toBe("Film introuvable");
   });
+
+  it("throws schema error when payload is invalid", async () => {
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ film: { id: 1 } }),
+    });
+
+    const client = createTestQueryClient();
+    const wrapper = createQueryClientWrapper(client);
+
+    const { result } = renderHook(() => useMovieDetails("tt0133093"), {
+      wrapper,
+    });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    expect((result.current.error as Error).message).toBe(
+      "Réponse API invalide",
+    );
+  });
 });

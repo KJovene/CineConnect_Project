@@ -79,4 +79,65 @@ describe("useSignup", () => {
     expect(navigateMock).not.toHaveBeenCalled();
     expect(result.current.loading).toBe(false);
   });
+
+  it("shows email validation error when email is invalid", async () => {
+    const { result } = renderHook(() => useSignup());
+
+    act(() => {
+      result.current.setName("Kevin");
+      result.current.setEmail("bad-email");
+      result.current.setPassword("secret123");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    expect(result.current.error).toBe("Adresse email invalide.");
+    expect(authClient.signUp.email).not.toHaveBeenCalled();
+  });
+
+  it("shows username validation error when name is too short", async () => {
+    const { result } = renderHook(() => useSignup());
+
+    act(() => {
+      result.current.setName("A");
+      result.current.setEmail("kevin@example.com");
+      result.current.setPassword("secret123");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    expect(result.current.error).toBe(
+      "Le pseudo doit contenir au moins 2 caractères.",
+    );
+    expect(authClient.signUp.email).not.toHaveBeenCalled();
+  });
+
+  it("shows password validation error when password is too short", async () => {
+    const { result } = renderHook(() => useSignup());
+
+    act(() => {
+      result.current.setName("Kevin");
+      result.current.setEmail("kevin@example.com");
+      result.current.setPassword("short");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: jest.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    expect(result.current.error).toBe(
+      "Le mot de passe doit contenir au moins 8 caractères.",
+    );
+    expect(authClient.signUp.email).not.toHaveBeenCalled();
+  });
 });

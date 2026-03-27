@@ -1,17 +1,17 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { useTopRatedMovies } from "@/hooks/useTopRatedMovies";
+import { useFilmsByCategoryId } from "@/hooks/useFilmsByCategoryId";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
 } from "@/utils/test-utils";
 
-describe("useTopRatedMovies", () => {
+describe("useFilmsByCategoryId", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = jest.fn();
   });
 
-  it("fetches top-rated movies", async () => {
+  it("returns films for a category id when response is valid", async () => {
     const payload = [
       {
         film_id: 1,
@@ -41,14 +41,16 @@ describe("useTopRatedMovies", () => {
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
 
-    const { result } = renderHook(() => useTopRatedMovies(5), { wrapper });
+    const { result } = renderHook(() => useFilmsByCategoryId(4, 10), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/films/top-rated?limit=5",
+      "http://localhost:3000/api/categories/4/films?limit=10",
     );
     expect(result.current.data).toEqual(payload);
   });
@@ -62,27 +64,27 @@ describe("useTopRatedMovies", () => {
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
 
-    const { result } = renderHook(() => useTopRatedMovies(), { wrapper });
+    const { result } = renderHook(() => useFilmsByCategoryId(2), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
 
     expect((result.current.error as Error).message).toBe(
-      "Erreur chargement homepage",
+      "Erreur chargement des films de la catégorie",
     );
   });
 
   it("throws schema error when payload is invalid", async () => {
     (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({ films: [] }),
+      json: jest.fn().mockResolvedValue({ bad: true }),
     });
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
 
-    const { result } = renderHook(() => useTopRatedMovies(), { wrapper });
+    const { result } = renderHook(() => useFilmsByCategoryId(2), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);

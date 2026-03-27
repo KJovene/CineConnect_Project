@@ -162,4 +162,26 @@ describe("useSearchMovies", () => {
 
     expect((result.current.error as Error).message).toBe("Erreur de recherche");
   });
+
+  it("throws schema error when payload is invalid", async () => {
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ films: [] }),
+    });
+
+    const client = createTestQueryClient();
+    const wrapper = createQueryClientWrapper(client);
+
+    const { result } = renderHook(() => useSearchMovies("matrix", 1), {
+      wrapper,
+    });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    expect((result.current.error as Error).message).toBe(
+      "Réponse API invalide",
+    );
+  });
 });

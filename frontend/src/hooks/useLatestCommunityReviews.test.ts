@@ -73,4 +73,26 @@ describe("useLatestCommunityReviews", () => {
       "Erreur chargement des avis de la communauté",
     );
   });
+
+  it("throws schema error when payload is invalid", async () => {
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ reviews: [] }),
+    });
+
+    const client = createTestQueryClient();
+    const wrapper = createQueryClientWrapper(client);
+
+    const { result } = renderHook(() => useLatestCommunityReviews(), {
+      wrapper,
+    });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    expect((result.current.error as Error).message).toBe(
+      "Réponse API invalide",
+    );
+  });
 });
