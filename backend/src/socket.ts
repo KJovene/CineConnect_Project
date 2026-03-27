@@ -41,7 +41,7 @@ export function initSocket(httpServer: HttpServer): SocketServer {
   io.on("connection", (socket) => {
     const userId = (socket.data as SocketData).userId;
 
-    // Chaque utilisateur rejoint sa propre room pour recevoir des messages
+    // Chaque utilisateur rejoint son propre salon pour recevoir des messages
     socket.join(`user:${userId}`);
 
     // Envoi d'un DM

@@ -43,7 +43,7 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
 
   return (
     <>
-      {/*Sidebar desktop*/}
+      {/* Barre laterale sur ordinateur */}
       <aside
         className="hidden lg:flex w-64 flex-col h-full shrink-0"
         style={{
@@ -108,7 +108,7 @@ export function Sidebar({ sections, user, onUserClick }: SidebarProps) {
         />
       </aside>
 
-      {/* Bottom bar menu (mobile) */}
+      {/* Menu de barre basse sur mobile */}
       <nav
         className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-2 h-16"
         style={{

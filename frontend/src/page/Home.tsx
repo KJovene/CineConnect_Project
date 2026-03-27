@@ -25,7 +25,7 @@ const Home: React.FC = () => {
       return undefined;
     }
 
-    // Build a deterministic index from current film data to keep render pure.
+    // Construit un index deterministe a partir des films pour garder un rendu pur.
     const seed = topFilms.reduce((accumulator, film, index) => {
       const source = `${film.omdb_id ?? film.title ?? ""}-${index}`;
       let value = accumulator;

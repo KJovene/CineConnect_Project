@@ -69,7 +69,7 @@ export const verification = pgTable("verification", {
     .$onUpdateFn(() => new Date()),
 });
 
-// --- App (films, categories, reviews, friends, messages) ---
+// --- Application (films, categories, avis, amis, messages) ---
 // Table films
 export const films = pgTable("films", {
   film_id: serial("film_id").primaryKey(),
@@ -145,7 +145,7 @@ export const friends = pgTable("friends", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
-// Table messages
+// Table des messages
 export const messages = pgTable("messages", {
   message_id: serial("message_id").primaryKey(),
   sender_id: integer("sender_id")

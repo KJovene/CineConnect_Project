@@ -258,7 +258,7 @@ const Profil: React.FC = () => {
             <p className="text-xs text-emerald-400">{profileSuccess}</p>
           )}
 
-          {/* Stats */}
+          {/* Statistiques */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             {[
               { label: "Pseudo", value: currentUser?.name ?? "Utilisateur" },

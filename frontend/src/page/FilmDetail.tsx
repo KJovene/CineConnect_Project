@@ -7,7 +7,6 @@ import { FilmDetailOverview } from "@/components/organisms/FilmDetailOverview";
 import { FilmCommunityReviews } from "@/components/organisms/FilmCommunityReviews";
 
 const FilmDetailPage: React.FC = () => {
-  //récupérer l'id depuis l'url
   const { id } = useParams({ from: "/_authenticated/film/$id" });
 
   const { data: movie, isLoading, error } = useMovieDetails(id);
@@ -44,10 +43,7 @@ const LoadingSkeleton: React.FC = () => {
   return (
     <div className="min-h-screen" style={{ background: "var(--color-bg)" }}>
       {/* Barre de nav factice */}
-      <div
-        className="h-20"
-        style={{ background: "var(--color-surface)" }}
-      />
+      <div className="h-20" style={{ background: "var(--color-surface)" }} />
       {/* Hero factice */}
       <div
         className="w-full h-[65vh] animate-pulse"

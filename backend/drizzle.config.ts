@@ -1,9 +1,8 @@
 import type { Config } from "drizzle-kit";
 import * as dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
-// Load backend/.env first, then root .env as optional fallback.
 dotenv.config({ path: path.resolve(process.cwd(), "backend/.env") });
 dotenv.config({ path: path.resolve(process.cwd(), ".env"), override: false });
 dotenv.config({ path: path.resolve(__dirname, ".env"), override: false });
@@ -20,8 +19,6 @@ const resolveDatabaseUrl = (): string => {
 
   const isInsideDocker = fs.existsSync("/.dockerenv");
 
-  // When Studio runs on the host machine, Docker DNS names (e.g. postgres)
-  // are not resolvable, so fallback to localhost.
   if (!isInsideDocker) {
     const parsed = new URL(preferredUrl);
     if (parsed.hostname === "postgres") {

@@ -57,7 +57,7 @@ export async function getRatingSummary(req: RequestWithSession, res: Response) {
   const userId = Number.parseInt(String(req.session?.user?.id), 10);
 
   try {
-    /* istanbul ignore next: guard kept for runtime robustness */
+    /* istanbul ignore next: garde conservee pour la robustesse a l'execution */
     const summary = await getFilmRatingSummary({
       omdbId,
       userId: Number.isNaN(userId) ? undefined : userId,

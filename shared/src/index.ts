@@ -1,2 +1,2 @@
-// Export all types and interfaces
+// Exporte tous les types et interfaces
 export * from "./types/index";

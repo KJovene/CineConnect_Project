@@ -20,7 +20,7 @@ router.get("/conversations", getRecentConversations);
 // GET /api/messages/incoming?limit=20 — messages reçus pour les notifications
 router.get("/incoming", getIncomingMessages);
 
-// POST /api/messages — envoyer un message (fallback sans socket)
+// POST /api/messages — envoyer un message (secours sans socket)
 router.post("/", createMessage);
 
 export default router;

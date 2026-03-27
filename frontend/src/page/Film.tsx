@@ -16,13 +16,15 @@ const Film: React.FC = () => {
       ),
   });
 
-  // ⚠️ Le hook doit être avant tout return conditionnel (règles de React)
   const { data: sections, isLoading, error } = useFilmsByCategory(24);
 
   if (isOnDetail) return <Outlet />;
 
   return (
-    <div className="mt-18 min-h-screen" style={{ background: "var(--color-bg)" }}>
+    <div
+      className="mt-18 min-h-screen"
+      style={{ background: "var(--color-bg)" }}
+    >
       <div className="px-4 pt-6 pb-4 md:px-8 md:pt-10 md:pb-6">
         <h1
           className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
@@ -30,13 +32,15 @@ const Film: React.FC = () => {
         >
           Explorer par catégorie
         </h1>
-        <p className="mt-2 text-sm sm:text-base" style={{ color: "var(--color-text-muted)" }}>
+        <p
+          className="mt-2 text-sm sm:text-base"
+          style={{ color: "var(--color-text-muted)" }}
+        >
           Découvrez des films triés par genre — naviguez dans chaque section
         </p>
       </div>
 
       <div className="px-4 pb-10 md:px-8 md:pb-16">
-
         {isLoading && (
           <div className="space-y-10">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -67,7 +71,10 @@ const Film: React.FC = () => {
             <p className="text-red-400 text-lg">
               Erreur lors du chargement des films
             </p>
-            <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>
+            <p
+              className="text-sm mt-2"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               Veuillez réessayer plus tard
             </p>
           </div>

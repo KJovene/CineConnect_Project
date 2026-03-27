@@ -87,7 +87,7 @@ export function FriendList({
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {/* Boutons accept/reject — couleurs sémantiques, gardées */}
+                  {/* Boutons accepter/refuser — couleurs semantiques, gardees */}
                   <button
                     onClick={() => onAccept(req.user_id)}
                     className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors cursor-pointer"
