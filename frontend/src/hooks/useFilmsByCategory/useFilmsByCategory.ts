@@ -3,22 +3,27 @@ import {
   filmsByCategoryResponseSchema,
   type FilmsByCategoryResponse,
 } from "@cineconnect/shared";
-import { getApiBaseUrl } from "@/lib/runtimeConfig";
-
-const API_BASE = getApiBaseUrl();
+import { apiClient } from "@/lib/apiClient";
 
 async function fetchFilmsByCategory(
   limit: number,
 ): Promise<FilmsByCategoryResponse> {
-  const res = await fetch(`${API_BASE}/api/categories/films?limit=${limit}`);
-  if (!res.ok) throw new Error("Erreur chargement des films par catégorie");
-  const raw = await res.json();
-  const parsed = filmsByCategoryResponseSchema.safeParse(raw);
-  if (!parsed.success) {
-    console.error("[useFilmsByCategory] Réponse invalide:", parsed.error);
-    throw new Error("Réponse API invalide");
+  try {
+    const raw = await apiClient.get<unknown>(
+      `/categories/films?limit=${limit}`,
+    );
+    const parsed = filmsByCategoryResponseSchema.safeParse(raw);
+    if (!parsed.success) {
+      console.error("[useFilmsByCategory] Réponse invalide:", parsed.error);
+      throw new Error("Réponse API invalide");
+    }
+    return parsed.data;
+  } catch (error) {
+    if (error instanceof Error && /^HTTP\s\d+$/.test(error.message)) {
+      throw new Error("Erreur chargement des films par catégorie");
+    }
+    throw error;
   }
-  return parsed.data;
 }
 
 export function useFilmsByCategory(limit = 24) {

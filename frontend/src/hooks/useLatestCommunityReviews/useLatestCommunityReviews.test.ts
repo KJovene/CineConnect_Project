@@ -1,14 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useLatestCommunityReviews } from "@/hooks/useLatestCommunityReviews";
+import { apiClient } from "@/lib/apiClient";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
 } from "@/utils/test-utils";
 
+jest.mock("@/lib/apiClient", () => ({
+  apiClient: {
+    get: jest.fn(),
+  },
+}));
+
 describe("useLatestCommunityReviews", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    globalThis.fetch = jest.fn();
   });
 
   it("fetches latest community reviews", async () => {
@@ -30,10 +36,7 @@ describe("useLatestCommunityReviews", () => {
       },
     ];
 
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(payload),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue(payload);
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -46,17 +49,14 @@ describe("useLatestCommunityReviews", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/films/community-reviews?limit=6",
+    expect(apiClient.get).toHaveBeenCalledWith(
+      "/films/community-reviews?limit=6",
     );
     expect(result.current.data).toEqual(payload);
   });
 
   it("throws expected error when response is not ok", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn(),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 500"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -75,10 +75,7 @@ describe("useLatestCommunityReviews", () => {
   });
 
   it("throws schema error when payload is invalid", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ reviews: [] }),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue({ reviews: [] });
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
