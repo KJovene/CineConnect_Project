@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { Button, ErrorAlert } from "@/components/atoms";
 import {
   FormField,
@@ -13,6 +13,7 @@ interface AuthFormProps {
   error: string | null;
   navLink: { prompt: string; to: string; label: string };
   onSubmit: (e: FormEvent) => void;
+  extraAction?: ReactNode;
 }
 
 export function AuthForm({
@@ -22,6 +23,7 @@ export function AuthForm({
   error,
   navLink,
   onSubmit,
+  extraAction,
 }: AuthFormProps) {
   return (
     <>
@@ -30,6 +32,7 @@ export function AuthForm({
         {fields.map((field) => (
           <FormField key={field.id} {...field} />
         ))}
+        {extraAction && <div className="text-center">{extraAction}</div>}
         <Button type="submit" loading={loading} fullWidth>
           {submitLabel}
         </Button>

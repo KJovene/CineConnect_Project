@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useLogin } from "@/hooks/useLogin";
 import { AuthPageLayout } from "@/components/templates";
 import { AuthForm } from "@/components/organisms";
@@ -35,6 +36,14 @@ export default function LoginPage() {
         error={error}
         navLink={{ prompt: "Pas encore de compte ?", to: "/signup", label: "S'inscrire" }}
         onSubmit={handleSubmit}
+        extraAction={
+          <Link
+            to="/forgot-password"
+            className="text-sm text-neutral-500 hover:text-indigo-400"
+          >
+            Mot de passe oublié ?
+          </Link>
+        }
       />
     </AuthPageLayout>
   );
