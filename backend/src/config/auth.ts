@@ -4,13 +4,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import * as schema from "../db/schema.js";
-import { sendMail } from "../services/mailerService.js";
+import { sendMail } from "../services/mailer/mailerService.js";
 import {
   welcomeTemplate,
   verifyEmailTemplate,
   resetPasswordTemplate,
   loginAlertTemplate,
-} from "../utils/emailTemplates.js";
+} from "../utils/emailTemplates/index.js";
 
 dotenv.config();
 

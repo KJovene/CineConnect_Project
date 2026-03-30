@@ -24,7 +24,7 @@ describe("mailerService", () => {
     process.env.MAILGUN_SMTP_USER = "2021413@sandbox.mailgun.org";
     process.env.MAILGUN_SMTP_PASSWORD = "test-smtp-password";
 
-    require("../services/mailerService.js");
+    require("../services/mailer/mailerService.js");
 
     expect(createTransportMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -39,7 +39,7 @@ describe("mailerService", () => {
     const { sendMailMock } = mockNodemailer();
     process.env.MAIL_FROM = "CineTest <test@test.com>";
 
-    const { sendMail } = require("../services/mailerService.js");
+    const { sendMail } = require("../services/mailer/mailerService.js");
     await sendMail({ to: "user@test.com", subject: "Sujet", html: "<p>Body</p>" });
 
     expect(sendMailMock).toHaveBeenCalledWith(
@@ -55,7 +55,7 @@ describe("mailerService", () => {
   it("sendMail utilise le from par défaut si MAIL_FROM absent", async () => {
     const { sendMailMock } = mockNodemailer();
 
-    const { sendMail } = require("../services/mailerService.js");
+    const { sendMail } = require("../services/mailer/mailerService.js");
     await sendMail({ to: "user@test.com", subject: "Sujet", html: "<p>Body</p>" });
 
     expect(sendMailMock).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe("mailerService", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     mockNodemailer(jest.fn().mockRejectedValue(new Error("SMTP unreachable")));
 
-    const { sendMail } = require("../services/mailerService.js");
+    const { sendMail } = require("../services/mailer/mailerService.js");
     await expect(
       sendMail({ to: "user@test.com", subject: "S", html: "<p>H</p>" }),
     ).resolves.toBeUndefined();

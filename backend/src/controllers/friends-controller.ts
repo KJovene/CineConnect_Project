@@ -4,11 +4,11 @@ import type { RequestWithSession } from "../middlewares/authMiddleware.js";
 import * as friendsService from "../services/friends/friendsService.js";
 import { db } from "../db/index.js";
 import { user as userTable } from "../db/schema.js";
-import { sendMail } from "../services/mailerService.js";
+import { sendMail } from "../services/mailer/mailerService.js";
 import {
   friendRequestTemplate,
   friendRequestAcceptedTemplate,
-} from "../utils/emailTemplates.js";
+} from "../utils/emailTemplates/index.js";
 
 export async function getFriends(req: RequestWithSession, res: Response) {
   try {
