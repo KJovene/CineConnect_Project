@@ -3,26 +3,30 @@ import {
   communityReviewsResponseSchema,
   type CommunityReviewsResponse,
 } from "@cineconnect/shared";
-import { getApiBaseUrl } from "@/lib/runtimeConfig";
-
-const API_BASE = getApiBaseUrl();
+import { apiClient } from "@/lib/apiClient";
 
 async function fetchLatestCommunityReviews(
   limit: number,
 ): Promise<CommunityReviewsResponse> {
-  const res = await fetch(
-    `${API_BASE}/api/films/community-reviews?limit=${limit}`,
-  );
-  if (!res.ok) {
-    throw new Error("Erreur chargement des avis de la communauté");
+  try {
+    const raw = await apiClient.get<unknown>(
+      `/films/community-reviews?limit=${limit}`,
+    );
+    const parsed = communityReviewsResponseSchema.safeParse(raw);
+    if (!parsed.success) {
+      console.error(
+        "[useLatestCommunityReviews] Réponse invalide:",
+        parsed.error,
+      );
+      throw new Error("Réponse API invalide");
+    }
+    return parsed.data;
+  } catch (error) {
+    if (error instanceof Error && /^HTTP\s\d+$/.test(error.message)) {
+      throw new Error("Erreur chargement des avis de la communauté");
+    }
+    throw error;
   }
-  const raw = await res.json();
-  const parsed = communityReviewsResponseSchema.safeParse(raw);
-  if (!parsed.success) {
-    console.error("[useLatestCommunityReviews] Réponse invalide:", parsed.error);
-    throw new Error("Réponse API invalide");
-  }
-  return parsed.data;
 }
 
 export function useLatestCommunityReviews(limit = 4) {
