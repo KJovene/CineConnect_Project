@@ -1,14 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useFilmsByCategory } from "@/hooks/useFilmsByCategory";
+import { apiClient } from "@/lib/apiClient";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
 } from "@/utils/test-utils";
 
+jest.mock("@/lib/apiClient", () => ({
+  apiClient: {
+    get: jest.fn(),
+  },
+}));
+
 describe("useFilmsByCategory", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    globalThis.fetch = jest.fn();
   });
 
   it("returns category sections when response is valid", async () => {
@@ -42,10 +48,7 @@ describe("useFilmsByCategory", () => {
       },
     ];
 
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(payload),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue(payload);
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -56,17 +59,12 @@ describe("useFilmsByCategory", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/categories/films?limit=6",
-    );
+    expect(apiClient.get).toHaveBeenCalledWith("/categories/films?limit=6");
     expect(result.current.data).toEqual(payload);
   });
 
   it("throws expected error when response is not ok", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn(),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 500"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -83,10 +81,7 @@ describe("useFilmsByCategory", () => {
   });
 
   it("throws schema error when payload is invalid", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ bad: true }),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue({ bad: true });
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);

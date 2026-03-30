@@ -1,14 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useMovieDetails } from "@/hooks/useMovieDetails";
+import { apiClient } from "@/lib/apiClient";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
 } from "@/utils/test-utils";
 
+jest.mock("@/lib/apiClient", () => ({
+  apiClient: {
+    get: jest.fn(),
+  },
+}));
+
 describe("useMovieDetails", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    globalThis.fetch = jest.fn();
   });
 
   it("does not fetch when omdbId is empty", () => {
@@ -17,10 +23,10 @@ describe("useMovieDetails", () => {
 
     renderHook(() => useMovieDetails(""), { wrapper });
 
-    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(apiClient.get).not.toHaveBeenCalled();
   });
 
-  it("fetches details with credentials include", async () => {
+  it("fetches details", async () => {
     const payload = {
       film_id: 1,
       omdb_id: "tt0133093",
@@ -41,10 +47,7 @@ describe("useMovieDetails", () => {
       user_rating: null,
     };
 
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(payload),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue(payload);
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -57,18 +60,12 @@ describe("useMovieDetails", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/films/tt0133093",
-      { credentials: "include" },
-    );
+    expect(apiClient.get).toHaveBeenCalledWith("/films/tt0133093");
     expect(result.current.data).toEqual(payload);
   });
 
   it("uses API error message when backend returns one", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockResolvedValue({ message: "Not found" }),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("Not found"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -83,10 +80,7 @@ describe("useMovieDetails", () => {
   });
 
   it("uses fallback message when backend error has no message", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockResolvedValue({}),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 404"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -101,10 +95,7 @@ describe("useMovieDetails", () => {
   });
 
   it("uses fallback message when backend error body parsing fails", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockRejectedValue(new Error("invalid json")),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 404"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -119,10 +110,7 @@ describe("useMovieDetails", () => {
   });
 
   it("throws schema error when payload is invalid", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ film: { id: 1 } }),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue({ film: { id: 1 } });
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);

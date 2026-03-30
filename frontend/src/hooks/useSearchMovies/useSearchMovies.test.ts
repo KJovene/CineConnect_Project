@@ -1,14 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useSearchMovies } from "@/hooks/useSearchMovies";
+import { apiClient } from "@/lib/apiClient";
 import {
   createQueryClientWrapper,
   createTestQueryClient,
 } from "@/utils/test-utils";
 
+jest.mock("@/lib/apiClient", () => ({
+  apiClient: {
+    get: jest.fn(),
+  },
+}));
+
 describe("useSearchMovies", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    globalThis.fetch = jest.fn();
   });
 
   it("does not fetch when query has less than 3 characters", () => {
@@ -17,7 +23,7 @@ describe("useSearchMovies", () => {
 
     renderHook(() => useSearchMovies("ab", 1), { wrapper });
 
-    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(apiClient.get).not.toHaveBeenCalled();
   });
 
   it("does not fetch when query is empty", () => {
@@ -26,7 +32,7 @@ describe("useSearchMovies", () => {
 
     renderHook(() => useSearchMovies("", 1), { wrapper });
 
-    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(apiClient.get).not.toHaveBeenCalled();
   });
 
   it("fetches movies when query is valid", async () => {
@@ -44,10 +50,7 @@ describe("useSearchMovies", () => {
       totalResults: 1,
     };
 
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(payload),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue(payload);
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -60,9 +63,7 @@ describe("useSearchMovies", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/films/search?q=matrix&page=2",
-    );
+    expect(apiClient.get).toHaveBeenCalledWith("/films/search?q=matrix&page=2");
     expect(result.current.data).toEqual(payload);
   });
 
@@ -81,10 +82,7 @@ describe("useSearchMovies", () => {
       totalResults: 1,
     };
 
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(payload),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue(payload);
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -97,17 +95,14 @@ describe("useSearchMovies", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/api/films/search?q=inception&page=1",
+    expect(apiClient.get).toHaveBeenCalledWith(
+      "/films/search?q=inception&page=1",
     );
     expect(result.current.data).toEqual(payload);
   });
 
   it("uses API error message when search fails", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockResolvedValue({ message: "Boom" }),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("Boom"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -124,10 +119,7 @@ describe("useSearchMovies", () => {
   });
 
   it("uses fallback message when API error has no message", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockResolvedValue({}),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 500"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -144,10 +136,7 @@ describe("useSearchMovies", () => {
   });
 
   it("uses fallback message when error body parsing fails", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      json: jest.fn().mockRejectedValue(new Error("invalid json")),
-    });
+    (apiClient.get as jest.Mock).mockRejectedValue(new Error("HTTP 500"));
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);
@@ -164,10 +153,7 @@ describe("useSearchMovies", () => {
   });
 
   it("throws schema error when payload is invalid", async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ films: [] }),
-    });
+    (apiClient.get as jest.Mock).mockResolvedValue({ films: [] });
 
     const client = createTestQueryClient();
     const wrapper = createQueryClientWrapper(client);

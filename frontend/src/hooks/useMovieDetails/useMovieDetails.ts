@@ -3,25 +3,23 @@ import {
   filmDetailResponseSchema,
   type FilmDetailResponse,
 } from "@cineconnect/shared";
-import { getApiBaseUrl } from "@/lib/runtimeConfig";
-
-const API_BASE = getApiBaseUrl();
+import { apiClient } from "@/lib/apiClient";
 
 async function fetchFilmDetail(omdbId: string): Promise<FilmDetailResponse> {
-  const res = await fetch(`${API_BASE}/api/films/${omdbId}`, {
-    credentials: "include",
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message ?? "Film introuvable");
+  try {
+    const raw = await apiClient.get<unknown>(`/films/${omdbId}`);
+    const parsed = filmDetailResponseSchema.safeParse(raw);
+    if (!parsed.success) {
+      console.error("[useMovieDetails] Réponse invalide:", parsed.error);
+      throw new Error("Réponse API invalide");
+    }
+    return parsed.data;
+  } catch (error) {
+    if (error instanceof Error && /^HTTP\s\d+$/.test(error.message)) {
+      throw new Error("Film introuvable");
+    }
+    throw error;
   }
-  const raw = await res.json();
-  const parsed = filmDetailResponseSchema.safeParse(raw);
-  if (!parsed.success) {
-    console.error("[useMovieDetails] Réponse invalide:", parsed.error);
-    throw new Error("Réponse API invalide");
-  }
-  return parsed.data;
 }
 
 export function useMovieDetails(omdbId: string) {
